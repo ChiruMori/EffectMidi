@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Effect_Piano", "test.vcxproj", "{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}.Debug|x64.ActiveCfg = Debug|Win32
+		{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}.Debug|x86.ActiveCfg = Debug|Win32
+		{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}.Debug|x86.Build.0 = Debug|Win32
+		{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}.Release|x64.ActiveCfg = Release|Win32
+		{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}.Release|x86.ActiveCfg = Release|Win32
+		{0BEACB8B-4058-41A4-A9DE-1B1FB650B21A}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
