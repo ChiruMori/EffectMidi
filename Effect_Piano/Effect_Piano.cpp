@@ -103,25 +103,25 @@ bool serialopen() {
 	scanf("%s", &serialname);
 	freopen("CON", "r", stdin);
 
-	//³¢ÊÔ´ò¿ª´®¿Ú
-	hCom = CreateFile(serialname,//´®¿ÚÃû³Æ£¨Çë×ÔĞĞÍ¨¹ıÉè±¸¹ÜÀíÆ÷²éÑ¯´®¿ÚÃû³Æ£© 
-		GENERIC_READ | GENERIC_WRITE, //ÔÊĞí¶ÁºÍĞ´
-		0, //¶ÀÕ¼·½Ê½
+	//å°è¯•æ‰“å¼€ä¸²å£
+	hCom = CreateFile(serialname,//ä¸²å£åç§°ï¼ˆè¯·è‡ªè¡Œé€šè¿‡è®¾å¤‡ç®¡ç†å™¨æŸ¥è¯¢ä¸²å£åç§°ï¼‰ 
+		GENERIC_READ | GENERIC_WRITE, //å…è®¸è¯»å’Œå†™
+		0, //ç‹¬å æ–¹å¼
 		0,
-		OPEN_EXISTING, //´ò¿ª¶ø²»ÊÇ´´½¨
-		0, //Í¬²½·½Ê½
+		OPEN_EXISTING, //æ‰“å¼€è€Œä¸æ˜¯åˆ›å»º
+		0, //åŒæ­¥æ–¹å¼
 		0);
 
-	//¼ì²â´®¿ÚÊÇ·ñÒÑ¾­Á¬½Ó
+	//æ£€æµ‹ä¸²å£æ˜¯å¦å·²ç»è¿æ¥
 	if (hCom != INVALID_HANDLE_VALUE) {
 		printf("Serial connected\n");
 
-		GetCommState(hCom, &lpTest);  //»ñÈ¡µ±Ç°µÄ²ÎÊıÉèÖÃ
-		lpTest.BaudRate = CBR_19200;       //ÉèÖÃ²¨ÌØÂÊ
-		lpTest.ByteSize = 8;              //Êı¾İÎ»ÊıÎª8
-		lpTest.Parity = NOPARITY;         //ÎŞĞ£Ñé
-		lpTest.StopBits = ONESTOPBIT;   //1Î»Í£Ö¹Î»
-		SetCommState(hCom, &lpTest);  //ÉèÖÃÍ¨ĞÅ²ÎÊı
+		GetCommState(hCom, &lpTest);  //è·å–å½“å‰çš„å‚æ•°è®¾ç½®
+		lpTest.BaudRate = CBR_19200;       //è®¾ç½®æ³¢ç‰¹ç‡
+		lpTest.ByteSize = 8;              //æ•°æ®ä½æ•°ä¸º8
+		lpTest.Parity = NOPARITY;         //æ— æ ¡éªŒ
+		lpTest.StopBits = ONESTOPBIT;   //1ä½åœæ­¢ä½
+		SetCommState(hCom, &lpTest);  //è®¾ç½®é€šä¿¡å‚æ•°
 		return TRUE;
 	}
 	else {
