@@ -12,10 +12,14 @@
 #define printf printf_s
 using namespace std;
 
-
+// 指定的键按下
 #define KEY_DOWN(VK_NONAME) ((GetAsyncKeyState(VK_NONAME) & 0x8000) ? 1:0)
-#define CTRL KEY_DOWN(17)
-#define CAPSLOCK GetKeyState(VK_CAPITAL)
+// Ctrl 键按下
+#define CTRL_DOWN KEY_DOWN(VK_CONTROL)
+// 大写锁定打开
+#define CAPSLOCK_ACTIVE GetKeyState(VK_CAPITAL)
+
+
 #define LONGTH 512
 #define NUM_SET 128
 
@@ -29,9 +33,20 @@ using namespace std;
 
 #define STRING_MAX 80 /* used for console input */
 
-#define LODATA 200
+#define BUFFER_SIZE 200
 
 #define LOSET_FORM 6
+
+// 串口设备句柄
+HANDLE comDeviceHandle;
+// 串口数据交互缓冲区
+int buffer[BUFFER_SIZE];
+// 数据缓冲区读写指针
+int bufferReaderIndex, bufferWriterIndex;
+// 写入串口的数据
+char dataBus[1];
+// 配置项：全局延迟时间
+int latencyTime = 0;
 
 int num_color;
 struct nodec {
@@ -45,15 +60,6 @@ nodec color_plus;
 nodec color_bg_real;
 
 
-int latency = 0;
-
-
-int op, cl;
-int data[200];
-char commu[1];
-HANDLE hCom;
-DCB lpTest;
-DWORD btsIO;
 int nkey;
 int kbcd,kbecd;
 char serialname[256];
@@ -62,7 +68,7 @@ int cdplus;
 
 int brightness;
 bool on_circle, on_ends;
-bool show_in_front, show_num_log;
+bool show_in_front, enableNumberPushedLog;
 
 
 bool on_rainbow;
@@ -104,7 +110,7 @@ bool serialopen() {
 	freopen("CON", "r", stdin);
 
 	//尝试打开串口
-	hCom = CreateFile(serialname,//串口名称（请自行通过设备管理器查询串口名称） 
+	comDeviceHandle = CreateFile(serialname,//串口名称（请自行通过设备管理器查询串口名称） 
 		GENERIC_READ | GENERIC_WRITE, //允许读和写
 		0, //独占方式
 		0,
@@ -113,23 +119,25 @@ bool serialopen() {
 		0);
 
 	//检测串口是否已经连接
-	if (hCom != INVALID_HANDLE_VALUE) {
+	if (comDeviceHandle != INVALID_HANDLE_VALUE) {
 		printf("Serial connected\n");
-
-		GetCommState(hCom, &lpTest);  //获取当前的参数设置
+		// 串口参数设置
+		DCB lpTest;
+		GetCommState(comDeviceHandle, &lpTest);  //获取当前的参数设置
 		lpTest.BaudRate = CBR_19200;       //设置波特率
 		lpTest.ByteSize = 8;              //数据位数为8
 		lpTest.Parity = NOPARITY;         //无校验
 		lpTest.StopBits = ONESTOPBIT;   //1位停止位
-		SetCommState(hCom, &lpTest);  //设置通信参数
+		SetCommState(comDeviceHandle, &lpTest);  //设置通信参数
 		return TRUE;
 	}
 	else {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
 		printf("Serial connection failed .\nPlease check the serial name in serial_name.txt\n\nPress Enter to retry\nPress ESC to quit\n");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-		while (!KEY_DOWN(13) || kbcd > 10) {
-			if (KEY_DOWN(27)) {
+		// Enter 未按下
+		while (!KEY_DOWN(VK_RETURN) || kbcd > 10) {
+			if (KEY_DOWN(VK_ESCAPE)) {
 				return FALSE;
 			}
 			kbcd -= 1;
@@ -142,65 +150,70 @@ bool serialopen() {
 
 }
 
-void pta(int a) {
-	cl++;
-	if (cl >= LODATA) {
-		cl -= LODATA;
+// 将数据放入缓冲区
+void putIntToBuffer(int intData) {
+	bufferWriterIndex++;
+	if (bufferWriterIndex >= BUFFER_SIZE) {
+		bufferWriterIndex -= BUFFER_SIZE;
 	}
-	data[cl] = a;
+	buffer[bufferWriterIndex] = intData;
 }
+
+// 递归发送数据，直到缓冲区为空后退出
 void push() {
-	if (op != cl) {
-		++op;
-		if (op >= LODATA) {
-			op -= LODATA;
+	if (bufferReaderIndex != bufferWriterIndex) {
+		++bufferReaderIndex;
+		if (bufferReaderIndex >= BUFFER_SIZE) {
+			bufferReaderIndex -= BUFFER_SIZE;
 		}
-		commu[0] = data[op];
-		WriteFile(hCom, commu, strlen(commu), &btsIO, NULL);
-		if (show_num_log == 1) {
-			printf("key=%d	", data[op]);
+		dataBus[0] = buffer[bufferReaderIndex];
+		// 串口数据交互字节数
+		DWORD lpNumberOfBytesWritten;
+		WriteFile(comDeviceHandle, dataBus, strlen(dataBus), &lpNumberOfBytesWritten, NULL);
+		// 输出发送的数据
+		if (enableNumberPushedLog == 1) {
+			printf("pushed[%4d]:", buffer[bufferReaderIndex]);
 		}
-		Sleep(latency);
+		Sleep(latencyTime);
 		push();
 	}
 	else {
-		Sleep(latency);
+		Sleep(latencyTime);
 		return;
 	}
 }
 
 
 void effect1(int n) {
-	pta(90);
+	putIntToBuffer(90);
 	push();
-	Sleep(latency);
+	Sleep(latencyTime);
 	for (int j = 1; j <= n; ++j) {
-		pta(j);
+		putIntToBuffer(j);
 		push();
-		Sleep(latency);
+		Sleep(latencyTime);
 	}
 	for (int j = n + 1; j <= 87; ++j) {
-		pta(j);
-		pta(j - n);
+		putIntToBuffer(j);
+		putIntToBuffer(j - n);
 		push();
-		Sleep(latency);
+		Sleep(latencyTime);
 	}
 	for (int j = 88 - n; j <= 87; ++j) {
-		pta(j);
+		putIntToBuffer(j);
 		push();
-		Sleep(latency);
+		Sleep(latencyTime);
 	}
-	pta(91);
+	putIntToBuffer(91);
 	push();
-	Sleep(latency);
-	pta(88);
+	Sleep(latencyTime);
+	putIntToBuffer(88);
 	push();
-	Sleep(latency);
+	Sleep(latencyTime);
 }
 
 
 /* read a number from console */
-/**/
 int get_number(char *prompt)
 {
     char line[STRING_MAX];
@@ -256,9 +269,9 @@ void read_set(int useset) {
 	strcat(file_name, ".efpdata");
 	cout << "file name= " << file_name << "\n";
 	freopen(file_name, "r", stdin);
-	latency = read_num();
+	latencyTime = read_num();
 	show_in_front = read_num();
-	show_num_log = read_num();
+	enableNumberPushedLog = read_num();
 	on_circle = read_num();
 	on_ends = read_num();
 	cin.getline(rubbish, LONGTH);
@@ -301,9 +314,9 @@ void read_set(int useset) {
 }
 
 void print_set(int useset) {
-	cout << "latency= " << latency << "\n";
+	cout << "latencyTime= " << latencyTime << "\n";
 	cout << "show_in_front= " << show_in_front << "\n";
-	cout << "show_number_log= " << show_num_log << "\n";
+	cout << "show_number_log= " << enableNumberPushedLog << "\n";
 	cout << "circle_on= " << on_circle << "\n";
 	cout << "LEDs_at_two_end= " << on_ends << "\n";
 	cout << "serial_name=\n" << serialname << "\n";
@@ -392,21 +405,6 @@ bool same(char a[], char b[]) {
 	}
 }
 
-/*
-void print_file(char filename[]) {
-	char helpline[LONGTH];
-	freopen(filename, "r", stdin);
-	strcpy(helpline, "Command list:\n");
-	while (!same(helpline, "")) {
-		cout << "a";
-		cout << helpline << "\n";
-		cin.getline(helpline, LONGTH);
-	}
-	//cout << "These are all the commands and key-switchers available now.\n";
-	freopen("CON", "r", stdin);
-}
-*/
-
 bool get_bg_color(int colora,int bgcolor) {
 	if (bright_background == 0) {
 		on_background = false;
@@ -430,86 +428,86 @@ bool get_bg_color(int colora,int bgcolor) {
 }
 void refresh_bg() {
 	//bool a = get_bg_color(color_default, color_background_default);
-	pta(103);
-	pta(102);
-	pta(color_bg_real.r);
-	pta(color_bg_real.g);
-	pta(color_bg_real.b);
+	putIntToBuffer(103);
+	putIntToBuffer(102);
+	putIntToBuffer(color_bg_real.r);
+	putIntToBuffer(color_bg_real.g);
+	putIntToBuffer(color_bg_real.b);
 	push();
-	pta(89);
-	pta(color_plus.r);
-	pta(color_plus.g);
-	pta(color_plus.b);
+	putIntToBuffer(89);
+	putIntToBuffer(color_plus.r);
+	putIntToBuffer(color_plus.g);
+	putIntToBuffer(color_plus.b);
 	//cout << "colorp=" << color_plus.r << "	" << color_plus.g << "	" << color_plus.b << "\n";
 	push();
 	return;
 }
 
 void start(int useset) {
-	pta(0);
-	pta(127);
+	putIntToBuffer(0);
+	putIntToBuffer(127);
 	push();
 	Sleep(100);
-	pta(127);
+	putIntToBuffer(127);
 	push();
-	pta(89);
-	pta(color[color_default].r);
-	pta(color[color_default].g);
-	pta(color[color_default].b);
+	putIntToBuffer(89);
+	putIntToBuffer(color[color_default].r);
+	putIntToBuffer(color[color_default].g);
+	putIntToBuffer(color[color_default].b);
 
 	if (get_bg_color(color_default,color_background_default) == true) {
 		if (on_background == true) {
 			refresh_bg();
 		}
 		else {
-			pta(103);
+			putIntToBuffer(103);
 			push();
 		}
 	}
 	else {
 		cout << "\nBackground light disabled.\n";
-		pta(103);
+		putIntToBuffer(103);
 		push();
 	}
 	
 	
 
 	if (on_circle == TRUE) {
-		pta(91);
+		putIntToBuffer(91);
 		push();
 	}
 	else {
-		pta(90);
+		putIntToBuffer(90);
 		push();
 	}
 	if (on_ends == FALSE) {
-		pta(97);
+		putIntToBuffer(97);
 		push();
 	}
 	else {
-		pta(92);
+		putIntToBuffer(92);
 		push();
 	}
 	if (on_remain == TRUE) {
-		pta(98);
-		pta(num_remain);
+		putIntToBuffer(98);
+		putIntToBuffer(num_remain);
 		push();
 	}
 	else {
-		pta(99);
+		putIntToBuffer(99);
 		push();
 	}
 	if (on_extend == TRUE) {
-		pta(96);
-		pta(num_extend);
+		putIntToBuffer(96);
+		putIntToBuffer(num_extend);
 		push();
 	}
 	else {
-		pta(101);
+		putIntToBuffer(101);
 		push();
 	}
-	pta(93);
-	pta(brightness);
+	putIntToBuffer(93);
+	putIntToBuffer(brightness);
 	push();
 	return;
 }
@@ -565,8 +563,8 @@ void con_mode() {
 					brightness = 10;
 				}
 				if (brightness <= 255) {
-					pta(93);
-					pta(brightness);
+					putIntToBuffer(93);
+					putIntToBuffer(brightness);
 					push();
 					write_set(using_set);
 					cout << "\nBrightness : " << brightness << "\n";
@@ -590,8 +588,8 @@ void con_mode() {
 					cout << "\nThe min value of the number is 0\n";
 				}
 				if (on_extend == true) {
-					pta(96);
-					pta(num_extend);
+					putIntToBuffer(96);
+					putIntToBuffer(num_extend);
 					push();
 				}
 				write_set(using_set);
@@ -613,8 +611,8 @@ void con_mode() {
 					cout << "\nThe min value of the number is 0\n";
 				}
 				if (on_remain == true) {
-					pta(98);
-					pta(num_remain);
+					putIntToBuffer(98);
+					putIntToBuffer(num_remain);
 					push();
 				}
 				write_set(using_set);
@@ -623,7 +621,7 @@ void con_mode() {
 			}
 			else if (same(com, "select")) {
 				select_set();
-				pta(125);
+				putIntToBuffer(125);
 				push();
 				start(using_set);
 				read_color(using_set);
@@ -662,10 +660,10 @@ void con_mode() {
 					continue;
 				}
 			}
-			else if (same(com, "latency")) {
-				scanf("%d", &latency);
-				cdplus = 300 / latency;
-				cout << "Latency : " << latency << "\n";
+			else if (same(com, "latencyTime")) {
+				scanf("%d", &latencyTime);
+				cdplus = 300 / latencyTime;
+				cout << "Latency : " << latencyTime << "\n";
 			}
 			else if (same(com, "using_channel")) {
 				cout << "Please type the amount of using channels\n";
@@ -713,12 +711,12 @@ void con_mode() {
 				bool input_bool;
 				scanf("%d", &input_bool);
 				if (input_bool == true) {
-					show_num_log = 1;
+					enableNumberPushedLog = 1;
 					write_set(using_set);
 					cout << "\nThe number logs will be shown.\n";
 				}
 				else {
-					show_num_log = 0;
+					enableNumberPushedLog = 0;
 					write_set(using_set);
 					cout << "\nThe number logs will not be shown.\n";
 				}
@@ -753,18 +751,6 @@ void con_mode() {
 				type = 0;
 				continue;
 			}
-		/*
-		case 3:
-			cout << "These are all the command and key-switchers available now.\n";
-			//print_file("help.efphelp");
-			type = 0;
-			continue;
-		default:
-			cout << "Unknown case.\nThis might be caused by a bug.\nType exit to exit.\n";
-			type = 0;
-			continue;
-			*/
-		}
 	}
 }
 
@@ -802,14 +788,16 @@ void main_test_input() {
     while (1) {
 
 		
-
-		if ((KEY_DOWN(16)||KEY_DOWN(160))/*Shift*/ && KEY_DOWN(190)/*>*/) {
+		// 组合键：[Shift] + [.]
+		if ((KEY_DOWN(VK_SHIFT)||KEY_DOWN(VK_LSHIFT)) && KEY_DOWN(VK_OEM_PERIOD)) {
 			con_mode();
 		}
 		
-		if (CAPSLOCK == TRUE) {
-			if (KEY_DOWN(27)) {
-				pta(125);
+		// 大写锁定键按下
+		if (CAPSLOCK_ACTIVE == TRUE) {
+			// Esc
+			if (KEY_DOWN(VK_ESCAPE)) {
+				putIntToBuffer(125);
 				push();
 				break;
 			}
@@ -818,14 +806,14 @@ void main_test_input() {
 					using_set = set_form[i].value;
 					read_set(using_set);
 					read_color(using_set);
-					pta(125);
+					putIntToBuffer(125);
 					push();
 					start(using_set);
 				}
 			}
 			for (int ch = 49; ch < 59; ++ch) {
 				if (KEY_DOWN(ch) && kbcd <= 10) {
-					if (CTRL) {
+					if (CTRL_DOWN) {
 						color_background_default = ch - 49;
 						write_set(using_set);
 						if (get_bg_color(color_default, color_background_default)) {
@@ -842,10 +830,10 @@ void main_test_input() {
 					}
 					else {
 						if (on_background == false) {
-							pta(89);
-							pta(color[ch - 49].r);
-							pta(color[ch - 49].g);
-							pta(color[ch - 49].b);
+							putIntToBuffer(89);
+							putIntToBuffer(color[ch - 49].r);
+							putIntToBuffer(color[ch - 49].g);
+							putIntToBuffer(color[ch - 49].b);
 							push();
 							color_default = ch - 49;
 							write_set(using_set);
@@ -868,7 +856,7 @@ void main_test_input() {
 				kbecd += cdplus;
 			}
 			if (KEY_DOWN(8)/*backspace*/ && kbcd <= 10) {
-				pta(88);
+				putIntToBuffer(88);
 				push();
 				printf("\nCleared\n");
 				kbcd += cdplus;
@@ -877,7 +865,7 @@ void main_test_input() {
 				if (on_circle == TRUE) {
 					on_circle = FALSE;
 					write_set(using_set);
-					pta(90);
+					putIntToBuffer(90);
 					push();
 					printf("\nCircle off\n");
 					kbcd += cdplus;
@@ -885,7 +873,7 @@ void main_test_input() {
 				else {
 					on_circle = TRUE;
 					write_set(using_set);
-					pta(91);
+					putIntToBuffer(91);
 					push();
 					printf("\nCircle on\n");
 					kbcd += cdplus;
@@ -895,7 +883,7 @@ void main_test_input() {
 				if (on_ends == TRUE) {
 					on_ends = FALSE;
 					write_set(using_set);
-					pta(97);
+					putIntToBuffer(97);
 					push();
 					printf("\nThe LEDs on both ends are off\n");
 					kbcd += cdplus;
@@ -903,89 +891,67 @@ void main_test_input() {
 				else {
 					on_ends = TRUE;
 					write_set(using_set);
-					pta(92);
+					putIntToBuffer(92);
 					push();
 					printf("\nThe LEDs on both ends are on\n");
 					kbcd += cdplus;
 				}
 			}
-			/*
-			if (KEY_DOWN(88) && kbcd <= 10) {
-				scanf("%*[^\n]%*c");
-				printf("\nType the brightness\n");
-				scanf("%d", &brightness);
-				if (brightness < 10) {
-					brightness = 10;
-				}
-				if (brightness <= 255) {
-					pta(93);
-					pta(brightness);
-					push();
-					write_set(using_set);
-					printf("\nBrightness : %d\n", brightness);
-					kbcd += cdplus;
-				}
-				else {
-					printf("Invalid brightness value . This number should be in the range [10,255]");
-					kbcd += cdplus;
-				}
-			}
-			*/
 			if (KEY_DOWN('M')) {
 				if (on_rainbow == FALSE) {
-					pta(93);
-					pta(20);
+					putIntToBuffer(93);
+					putIntToBuffer(20);
 					push();
-					pta(90);
+					putIntToBuffer(90);
 
 					push();
-					pta(94);
+					putIntToBuffer(94);
 					push();
 					on_rainbow = TRUE;
 
 				}
 				else {
-					pta(94);
+					putIntToBuffer(94);
 					push();
-					Sleep(latency * 2);
+					Sleep(latencyTime * 2);
 				}
 			}
 			else {
 				if (on_rainbow == TRUE) {
-					pta(95);
+					putIntToBuffer(95);
 					push();
-					pta(93);
-					pta(brightness);
+					putIntToBuffer(93);
+					putIntToBuffer(brightness);
 					on_rainbow = FALSE;
 					if (on_circle == TRUE) {
-						pta(91);
+						putIntToBuffer(91);
 						push();
 					}
 				}
 			}
-			if (KEY_DOWN('M') && CTRL && kbcd <= 10) {
+			if (KEY_DOWN('M') && CTRL_DOWN && kbcd <= 10) {
 				if (contain_rainbow == FALSE) {
-					pta(93);
-					pta(20);
+					putIntToBuffer(93);
+					putIntToBuffer(20);
 					push();
-					pta(90);
+					putIntToBuffer(90);
 					push();
-					pta(94);
+					putIntToBuffer(94);
 					push();
 					contain_rainbow = TRUE;
 				}
 				else {
-					pta(95);
+					putIntToBuffer(95);
 					push();
-					pta(93);
-					pta(brightness);
+					putIntToBuffer(93);
+					putIntToBuffer(brightness);
 					contain_rainbow = FALSE;
-					pta(88);
+					putIntToBuffer(88);
 					push();
 
 
 					if (on_circle == TRUE) {
-						pta(91);
+						putIntToBuffer(91);
 						push();
 						on_circle = TRUE;
 					}
@@ -995,7 +961,7 @@ void main_test_input() {
 			if (KEY_DOWN('Z') && kbcd <= 10) {
 				if (on_extend == TRUE) {
 					on_extend = FALSE;
-					pta(101);
+					putIntToBuffer(101);
 					push();
 					//num_extend = 0;
 					write_set(using_set);
@@ -1004,8 +970,8 @@ void main_test_input() {
 				else {
 					on_extend = TRUE;
 					//scanf("%*[^\n]%*c");
-					pta(96);
-					pta(num_extend);
+					putIntToBuffer(96);
+					putIntToBuffer(num_extend);
 					push();
 					write_set(using_set);
 					printf("\nExtension On\n");
@@ -1015,7 +981,7 @@ void main_test_input() {
 			if (KEY_DOWN('X') && kbcd <= 10) {
 				if (on_remain == TRUE) {
 					on_remain = FALSE;
-					pta(99);
+					putIntToBuffer(99);
 					push();
 					//num_remain = 0;
 					write_set(using_set);
@@ -1023,9 +989,9 @@ void main_test_input() {
 				}
 				else {
 					on_remain = TRUE;
-					rm_times = num_remain *1000/ 200 / latency;
-					pta(98);
-					pta(num_remain);
+					rm_times = num_remain *1000/ 200 / latencyTime;
+					putIntToBuffer(98);
+					putIntToBuffer(num_remain);
 					push();
 					write_set(using_set);
 					printf("\nRemain on\n");
@@ -1035,7 +1001,7 @@ void main_test_input() {
 			else if (KEY_DOWN('B') && kbcd <= 10) {
 				if (on_background == true) {
 					on_background = false;
-					pta(103);
+					putIntToBuffer(103);
 					push();
 					write_set(using_set);
 					cout << "\nBackground light off\n";
@@ -1066,9 +1032,9 @@ void main_test_input() {
 		}
 
 		if (contain_rainbow == TRUE) {
-			pta(94);
+			putIntToBuffer(94);
 			push();
-			Sleep(latency*5);
+			Sleep(latencyTime*5);
 			continue;
 		}
 		
@@ -1095,10 +1061,10 @@ void main_test_input() {
 						}
 					}
 					if (flag_ignore == FALSE) {
-						if (show_num_log == 1) {
+						if (enableNumberPushedLog == 1) {
 							printf("channal=%d	", Pm_MessageStatus(buffer[0].message));
 						}
-						pta(Pm_MessageData1(buffer[0].message) - 20);
+						putIntToBuffer(Pm_MessageData1(buffer[0].message) - 20);
 						push();
 					}
 				}
@@ -1111,10 +1077,10 @@ void main_test_input() {
 						}
 					}
 					if (flag_using == TRUE) {
-						if (show_num_log == 1) {
+						if (enableNumberPushedLog == 1) {
 							printf("channal = %d	", Pm_MessageStatus(buffer[0].message));
 						}
-						pta(Pm_MessageData1(buffer[0].message) - 20);
+						putIntToBuffer(Pm_MessageData1(buffer[0].message) - 20);
 						push();
 					}
 				}
@@ -1130,11 +1096,11 @@ void main_test_input() {
 			rm_timer++;
 			if (rm_timer >= rm_times) {
 				rm_timer = 0;
-				pta(100);
+				putIntToBuffer(100);
 				push();
 			}
 		}
-		Sleep(latency);
+		Sleep(latencyTime);
 		
     }
 
@@ -1160,8 +1126,9 @@ int main(int argc, char *argv[]){
     //char line[STRING_MAX];
     int test_input = 0, test_output = 0, test_both = 0;
     int stream_test = 0;
-    int latency_valid = FALSE;
+    int latencyTime_valid = FALSE;
 
+	// 移动窗口
 	char contitle[255];
 	HWND desktop,selfhwnd;
 	RECT desktoprect;
@@ -1185,203 +1152,13 @@ int main(int argc, char *argv[]){
 	select_set();
 	read_set(using_set);
 	//print_set(using_set);
-	cdplus = 300 / latency;
+	cdplus = 300 / latencyTime;
 	if (serialopen() == FALSE) {
 		return 0;
 	}
 	read_color(using_set);
 	start(using_set);
 	cout << "\n";
-	
-	//print_color(using_set);
-	
-	/*
-	freopen("always_show_in_front.txt", "r", stdin);
-	scanf("%d", &always_show_in_front);
-	freopen("CON", "r", stdin);
-	if (always_show_in_front == 1) {
-		SetWindowPos(selfhwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-		printf("\nThis window has been fixed in the foreground\n\n");
-	}
-	
-	
-
-	
-
-	freopen("latency.txt", "r", stdin);
-    while (!latency_valid) {
-        int lat; // declared int to match "%d"
-        printf("Latency in ms: ");
-		
-        if (scanf("%d", &lat) == 1) {
-            latency = (int32_t) lat; // coerce from "%d" to known size
-	    latency_valid = TRUE;
-        }
-		else if (lat == 0 || lat >= 1000) {
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
-			printf("Need file : latency.txt\nThe number should in the range (0,1000)\n");
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-			return 0;
-		}
-
-		printf("%d .\nChange it in latency.txt if you want\n\n", lat);
-    }
-	freopen("CON", "r", stdin);
-	cdplus = 300 / latency;
-	
-	
-	freopen("do_not_show_numbers_or_channels.txt", "r", stdin);
-	scanf("%d%d", &do_not_show_numbers,&do_not_show_channels);
-	freopen("CON", "r", stdin);
-	if (do_not_show_numbers == 1) {
-		printf("Numbers logs will not be shown .\n");
-	}
-	if (do_not_show_channels == 1) {
-		printf("Channels logs will not be shown.\n");
-	}
-	printf("Change it in do_not_show_numbers_or_channels.txt if you want\n\n");
-
-	
-	freopen("serial_name.txt", "r", stdin);
-	scanf("%s", &serialname);
-	freopen("CON", "r", stdin);
-	
-	freopen("color.txt", "r", stdin);
-	scanf("%d", &nocolor);
-	
-	if (nocolor == 0) {
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
-		printf("No color found\nNeed file : color.txt\n");
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-		return 0;
-	}
-	else {
-		
-		for (int i = 0; i < nocolor; ++i) {
-			scanf("%d%d%d", &color[i].r, &color[i].g, &color[i].b);
-		}
-		printf("%d color loaded .\nAdd colors in color.txt if you want\n\n", nocolor);
-	}
-	
-	freopen("CON", "r", stdin);
-
-	freopen("using_channel.txt", "r", stdin);
-	scanf("%d", &numofusingchannel);
-	if (numofusingchannel != 0) {
-		igoruse = TRUE;
-		printf("Mode :using channel\nIf you want to switch to ignore channel mode , change the first number in using_channel.txt to 0\n");
-		printf("%d channel will be read\n", numofusingchannel);
-		for (int i = 0; i < numofusingchannel; ++i) {
-			scanf("%d", &using_channel[i]);
-			printf("%d	", using_channel[i]);
-		}
-		printf("\nChange them in using_channel.txt if you want\n\n");
-	}
-	freopen("CON", "r", stdin);
-
-	if (igoruse == FALSE) {
-		freopen("ignored_channel.txt", "r", stdin);
-		scanf("%d", &numofignoredchannel);
-		for (int i = 0; i < numofignoredchannel; ++i) {
-			scanf("%d", &ignore_channel[i]);
-		}
-		printf("Mode : ignore cahnnel\nIgnored Channel :\n");
-		for (int i = 0; i < numofignoredchannel; ++i) {
-			printf("%d	", ignore_channel[i]);
-		}
-		printf("\n %d channel(s) will be ignored.\nChange it in ignored_channel.txt if you want\n\n", numofignoredchannel);
-	}
-	
-   
-    
-	
-
-	// read data
-	freopen("data.efpdata", "r", stdin);
-	scanf("%d", &numflagc);
-	if (numflagc == 0) {
-		flagc = FALSE;
-	}
-	else flagc = TRUE;
-	scanf("%d", &numflagz);
-	if (numflagz == 0) {
-		flagz = FALSE;
-	}
-	else flagz = TRUE;
-	scanf("%d", &numofextend);
-	if (numofextend == 0) {
-		extend = FALSE;
-	}
-	else {
-		extend = TRUE;
-	}
-	scanf("%d", &rm_time);
-	if (rm_time == 0) {
-		rm_status = FALSE;
-	}
-	else {
-		rm_times = rm_time * 1000 / 200 / latency;
-		rm_status = TRUE;
-	}
-	scanf("%d", &brightness);
-	if (brightness < 10) {
-		brightness = 10;
-	}
-	freopen("CON", "r", stdin);
-
-	//initialize
-	if (serialopen() == FALSE) {
-		return 0;
-	}
-
-	pta(0);
-	push();
-	Sleep(100);
-	pta(127);
-	push();
-	pta(127);
-	push();
-
-	if (flagc == TRUE) {
-		pta(91);
-		push();
-	}
-	else {
-		pta(90);
-		push();
-	}
-	if (flagz == FALSE) {
-		pta(97);
-		push();
-	}
-	else {
-		pta(92);
-		push();
-	}
-	if (rm_status == TRUE) {
-		pta(98);
-		pta(rm_time);
-		push();
-	}
-	else {
-		pta(99);
-		push();
-	}
-	if (extend == TRUE) {
-		pta(96);
-		pta(numofextend);
-		push();
-	}
-	else {
-		pta(101);
-		push();
-	}
-	pta(93);
-	pta(brightness);
-	push();
-
-	printf("\ninitialized\n\n");
-	*/
 
     /* list device information */
 	test_input = 1;
@@ -1406,10 +1183,6 @@ int main(int argc, char *argv[]){
     }
 	
 	main_test_input();
-    /*
-    printf("\ntype ENTER again to quit...");
-    fgets(line, STRING_MAX, stdin);
-	*/
 
 	cout << "\nGoing to exit in 1 second\n";
 	Sleep(1000);
