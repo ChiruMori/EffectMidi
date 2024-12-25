@@ -19,9 +19,9 @@ using namespace std;
 // 大写锁定打开
 #define CAPSLOCK_ACTIVE GetKeyState(VK_CAPITAL)
 
-
 #define LONGTH 512
-#define NUM_SET 128
+// 最大配置数量
+#define MAX_SETTING_CNT 128
 
 
 #define INPUT_BUFFER_SIZE 100
@@ -48,51 +48,64 @@ char dataBus[1];
 // 配置项：全局延迟时间
 int latencyTime = 0;
 
-int num_color;
+int colorConfigCnt;
 struct nodec {
 	int r;
 	int g;
 	int b;
 };
-nodec color[100];
-nodec color_background;
-nodec color_plus;
-nodec color_bg_real;
+nodec colorSettings[100];
+nodec activeBgColorConfig;
+nodec activeFgColorRgb;
+nodec activeBgColorRgb;
 
 
 int nkey;
+// TODO: 解析神迹
 int kbcd,kbecd;
-char serialname[256];
+char comDeviceName[256];
 
 int cdplus;
 
 int brightness;
-bool on_circle, on_ends;
-bool show_in_front, enableNumberPushedLog;
+// TODO: 启用圈？？
+bool enableCircle;
+// 启用端点灯
+bool enableEndLight;
+// 启用日志：push到COM设备的数字
+bool enableNumberPushedLog;
+// 没有使用
+bool unuseNum;
 
 
 bool on_rainbow;
 bool contain_rainbow;
-
-int num_set, using_set;
-char rubbish[LONGTH];
+char paddingToIgnore[LONGTH];
+// 读取到的全部配置项
 struct node1 {
 	char a[LONGTH];
 };
-node1 name_set[NUM_SET];
+node1 settings[MAX_SETTING_CNT];
+// 配置项总数
+int settingCnt;
+// 使用的配置项索引
+int activeSettingIndex;
 
 bool on_using_channel;
 int num_using_channel, num_ignore_channel;
 int using_channel[128], ignore_channel[128];
 
-bool on_extend, on_remain;
-int num_extend, num_remain;
+// 启用扩散模式
+bool enableExtend;
+// 启用残留模式
+bool enableRemain;
+int extendLedCnt, remainTime;
 int rm_times, rm_timer;
 
 bool on_background;
-int bright_background;
+int backgroundBrightness;
 
-int color_default, color_background_default;
+int color_default, activeBgColorConfig_default;
 
 struct node2 {
 	int key;
@@ -106,11 +119,11 @@ node2 set_form[LOSET_FORM];
 bool serialopen() {
 
 	freopen("serial_name.txt", "r", stdin);
-	scanf("%s", &serialname);
+	scanf("%s", &comDeviceName);
 	freopen("CON", "r", stdin);
 
 	//尝试打开串口
-	comDeviceHandle = CreateFile(serialname,//串口名称（请自行通过设备管理器查询串口名称） 
+	comDeviceHandle = CreateFile(comDeviceName,//串口名称（请自行通过设备管理器查询串口名称） 
 		GENERIC_READ | GENERIC_WRITE, //允许读和写
 		0, //独占方式
 		0,
@@ -146,8 +159,6 @@ bool serialopen() {
 		kbcd += 100;
 		serialopen();
 	}
-	//return FALSE;
-
 }
 
 // 将数据放入缓冲区
@@ -161,7 +172,7 @@ void putIntToBuffer(int intData) {
 
 // 递归发送数据，直到缓冲区为空后退出
 void push() {
-	if (bufferReaderIndex != bufferWriterIndex) {
+	while (bufferReaderIndex != bufferWriterIndex) {
 		++bufferReaderIndex;
 		if (bufferReaderIndex >= BUFFER_SIZE) {
 			bufferReaderIndex -= BUFFER_SIZE;
@@ -175,35 +186,36 @@ void push() {
 			printf("pushed[%4d]:", buffer[bufferReaderIndex]);
 		}
 		Sleep(latencyTime);
-		push();
 	}
-	else {
-		Sleep(latencyTime);
-		return;
-	}
+	Sleep(latencyTime);
 }
 
 
 void effect1(int n) {
+	// 这个用于控制关闭全部灯珠，目前90已被干掉
 	putIntToBuffer(90);
 	push();
 	Sleep(latencyTime);
+	// 灯效：左->n
 	for (int j = 1; j <= n; ++j) {
 		putIntToBuffer(j);
 		push();
 		Sleep(latencyTime);
 	}
+	// 灯效：左->n 同时 n->右
 	for (int j = n + 1; j <= 87; ++j) {
 		putIntToBuffer(j);
 		putIntToBuffer(j - n);
 		push();
 		Sleep(latencyTime);
 	}
+	// 灯效：n->右
 	for (int j = 88 - n; j <= 87; ++j) {
 		putIntToBuffer(j);
 		push();
 		Sleep(latencyTime);
 	}
+	// 与 90 对应的控制信号
 	putIntToBuffer(91);
 	push();
 	Sleep(latencyTime);
@@ -212,9 +224,8 @@ void effect1(int n) {
 	Sleep(latencyTime);
 }
 
-
-/* read a number from console */
-int get_number(char *prompt)
+// 输出提示信息并读取一个整数
+int readConsoleIntBy(char *prompt)
 {
     char line[STRING_MAX];
     int n = 0, i;
@@ -222,65 +233,64 @@ int get_number(char *prompt)
     while (n != 1) {
         n = scanf("%d", &i);
         fgets(line, STRING_MAX, stdin);
-
     }
     return i;
 }
 
 
-void show_set() {
+void readSettingConfig() {
 	freopen("setting_list.txt", "r", stdin);
-	scanf("%d", &num_set);
-	cin.getline(rubbish, LONGTH);
-	if (num_set >= NUM_SET) {
-		num_set = NUM_SET;
+	scanf("%d", &settingCnt);
+	cin.getline(paddingToIgnore, LONGTH);
+	if (settingCnt >= MAX_SETTING_CNT) {
+		settingCnt = MAX_SETTING_CNT;
 	}
-	cout << num_set << " settings has been found.\n";
-	for (int i = 0; i < num_set; ++i) {
-		scanf("%s", name_set[i].a);
-		cin.getline(rubbish, LONGTH);
-		cout << i + 1 << " : " << name_set[i].a << "\n";
+	cout << settingCnt << " settings has been found.\n";
+	for (int i = 0; i < settingCnt; ++i) {
+		scanf("%s", settings[i].a);
+		cin.getline(paddingToIgnore, LONGTH);
+		cout << i + 1 << " : " << settings[i].a << "\n";
 	}
 	freopen("CON", "r", stdin);
-
 	return;
 }
 
-void select_set() {
-	show_set();
+void selectSettingToUse() {
+	readSettingConfig();
 	cout << "Type the number before the setting you want to use.\n";
-	scanf("%d", &using_set);
-	cout << "num " << using_set << " has been selected\n";
-	using_set--;
+	scanf("%d", &activeSettingIndex);
+	cout << "num " << activeSettingIndex << " has been selected\n";
+	activeSettingIndex--;
 	return;
 }
 
-int read_num() {
+int readConsoleInt() {
 	int num;
-	scanf("%s", rubbish);
+	scanf("%s", paddingToIgnore);
 	scanf("%d", &num);
-	cin.getline(rubbish, LONGTH);
+	cin.getline(paddingToIgnore, LONGTH);
 	return num;
 }
 
-void read_set(int useset) {
-	char file_name[LONGTH];
-	strcpy(file_name, name_set[useset].a);
-	strcat(file_name, ".efpdata");
-	cout << "file name= " << file_name << "\n";
-	freopen(file_name, "r", stdin);
-	latencyTime = read_num();
-	show_in_front = read_num();
-	enableNumberPushedLog = read_num();
-	on_circle = read_num();
-	on_ends = read_num();
-	cin.getline(rubbish, LONGTH);
-	//cout << "rubbish= " << rubbish << "\n";
-	scanf("%s", rubbish);
-	cin.getline(rubbish, LONGTH);
-	scanf("%s", serialname);
-	cin.getline(rubbish, LONGTH);
-	scanf("%s", rubbish);
+void analyzeSetting(int settingIndex) {
+	// 拼接配置文件名
+	char configFileName[LONGTH];
+	strcpy(configFileName, settings[settingIndex].a);
+	strcat(configFileName, ".efpdata");
+	cout << "file name= " << configFileName << "\n";
+	// 打开配置文件
+	freopen(configFileName, "r", stdin);
+	latencyTime = readConsoleInt();
+	unuseNum = readConsoleInt();
+	enableNumberPushedLog = readConsoleInt();
+	enableCircle = readConsoleInt();
+	enableEndLight = readConsoleInt();
+	cin.getline(paddingToIgnore, LONGTH);
+	scanf("%s", paddingToIgnore);
+	cin.getline(paddingToIgnore, LONGTH);
+	scanf("%s", comDeviceName);
+	cin.getline(paddingToIgnore, LONGTH);
+	scanf("%s", paddingToIgnore);
 	scanf("%d", &num_using_channel);
 	if (num_using_channel == 0) {
 		on_using_channel = false;
@@ -291,35 +301,35 @@ void read_set(int useset) {
 			scanf("%d", &using_channel[i]);
 		}
 	}
-	cin.getline(rubbish, LONGTH);
-	scanf("%s", rubbish);
+	cin.getline(paddingToIgnore, LONGTH);
+	scanf("%s", paddingToIgnore);
 	scanf("%d", &num_ignore_channel);
 	for (int i = 0; i < num_ignore_channel; ++i) {
 		scanf("%d", &ignore_channel[i]);
 	}
-	cin.getline(rubbish, LONGTH);
-	brightness = read_num();
-	on_extend = read_num();
-	num_extend = read_num();
-	on_remain = read_num();
-	num_remain = read_num();
-	color_default = read_num();
+	cin.getline(paddingToIgnore, LONGTH);
+	brightness = readConsoleInt();
+	enableExtend = readConsoleInt();
+	extendLedCnt = readConsoleInt();
+	enableRemain = readConsoleInt();
+	remainTime = readConsoleInt();
+	color_default = readConsoleInt();
 	color_default--;
-	on_background = read_num();
-	bright_background = read_num();
-	color_background_default = read_num();
-	color_background_default--;
+	on_background = readConsoleInt();
+	backgroundBrightness = readConsoleInt();
+	activeBgColorConfig_default = readConsoleInt();
+	activeBgColorConfig_default--;
 	freopen("CON", "r", stdin);
 	return;
 }
 
-void print_set(int useset) {
+void printConfigInfo() {
 	cout << "latencyTime= " << latencyTime << "\n";
-	cout << "show_in_front= " << show_in_front << "\n";
-	cout << "show_number_log= " << enableNumberPushedLog << "\n";
-	cout << "circle_on= " << on_circle << "\n";
-	cout << "LEDs_at_two_end= " << on_ends << "\n";
-	cout << "serial_name=\n" << serialname << "\n";
+	cout << "ignore= " << unuseNum << "\n";
+	cout << "enableNumberPushedLog= " << enableNumberPushedLog << "\n";
+	cout << "enableCircle= " << enableCircle << "\n";
+	cout << "enableEndLight= " << enableEndLight << "\n";
+	cout << "comDeviceName=\n" << comDeviceName << "\n";
 	cout << "using_channel= " << num_using_channel << " ";
 	for (int i = 0; i < num_using_channel; ++i) {
 		cout << using_channel[i] << " ";
@@ -331,69 +341,67 @@ void print_set(int useset) {
 	}
 	cout << "\n";
 	cout << "brightness= " << brightness << "\n";
-	cout << "extend_on= " << on_extend << "\n";
-	cout << "extend_num= " << num_extend << "\n";
-	cout << "remain_on= " << on_remain << "\n";
-	cout << "remain_time= " << num_remain << "\n";
+	cout << "extend_on= " << enableExtend << "\n";
+	cout << "extend_num= " << extendLedCnt << "\n";
+	cout << "remain_on= " << enableRemain << "\n";
+	cout << "remain_time= " << remainTime << "\n";
 	cout << "color_default= " << color_default+1 << "\n";
 	cout << "background_on= " << on_background << "\n";
-	cout << "background_brightness= " << bright_background << "\n";
-	cout << "background_color_default= " << color_background_default+1 << "\n";
+	cout << "background_brightness= " << backgroundBrightness << "\n";
+	cout << "background_color_default= " << activeBgColorConfig_default+1 << "\n";
 	return;
 }
 
-void write_set(int useset) {
-	char file_name[LONGTH];
-	strcpy(file_name, name_set[useset].a);
-	strcat(file_name, ".efpdata");
-	//cout << "file name= " << file_name << "\n";
-	freopen(file_name, "w", stdout);
-	print_set(useset);
+void writeSettingsToConfigFile(int useset) {
+	char configFileName[LONGTH];
+	strcpy(configFileName, settings[useset].a);
+	strcat(configFileName, ".efpdata");
+	freopen(configFileName, "w", stdout);
+	printConfigInfo();
 	freopen("CON", "w", stdout);
 	return;
 }
 
-bool read_color(int useset) {
-	char file_name[LONGTH];
-	strcpy(file_name, name_set[useset].a);
-	strcat(file_name, ".efpcolor");
-	freopen(file_name, "r", stdin);
-	scanf("%d", &num_color);
-	if (num_color == 0) {
+bool readColorConfigFile(int useset) {
+	char configFileName[LONGTH];
+	strcpy(configFileName, settings[useset].a);
+	strcat(configFileName, ".efpcolor");
+	freopen(configFileName, "r", stdin);
+	scanf("%d", &colorConfigCnt);
+	if (colorConfigCnt == 0) {
 		cout << "\nNo color has been found.\n";
 		return false;
 	}
 	else {
-		for (int i = 0; i < num_color; ++i) {
-			scanf("%d%d%d", &color[i].r, &color[i].g, &color[i].b);
+		for (int i = 0; i < colorConfigCnt; ++i) {
+			scanf("%d%d%d", &colorSettings[i].r, &colorSettings[i].g, &colorSettings[i].b);
 		}
 		freopen("CON", "r", stdin);
-		cout << "\n" << num_color << " color(s) has been loaded.\n";
+		cout << "\n" << colorConfigCnt << " color(s) has been loaded.\n";
 		return true;
 	}
 }
 
-void print_color(int useset) {
-	cout << num_color << " color(s) is in this setting\n";
+void printAllColorSettings() {
+	cout << colorConfigCnt << " color(s) is in this setting\n";
 	cout << "num	r	g	b\n";
-	for (int i = 0; i < num_color; ++i) {
-		cout << i+1 << "	" << color[i].r << "	" << color[i].g << "	" << color[i].b << "\n";
+	for (int i = 0; i < colorConfigCnt; ++i) {
+		cout << i+1 << "	" << colorSettings[i].r << "	" << colorSettings[i].g << "	" << colorSettings[i].b << "\n";
 	}
-	return;
 }
 
-void write_color(int useset) {
-	char file_name[LONGTH];
-	strcpy(file_name, name_set[useset].a);
-	strcat(file_name, ".efpcolor");
-	freopen(file_name, "w", stdout);
-	cout << num_color << "\n";
-	for (int i = 0; i < num_color; ++i) {
-		cout << color[i].r << " " << color[i].g << " " << color[i].b << "\n";
+// TODO: 干掉，无用
+void writeColorConfig(int useset) {
+	char configFileName[LONGTH];
+	strcpy(configFileName, settings[useset].a);
+	strcat(configFileName, ".efpcolor");
+	freopen(configFileName, "w", stdout);
+	cout << colorConfigCnt << "\n";
+	for (int i = 0; i < colorConfigCnt; ++i) {
+		cout << colorSettings[i].r << " " << colorSettings[i].g << " " << colorSettings[i].b << "\n";
 	}
 	freopen("CON", "w", stdout);
-	cout << "\n" << num_color << " color(s) has been write to " << file_name << "\n";
-	return;
+	cout << "\n" << colorConfigCnt << " color(s) has been write to " << configFileName << "\n";
 }
 
 bool same(char a[], char b[]) {
@@ -405,40 +413,40 @@ bool same(char a[], char b[]) {
 	}
 }
 
-bool get_bg_color(int colora,int bgcolor) {
-	if (bright_background == 0) {
+bool setFgBgColor(int fgColorIndex, int bgColorIndex) {
+	if (backgroundBrightness == 0) {
 		on_background = false;
 		return false;
 	}
 	else {
-		float vs_float;
-		vs_float = (float)bright_background / 256;
-		color_background = color[bgcolor];
-		color_bg_real.r = color_background.r*vs_float;
-		color_bg_real.g = color_background.g*vs_float;
-		color_bg_real.b = color_background.b*vs_float;
-		color_plus.r = color[colora].r - color_bg_real.r;
-		color_plus.g = color[colora].g - color_bg_real.g;
-		color_plus.b = color[colora].b - color_bg_real.b;
-		cout << "\n" << color[colora].r <<"	"<< color[colora].g <<"	"<< color[colora].b;
-		cout << "\n" << color_bg_real.r << "	" << color_bg_real.g << "	" << color_bg_real.b;
+		float bgBrightLevel = (float) backgroundBrightness / 256;
+		activeBgColorConfig = colorSettings[bgColorIndex];
+		activeBgColorRgb.r = activeBgColorConfig.r * bgBrightLevel;
+		activeBgColorRgb.g = activeBgColorConfig.g * bgBrightLevel;
+		activeBgColorRgb.b = activeBgColorConfig.b * bgBrightLevel;
+		activeFgColorRgb.r = colorSettings[fgColorIndex].r - activeBgColorRgb.r;
+		activeFgColorRgb.g = colorSettings[fgColorIndex].g - activeBgColorRgb.g;
+		activeFgColorRgb.b = colorSettings[fgColorIndex].b - activeBgColorRgb.b;
+		cout << "\n" << colorSettings[fgColorIndex].r <<"	"<< colorSettings[fgColorIndex].g <<"	"<< colorSettings[fgColorIndex].b;
+		cout << "\n" << activeBgColorRgb.r << "	" << activeBgColorRgb.g << "	" << activeBgColorRgb.b;
 		cout << "\n";
 		return true;
 	}
 }
-void refresh_bg() {
-	//bool a = get_bg_color(color_default, color_background_default);
+
+void refreshColor() {
+	// 关闭背景灯，然后重新打开
 	putIntToBuffer(103);
 	putIntToBuffer(102);
-	putIntToBuffer(color_bg_real.r);
-	putIntToBuffer(color_bg_real.g);
-	putIntToBuffer(color_bg_real.b);
+	putIntToBuffer(activeBgColorRgb.r);
+	putIntToBuffer(activeBgColorRgb.g);
+	putIntToBuffer(activeBgColorRgb.b);
 	push();
+	// 切换前景色
 	putIntToBuffer(89);
-	putIntToBuffer(color_plus.r);
-	putIntToBuffer(color_plus.g);
-	putIntToBuffer(color_plus.b);
-	//cout << "colorp=" << color_plus.r << "	" << color_plus.g << "	" << color_plus.b << "\n";
+	putIntToBuffer(activeFgColorRgb.r);
+	putIntToBuffer(activeFgColorRgb.g);
+	putIntToBuffer(activeFgColorRgb.b);
 	push();
 	return;
 }
@@ -451,13 +459,13 @@ void start(int useset) {
 	putIntToBuffer(127);
 	push();
 	putIntToBuffer(89);
-	putIntToBuffer(color[color_default].r);
-	putIntToBuffer(color[color_default].g);
-	putIntToBuffer(color[color_default].b);
+	putIntToBuffer(colorSettings[color_default].r);
+	putIntToBuffer(colorSettings[color_default].g);
+	putIntToBuffer(colorSettings[color_default].b);
 
-	if (get_bg_color(color_default,color_background_default) == true) {
+	if (setFgBgColor(color_default,activeBgColorConfig_default) == true) {
 		if (on_background == true) {
-			refresh_bg();
+			refreshColor();
 		}
 		else {
 			putIntToBuffer(103);
@@ -472,7 +480,7 @@ void start(int useset) {
 	
 	
 
-	if (on_circle == TRUE) {
+	if (enableCircle == TRUE) {
 		putIntToBuffer(91);
 		push();
 	}
@@ -480,7 +488,7 @@ void start(int useset) {
 		putIntToBuffer(90);
 		push();
 	}
-	if (on_ends == FALSE) {
+	if (enableEndLight == FALSE) {
 		putIntToBuffer(97);
 		push();
 	}
@@ -488,18 +496,18 @@ void start(int useset) {
 		putIntToBuffer(92);
 		push();
 	}
-	if (on_remain == TRUE) {
+	if (enableRemain == TRUE) {
 		putIntToBuffer(98);
-		putIntToBuffer(num_remain);
+		putIntToBuffer(remainTime);
 		push();
 	}
 	else {
 		putIntToBuffer(99);
 		push();
 	}
-	if (on_extend == TRUE) {
+	if (enableExtend == TRUE) {
 		putIntToBuffer(96);
-		putIntToBuffer(num_extend);
+		putIntToBuffer(extendLedCnt);
 		push();
 	}
 	else {
@@ -514,7 +522,7 @@ void start(int useset) {
 
 
 
-void con_mode() {
+void commandMode() {
 	int type = 0;
 	char com[LONGTH];
 	cout << "\nType help to show the command list\n";
@@ -566,9 +574,9 @@ void con_mode() {
 					putIntToBuffer(93);
 					putIntToBuffer(brightness);
 					push();
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 					cout << "\nBrightness : " << brightness << "\n";
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 				}
 				else {
 					cout << "\nInvalid brightness value . This number should be in the range [10,255]\n";
@@ -578,22 +586,22 @@ void con_mode() {
 			}
 			else if (same(com, "extend")) {
 				cout << "Type the number of LEDs you want to extend:\n";
-				scanf("%d", &num_extend);
-				if (num_extend > 10) {
-					num_extend = 10;
+				scanf("%d", &extendLedCnt);
+				if (extendLedCnt > 10) {
+					extendLedCnt = 10;
 					cout << "\nThe max value of the number is 10\n";
 				}
-				else if (num_extend < 0) {
-					num_extend = 0;
+				else if (extendLedCnt < 0) {
+					extendLedCnt = 0;
 					cout << "\nThe min value of the number is 0\n";
 				}
-				if (on_extend == true) {
+				if (enableExtend == true) {
 					putIntToBuffer(96);
-					putIntToBuffer(num_extend);
+					putIntToBuffer(extendLedCnt);
 					push();
 				}
-				write_set(using_set);
-				cout << "\nThe number of LEDs to extend : " << num_extend << "\n";
+				writeSettingsToConfigFile(activeSettingIndex);
+				cout << "\nThe number of LEDs to extend : " << extendLedCnt << "\n";
 				type = 0;
 				continue;
 			}
@@ -601,59 +609,59 @@ void con_mode() {
 				cout << "Type the time you want the LEDs to remain (second,allow float):\n";
 				float rm;
 				scanf("%f", &rm);
-				num_remain = (int)(rm * 10);
-				if (num_remain > 200) {
-					num_remain = 200;
+				remainTime = (int)(rm * 10);
+				if (remainTime > 200) {
+					remainTime = 200;
 					cout << "\nThe max value of the number is 20\n";
 				}
-				else if (num_remain < 0) {
-					num_remain = 0;
+				else if (remainTime < 0) {
+					remainTime = 0;
 					cout << "\nThe min value of the number is 0\n";
 				}
-				if (on_remain == true) {
+				if (enableRemain == true) {
 					putIntToBuffer(98);
-					putIntToBuffer(num_remain);
+					putIntToBuffer(remainTime);
 					push();
 				}
-				write_set(using_set);
+				writeSettingsToConfigFile(activeSettingIndex);
 				type = 0;
 				continue;
 			}
 			else if (same(com, "select")) {
-				select_set();
+				selectSettingToUse();
 				putIntToBuffer(125);
 				push();
-				start(using_set);
-				read_color(using_set);
+				start(activeSettingIndex);
+				readColorConfigFile(activeSettingIndex);
 				type = 0;
 				continue;
 			}
 			else if (same(com, "background")) {
 				scanf("%s", com);
 				if (same(com, "color_default")) {
-					scanf("%d", &color_background_default);
-					write_set(using_set);
-					cout << "Default background color : \n" << color[color_background_default].r << "	" << color[color_background_default].g << "	" << color[color_background_default].b << "\n";
+					scanf("%d", &activeBgColorConfig_default);
+					writeSettingsToConfigFile(activeSettingIndex);
+					cout << "Default background color : \n" << colorSettings[activeBgColorConfig_default].r << "	" << colorSettings[activeBgColorConfig_default].g << "	" << colorSettings[activeBgColorConfig_default].b << "\n";
 					type = 0;
 					continue;
 				}
 				else if (same(com, "brightness")) {
-					scanf("%d", &bright_background);
-					if (bright_background <= 0 || bright_background >= 256) {
+					scanf("%d", &backgroundBrightness);
+					if (backgroundBrightness <= 0 || backgroundBrightness >= 256) {
 						cout << "This value should be in the range of (0,255]";
 						type = 0;
 						continue;
 					}
 					else {
-						if (get_bg_color(color_default, color_background_default) == false) {
+						if (setFgBgColor(color_default, activeBgColorConfig_default) == false) {
 							cout << "Disabled background light.\n";
 						}
 						else {
-							cout << "Background brightness = " << bright_background;
+							cout << "Background brightness = " << backgroundBrightness;
 							if (on_background == true) {
-								refresh_bg();
+								refreshColor();
 							}
-							write_set(using_set);
+							writeSettingsToConfigFile(activeSettingIndex);
 						}
 					}
 					type = 0;
@@ -712,37 +720,37 @@ void con_mode() {
 				scanf("%d", &input_bool);
 				if (input_bool == true) {
 					enableNumberPushedLog = 1;
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 					cout << "\nThe number logs will be shown.\n";
 				}
 				else {
 					enableNumberPushedLog = 0;
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 					cout << "\nThe number logs will not be shown.\n";
 				}
 				type = 0;
 				continue;
 			}
 			else if (same(com, "set")) {
-				print_set(using_set);
+				printConfigInfo();
 				type = 0;
 				continue;
 			}
 			else if (same(com, "set_name")) {
-				cout <<"set name : "<< name_set[using_set].a << "\n";
+				cout <<"set name : "<< settings[activeSettingIndex].a << "\n";
 				type = 0;
 				continue;
 			}
 			else if (same(com, "set_list")) {
 				cout << "num" << " " << "name\n";
-				for (int i = 0; i < num_set; ++i) {
-					cout << i + 1 << " : " << name_set[i].a << "\n";
+				for (int i = 0; i < settingCnt; ++i) {
+					cout << i + 1 << " : " << settings[i].a << "\n";
 				}
 				type = 0;
 				continue;
 			}
 			else if (same(com, "color")) {
-				print_color(using_set);
+				printAllColorSettings();
 				type = 0;
 				continue;
 			}
@@ -751,6 +759,7 @@ void con_mode() {
 				type = 0;
 				continue;
 			}
+		}
 	}
 }
 
@@ -762,7 +771,7 @@ void main_test_input() {
 	int cmpignore;
 	bool flag_ignore,flag_using;
     //int num = 100;
-    int i = get_number("Type input number: ");
+    int i = readConsoleIntBy("Type input number: ");
     /* It is recommended to start timer before Midi; otherwise, PortMidi may
        start the timer with its (default) parameters
      */
@@ -788,9 +797,9 @@ void main_test_input() {
     while (1) {
 
 		
-		// 组合键：[Shift] + [.]
+		// 组合键：[Shift] + [.]，进入命令行模式
 		if ((KEY_DOWN(VK_SHIFT)||KEY_DOWN(VK_LSHIFT)) && KEY_DOWN(VK_OEM_PERIOD)) {
-			con_mode();
+			commandMode();
 		}
 		
 		// 大写锁定键按下
@@ -801,51 +810,51 @@ void main_test_input() {
 				push();
 				break;
 			}
-			for (int i = 0; i < num_set; ++i) {
+			for (int i = 0; i < settingCnt; ++i) {
 				if (KEY_DOWN(set_form[i].key)) {
-					using_set = set_form[i].value;
-					read_set(using_set);
-					read_color(using_set);
+					activeSettingIndex = set_form[i].value;
+					analyzeSetting(activeSettingIndex);
+					readColorConfigFile(activeSettingIndex);
 					putIntToBuffer(125);
 					push();
-					start(using_set);
+					start(activeSettingIndex);
 				}
 			}
 			for (int ch = 49; ch < 59; ++ch) {
 				if (KEY_DOWN(ch) && kbcd <= 10) {
 					if (CTRL_DOWN) {
-						color_background_default = ch - 49;
-						write_set(using_set);
-						if (get_bg_color(color_default, color_background_default)) {
+						activeBgColorConfig_default = ch - 49;
+						writeSettingsToConfigFile(activeSettingIndex);
+						if (setFgBgColor(color_default, activeBgColorConfig_default)) {
 							if (on_background) {
-								refresh_bg();
+								refreshColor();
 							}
-							write_set(using_set);
+							writeSettingsToConfigFile(activeSettingIndex);
 						}
 						else {
 							cout << "\nDisabled background light.\n";
 						}
 						kbcd += cdplus;
-						cout << "\nChanged background light color : " << color[color_background_default].r << "	" << color[color_background_default].g << "	" << color[color_background_default].b << "\n";
+						cout << "\nChanged background light color : " << colorSettings[activeBgColorConfig_default].r << "	" << colorSettings[activeBgColorConfig_default].g << "	" << colorSettings[activeBgColorConfig_default].b << "\n";
 					}
 					else {
 						if (on_background == false) {
 							putIntToBuffer(89);
-							putIntToBuffer(color[ch - 49].r);
-							putIntToBuffer(color[ch - 49].g);
-							putIntToBuffer(color[ch - 49].b);
+							putIntToBuffer(colorSettings[ch - 49].r);
+							putIntToBuffer(colorSettings[ch - 49].g);
+							putIntToBuffer(colorSettings[ch - 49].b);
 							push();
 							color_default = ch - 49;
-							write_set(using_set);
+							writeSettingsToConfigFile(activeSettingIndex);
 						}
 						else {
 							color_default = ch - 49;
-							get_bg_color(color_default, color_background_default);
-							refresh_bg();
-							write_set(using_set);
+							setFgBgColor(color_default, activeBgColorConfig_default);
+							refreshColor();
+							writeSettingsToConfigFile(activeSettingIndex);
 						}
 						kbcd += cdplus;
-						printf("\nChange_Color:%d %d %d\n", color[ch - 49].r, color[ch - 49].g, color[ch - 49].b);
+						printf("\nChange_Color:%d %d %d\n", colorSettings[ch - 49].r, colorSettings[ch - 49].g, colorSettings[ch - 49].b);
 					}
 				}
 			}
@@ -862,17 +871,17 @@ void main_test_input() {
 				kbcd += cdplus;
 			}
 			if (KEY_DOWN('C') && kbcd <= 10) {
-				if (on_circle == TRUE) {
-					on_circle = FALSE;
-					write_set(using_set);
+				if (enableCircle == TRUE) {
+					enableCircle = FALSE;
+					writeSettingsToConfigFile(activeSettingIndex);
 					putIntToBuffer(90);
 					push();
 					printf("\nCircle off\n");
 					kbcd += cdplus;
 				}
 				else {
-					on_circle = TRUE;
-					write_set(using_set);
+					enableCircle = TRUE;
+					writeSettingsToConfigFile(activeSettingIndex);
 					putIntToBuffer(91);
 					push();
 					printf("\nCircle on\n");
@@ -880,17 +889,17 @@ void main_test_input() {
 				}
 			}
 			if (KEY_DOWN('V') && kbcd <= 10) {
-				if (on_ends == TRUE) {
-					on_ends = FALSE;
-					write_set(using_set);
+				if (enableEndLight == TRUE) {
+					enableEndLight = FALSE;
+					writeSettingsToConfigFile(activeSettingIndex);
 					putIntToBuffer(97);
 					push();
 					printf("\nThe LEDs on both ends are off\n");
 					kbcd += cdplus;
 				}
 				else {
-					on_ends = TRUE;
-					write_set(using_set);
+					enableEndLight = TRUE;
+					writeSettingsToConfigFile(activeSettingIndex);
 					putIntToBuffer(92);
 					push();
 					printf("\nThe LEDs on both ends are on\n");
@@ -923,7 +932,7 @@ void main_test_input() {
 					putIntToBuffer(93);
 					putIntToBuffer(brightness);
 					on_rainbow = FALSE;
-					if (on_circle == TRUE) {
+					if (enableCircle == TRUE) {
 						putIntToBuffer(91);
 						push();
 					}
@@ -950,50 +959,50 @@ void main_test_input() {
 					push();
 
 
-					if (on_circle == TRUE) {
+					if (enableCircle == TRUE) {
 						putIntToBuffer(91);
 						push();
-						on_circle = TRUE;
+						enableCircle = TRUE;
 					}
 				}
 				kbcd += cdplus ;
 			}
 			if (KEY_DOWN('Z') && kbcd <= 10) {
-				if (on_extend == TRUE) {
-					on_extend = FALSE;
+				if (enableExtend == TRUE) {
+					enableExtend = FALSE;
 					putIntToBuffer(101);
 					push();
-					//num_extend = 0;
-					write_set(using_set);
+					//extendLedCnt = 0;
+					writeSettingsToConfigFile(activeSettingIndex);
 					printf("\nExtension Off\n");
 				}
 				else {
-					on_extend = TRUE;
+					enableExtend = TRUE;
 					//scanf("%*[^\n]%*c");
 					putIntToBuffer(96);
-					putIntToBuffer(num_extend);
+					putIntToBuffer(extendLedCnt);
 					push();
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 					printf("\nExtension On\n");
 				}
 				kbcd += cdplus ;
 			}
 			if (KEY_DOWN('X') && kbcd <= 10) {
-				if (on_remain == TRUE) {
-					on_remain = FALSE;
+				if (enableRemain == TRUE) {
+					enableRemain = FALSE;
 					putIntToBuffer(99);
 					push();
-					//num_remain = 0;
-					write_set(using_set);
+					//remainTime = 0;
+					writeSettingsToConfigFile(activeSettingIndex);
 					printf("\nRemain off\n");
 				}
 				else {
-					on_remain = TRUE;
-					rm_times = num_remain *1000/ 200 / latencyTime;
+					enableRemain = TRUE;
+					rm_times = remainTime *1000/ 200 / latencyTime;
 					putIntToBuffer(98);
-					putIntToBuffer(num_remain);
+					putIntToBuffer(remainTime);
 					push();
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 					printf("\nRemain on\n");
 				}
 				kbcd += cdplus;
@@ -1003,15 +1012,15 @@ void main_test_input() {
 					on_background = false;
 					putIntToBuffer(103);
 					push();
-					write_set(using_set);
+					writeSettingsToConfigFile(activeSettingIndex);
 					cout << "\nBackground light off\n";
 					kbcd += cdplus;
 				}
 				else {
-					if (get_bg_color(color_default, color_background_default) == true) {
+					if (setFgBgColor(color_default, activeBgColorConfig_default) == true) {
 						on_background = true;
-						refresh_bg();
-						write_set(using_set);
+						refreshColor();
+						writeSettingsToConfigFile(activeSettingIndex);
 						cout << "\nBackground light on\n";
 						
 					}
@@ -1043,13 +1052,6 @@ void main_test_input() {
         if (status == TRUE) {
             length = (PmError)Pm_Read(midi,buffer, 1);
             if (length > 0) {
-                /*printf("time %ld, %d %d %2lx\n",
-                       
-                       (long) buffer[0].timestamp,
-                       (long) Pm_MessageStatus(buffer[0].message),
-                       (long) Pm_MessageData1(buffer[0].message),
-                       (long) Pm_MessageData2(buffer[0].message));
-					   */
 				cmpignore = Pm_MessageStatus(buffer[0].message);
 
 				if (num_using_channel == FALSE) {
@@ -1092,7 +1094,7 @@ void main_test_input() {
                 assert(0);
             }
         }
-		if (on_remain == TRUE) {
+		if (enableRemain == TRUE) {
 			rm_timer++;
 			if (rm_timer >= rm_times) {
 				rm_timer = 0;
@@ -1111,9 +1113,6 @@ void main_test_input() {
     printf("done closing...");
 	return;
 }
-
-
-
 
 
 
@@ -1149,15 +1148,15 @@ int main(int argc, char *argv[]){
 	}
 	
 
-	select_set();
-	read_set(using_set);
-	//print_set(using_set);
+	selectSettingToUse();
+	analyzeSetting(activeSettingIndex);
+	//printConfigInfo(activeSettingIndex);
 	cdplus = 300 / latencyTime;
 	if (serialopen() == FALSE) {
 		return 0;
 	}
-	read_color(using_set);
-	start(using_set);
+	readColorConfigFile(activeSettingIndex);
+	start(activeSettingIndex);
 	cout << "\n";
 
     /* list device information */

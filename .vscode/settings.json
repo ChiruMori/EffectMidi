@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "${workspaceFolder}/pm_common"
+  "cmake.sourceDirectory": "${workspaceFolder}/pm_common",
+  "C_Cpp.default.compilerPath": "c:\\work\\code\\mingw64_v14.2.0\\bin\\g++.exe"
 }
