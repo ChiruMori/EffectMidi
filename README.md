@@ -34,5 +34,5 @@
 
 ### C++ 开发环境
 
-- GCC/G++ 编译环境
-- IDE（VSCode 中需要指定编译器路径）
+- GCC/G++ 编译环境、[CMake](https://cmake.org/download/)
+- IDE（如 VSCode）

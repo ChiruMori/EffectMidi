@@ -1164,7 +1164,7 @@ int main(int argc, char *argv[]){
     default_in = Pm_GetDefaultInputDeviceID();
     default_out = Pm_GetDefaultOutputDeviceID();
     for (i = 0; i < Pm_CountDevices(); i++) {
-        char *deflt;
+        const char *deflt;
         const PmDeviceInfo *info = Pm_GetDeviceInfo(i);
         if (((test_input  | test_both) & info->input) |
             ((test_output | test_both | stream_test) & info->output)) {
