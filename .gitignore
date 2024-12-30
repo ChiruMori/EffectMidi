@@ -32,7 +32,7 @@
 *.app
 
 # Workspace
-.vscode
+# .vscode
 .vs
 
 # 构建目录

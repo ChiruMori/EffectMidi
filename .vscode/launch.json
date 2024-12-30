@@ -1,0 +1,30 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  // CMakeLists.txt https://wx-chevalier.github.io/books/cpp-notes/01.%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80/%E7%BC%96%E8%AF%91%E4%B8%8E%E8%BF%90%E8%A1%8C/make/cmake/99.%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99/2021-c++-%E5%B7%A5%E7%A8%8B%E6%80%BB%E7%BB%93-cmake-%E6%B7%BB%E5%8A%A0%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93%E4%BE%9D%E8%B5%96%E6%96%B9%E5%BC%8F-git-submodule-find_libraryfetchcontentcpm-%E7%AD%89/
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cmake Debug",
+      "preLaunchTask": "CMakeBuild",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}\\build\\EffectMidi.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": true,
+      "MIMode": "gdb",
+      "miDebuggerPath": "path_to_mingw64\\bin\\gdb.exe",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

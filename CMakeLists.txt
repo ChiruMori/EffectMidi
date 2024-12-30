@@ -19,5 +19,8 @@ FetchContent_Declare(
     portmidi
     URL https://github.com/PortMidi/portmidi/archive/refs/tags/${PORTMIDI_VERSION}.tar.gz)
 FetchContent_MakeAvailable(portmidi)
+# add porttime directory (For header file)
+set(PORTMIDI_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/portmidi-src)
+include_directories(${PORTMIDI_SRC_DIR}/porttime)
 add_executable(${PROJECT_NAME} src/EffectMidi.cpp)
 target_link_libraries(${PROJECT_NAME} portmidi)
