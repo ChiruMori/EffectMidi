@@ -36,3 +36,7 @@
 
 - GCC/G++ 编译环境、[CMake](https://cmake.org/download/)
 - IDE（如 VSCode）
+
+### Patch
+
+初次配置时，在完成 cmake 后，需要在项目根目录执行 `./patch.cmd` 修复外部依赖中的错误。

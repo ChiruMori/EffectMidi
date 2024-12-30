@@ -33,7 +33,8 @@
       "args": [".."],
       "options": {
         "cwd": "${workspaceFolder}/build"
-      }
+      },
+      "dependsOn": "clean"
     },
     {
       "label": "make",
@@ -45,7 +46,8 @@
       "args": [],
       "options": {
         "cwd": "${workspaceFolder}/build"
-      }
+      },
+      "dependsOn": "cmake"
     },
     {
       "label": "CMakeBuild",
