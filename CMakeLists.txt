@@ -38,6 +38,6 @@ target_link_libraries(${PROJECT_NAME} portmidi)
 # libportmidi.dll
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${CMAKE_CURRENT_BINARY_DIR}/_deps/portmidi-build/libportmidi.dll"
+    "$<TARGET_FILE:portmidi>"
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 )
