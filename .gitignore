@@ -34,3 +34,6 @@
 # Workspace
 .vscode
 .vs
+
+# 构建目录
+/build/**

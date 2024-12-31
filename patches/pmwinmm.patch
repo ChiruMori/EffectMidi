@@ -1,0 +1,12 @@
+--- pmwinmm_p.c	2022-10-08 09:56:28.000000000 +0800
++++ pmwinmm.c	2024-12-30 18:23:30.328695800 +0800
+@@ -988,7 +988,8 @@
+         info->hdr = hdr = get_free_output_buffer(midi);
+         assert(hdr);
+         midi->fill_base = (unsigned char *) info->hdr->lpData;
+-        midi->fill_offset_ptr = &(hdr->dwBytesRecorded);
++        // PATCH: 强制类型转换
++        midi->fill_offset_ptr = (uint32_t *)(&(hdr->dwBytesRecorded));
+         /* when buffer fills, Pm_WriteSysEx will revert to calling
+          * pmwin_write_byte, which expect to have space, so leave
+          * one byte free for pmwin_write_byte. Leave another byte

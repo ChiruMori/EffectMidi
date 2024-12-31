@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "${workspaceFolder}/pm_common"
+  "C_Cpp.default.compilerPath": "path_to_mingw64\\bin\\g++.exe",
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
 }
