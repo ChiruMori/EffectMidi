@@ -1,9 +1,9 @@
-# Effect Piano V2
+# EffectMidi
 
 > 本项目 Fork 自 [Effect_Piano_light_controller](https://github.com/esun-z/Effect_Piano_light_controller)
 > 原项目已不再活动，且存在 BUG。本项目对其进行了修复，并优化相关代码使其更可读可用。
 
-进展&规划：[dev.log](DEVLOG.md)
+进展&规划：[CHANGELOG.log](CHANGELOG.md)
 
 ## 说明
 
