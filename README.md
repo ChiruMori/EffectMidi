@@ -1,5 +1,9 @@
 # EffectMidi
 
+当前分支为原项目的 Fork 与问题修复，仅用于归档
+
+该分支仅支持命令行界面，建议查看其他分支获取更多特性
+
 > 本项目 Fork 自 [Effect_Piano_light_controller](https://github.com/esun-z/Effect_Piano_light_controller)
 > 原项目已不再活动，且存在 BUG。本项目对其进行了修复，并优化相关代码使其更可读可用。
 
