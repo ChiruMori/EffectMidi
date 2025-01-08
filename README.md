@@ -40,3 +40,30 @@
 ### Patch
 
 初次配置时，在完成 cmake 后，需要在项目根目录执行 `./patch.cmd` 修复外部依赖中的错误。
+
+## Project Setup
+
+### Install
+
+```bash
+$ pnpm install
+```
+
+### Development
+
+```bash
+$ pnpm dev
+```
+
+### Build
+
+```bash
+# For windows
+$ pnpm build:win
+
+# For macOS
+$ pnpm build:mac
+
+# For Linux
+$ pnpm build:linux
+```

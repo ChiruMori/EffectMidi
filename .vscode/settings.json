@@ -1,4 +1,11 @@
 {
-  "C_Cpp.default.compilerPath": "path_to_mingw64\\bin\\g++.exe",
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
