@@ -1,13 +1,10 @@
 # EffectMidi
 
-> 本项目 Fork 自 [Effect_Piano_light_controller](https://github.com/esun-z/Effect_Piano_light_controller)
-> 原项目已不再活动，且存在 BUG。本项目对其进行了修复，并优化相关代码使其更可读可用。
-
 进展&规划：[CHANGELOG.log](CHANGELOG.md)
 
 ## 说明
 
-本项目用于控制 MIDI 键盘的外置灯光效果，通过 MIDI 键盘输入，控制 WS2812B 灯带的同步变化。
+本项目受[Effect_Piano_light_controller](https://github.com/esun-z/Effect_Piano_light_controller)启发，通过桌面端控制 MIDI 键盘的外置灯光效果，通过读取 MIDI 键盘输入，控制灯带的效果。
 
 项目代码会在 Windows 的控制端和开发板上运行，需要以下设备：
 
@@ -32,38 +29,22 @@
 
 见[说明](#说明)部分，不能缺少。
 
-### C++ 开发环境
+### PC 控制端
 
-- GCC/G++ 编译环境、[CMake](https://cmake.org/download/)
-- IDE（如 VSCode）
+项目使用 [electron-vite](https://electron-vite.org/config/) 构建，推荐使用 [Visual Studio Code](https://code.visualstudio.com/) 编辑器。
 
-### Patch
+开发环境下，启动后可以通过 `F12` 打开开发者工具。
 
-初次配置时，在完成 cmake 后，需要在项目根目录执行 `./patch.cmd` 修复外部依赖中的错误。
+- `pnpm install` 安装依赖
+- `pnpm dev` 启动开发环境
+- `pnpm build:win` 打包 Windows 版本
+- `pnpm build:mac` 打包 macOS 版本
+- `pnpm build:linux` 打包 Linux 版本
 
-## Project Setup
+### Arduino 开发板端
 
-### Install
+推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)。
 
-```bash
-$ pnpm install
-```
+依赖下列库：
 
-### Development
-
-```bash
-$ pnpm dev
-```
-
-### Build
-
-```bash
-# For windows
-$ pnpm build:win
-
-# For macOS
-$ pnpm build:mac
-
-# For Linux
-$ pnpm build:linux
-```
+- [FastLED](https://fastled.io/)
