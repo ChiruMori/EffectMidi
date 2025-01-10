@@ -6,13 +6,7 @@ function App(): JSX.Element {
   return (
     <>
       <ConfigMenu />
-      <div className="actions">
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
+      
     </>
   )
 }
