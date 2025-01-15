@@ -1,10 +1,12 @@
 # English translations
 menu:
-  appearance: Appearance
-  led: LED
-  devices: Devices
-apperance:
+  appearance: Display
+  led: Lights
+  devices: Device
+  about: About
+appearance:
   language: Language
+  language-desc: Change the language of the application
   bgImg: Background Image
   bgMaskColor: Mask Color
   bgMaskOpacity: Mask Opacity

@@ -1,5 +1,6 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import * as configManger from '../config'
+import { useDispatch, useSelector } from 'react-redux'
 import 'redux'
 import 'redux-thunk'
 
@@ -23,3 +24,6 @@ export const store = configureStore({
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>
+
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
+export const useAppSelector = useSelector.withTypes<RootState>()

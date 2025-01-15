@@ -51,3 +51,5 @@ export default function useGetText() {
 
   return getText
 }
+
+export const selectLang = (state: RootState) => state.lang

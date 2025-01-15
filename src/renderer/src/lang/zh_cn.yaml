@@ -3,8 +3,10 @@ menu:
   appearance: 外观
   led: 灯光
   devices: 外设
-apperance:
+  about: 关于
+appearance:
   language: 语言
+  language-desc: 更换应用的语言
   bgImg: 背景图片
   bgMaskColor: 遮罩颜色
   bgMaskOpacity: 遮罩透明度

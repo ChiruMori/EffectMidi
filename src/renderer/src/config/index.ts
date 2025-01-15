@@ -6,9 +6,7 @@ export const langSlice = createSlice({
   name: 'lang',
   initialState: Lang.zh_cn,
   reducers: {
-    setLang: (state, action) => {
-      state = action.payload
-    }
+    setLang: (_, action) => action.payload
   }
 })
 
@@ -22,12 +20,22 @@ export const bgImgSlice = createSlice({
   reducers: {
     setBgImg: (state, action) => {
       state.img = action.payload
+      return {
+        ...state,
+        img: action.payload
+      }
     },
     setMaskColor: (state, action) => {
-      state.maskColor = action.payload
+      return {
+        ...state,
+        maskColor: action.payload
+      }
     },
     setMaskOpacity: (state, action) => {
-      state.maskOpacity = action.payload
+      return {
+        ...state,
+        maskOpacity: action.payload
+      }
     }
   }
 })
@@ -36,9 +44,7 @@ export const comSlice = createSlice({
   name: 'com',
   initialState: '',
   reducers: {
-    setCom: (state, action) => {
-      state = action.payload
-    }
+    setCom: (_, action) => action.payload
   }
 })
 

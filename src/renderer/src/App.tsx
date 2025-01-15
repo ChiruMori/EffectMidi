@@ -1,4 +1,5 @@
 import ConfigMenu from './components/ConfigMenu'
+import Keyboard from './components/Keyboard'
 
 function App(): JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -6,7 +7,7 @@ function App(): JSX.Element {
   return (
     <>
       <ConfigMenu />
-      
+      <Keyboard />
     </>
   )
 }
