@@ -30,7 +30,7 @@ export default function MenuContent({ menu }: { menu: MenuOptions }): JSX.Elemen
         hidden={menu !== 'devices'}
         className={`animate__animated animate__faster w-32 ${menu === 'devices' ? 'animate__lightSpeedInRight' : ''}`}
       >
-        <EmRange max={100} min={0} fromColor='#000000' toColor='#4CAF50'/>
+        <EmRange max={100} min={0} fromColor="#000000" toColor="#4CAF50" />
       </div>
     </div>
   )

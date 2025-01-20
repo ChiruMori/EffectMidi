@@ -31,7 +31,7 @@
 
 ### PC 控制端
 
-项目使用 [electron-vite](https://electron-vite.org/config/) 构建，推荐使用 [Visual Studio Code](https://code.visualstudio.com/) 编辑器。
+项目使用 [electron-vite](https://electron-vite.org/config/) 构建，推荐使用 [Visual Studio Code](https://code.visualstudio.com/) 编辑器（并建议安装 `Tailwind CSS IntelliSense`, `Prettier - Code formatter`, `stylus`）。
 
 开发环境下，启动后可以通过 `F12` 打开开发者工具。
 

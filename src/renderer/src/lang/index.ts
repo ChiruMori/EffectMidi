@@ -19,7 +19,7 @@ const parsedLangMap: { [key: string]: LangData } = {}
  *
  * @param lang 语言代码
  */
-const loadLangFile = async (lang: Lang) => {
+const loadLangFile = async (lang: Lang): Promise<void> => {
   if (null === parsedLangMap[lang] || undefined === parsedLangMap[lang]) {
     const langFile = await import(`../lang/${lang}.yaml`)
     parsedLangMap[lang] = langFile.default
@@ -29,7 +29,7 @@ const loadLangFile = async (lang: Lang) => {
 /**
  * 自定义 Hook 用于获取多语言文本
  */
-export default function useGetText() {
+export default function useGetText(): (key: string) => string {
   const lang = useSelector((state: RootState) => state.lang)
   const [text, setText] = useState<LangData>({})
 
@@ -52,4 +52,4 @@ export default function useGetText() {
   return getText
 }
 
-export const selectLang = (state: RootState) => state.lang
+export const selectLang = (state: RootState): Lang => state.lang

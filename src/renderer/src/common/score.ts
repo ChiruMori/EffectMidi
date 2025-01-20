@@ -30,11 +30,11 @@ export class Score {
   /**
    * 从字符串构造音符
    */
-  static fromString(scoreStr: string) {
+  static fromString(scoreStr: string): Score {
     // CDEFGAB
-    let letter = scoreStr[0]
+    const letter = scoreStr[0]
     // 八度
-    let octave = parseInt(scoreStr[1])
+    const octave = parseInt(scoreStr[1])
     // #、b
     let sharp: '#' | 'b' | null = null
     if (scoreStr.length === 3) {
@@ -46,8 +46,8 @@ export class Score {
   /**
    * 下一个半音
    */
-  nextHalfTone() {
-    let halfTone = this.letter + (this.sharp == null ? '' : this.sharp)
+  nextHalfTone(): Score {
+    const halfTone = this.letter + (this.sharp == null ? '' : this.sharp)
     let halfToneIndex = -1
     for (let i = 0; i < 12; i++) {
       if (HALF_TONE_TABLE[i].includes(halfTone)) {
@@ -56,7 +56,7 @@ export class Score {
       }
     }
     halfToneIndex = (halfToneIndex + 1) % 12
-    let nextHalfTone = HALF_TONE_TABLE[halfToneIndex]
+    const nextHalfTone = HALF_TONE_TABLE[halfToneIndex]
     return new Score(
       nextHalfTone[0].charAt(0),
       this.octave + (halfToneIndex === 0 ? 1 : 0),
@@ -64,7 +64,7 @@ export class Score {
     )
   }
 
-  toString() {
+  toString(): string {
     return this.letter + this.octave + (this.sharp == null ? '' : this.sharp)
   }
 }

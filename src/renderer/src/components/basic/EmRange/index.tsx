@@ -53,9 +53,9 @@ const EmRange: React.FC<EmRangeProps> = ({
     return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`
   }
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMouseDown = (event: React.MouseEvent<HTMLElement>): void => {
     const dragStartY = event.clientY
-    const handleMouseMove = function (e: Event) {
+    const handleMouseMove = function (e: Event): void {
       const deltaY = (-((e as MouseEvent).clientY - dragStartY) / (max - min)) * 30
       const newValue = ~~Math.min(max, Math.max(min, value + deltaY))
       setValue(newValue)
