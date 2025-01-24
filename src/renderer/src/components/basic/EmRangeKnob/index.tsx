@@ -1,17 +1,13 @@
 import React, { useState } from 'react'
 import './index.styl'
+import U from '@renderer/common/utils'
+import { EmRangeProps } from '../types'
 
 const SKIP_GAP = 0.3
 
-interface EmRangeProps {
-  min: number
-  max: number
-  fromColor?: string
-  toColor?: string
-  onChange?: (value: number) => void
-}
-
 const EmRange: React.FC<EmRangeProps> = ({
+  label,
+  description,
   min,
   max,
   fromColor = '#FF5252',
@@ -41,16 +37,7 @@ const EmRange: React.FC<EmRangeProps> = ({
 
   const getMidColor = (val: number): string => {
     const progress = (val - min) / (max - min)
-    const r =
-      parseInt(fromColor.slice(1, 3), 16) +
-      (parseInt(toColor.slice(1, 3), 16) - parseInt(fromColor.slice(1, 3), 16)) * progress
-    const g =
-      parseInt(fromColor.slice(3, 5), 16) +
-      (parseInt(toColor.slice(3, 5), 16) - parseInt(fromColor.slice(3, 5), 16)) * progress
-    const b =
-      parseInt(fromColor.slice(5, 7), 16) +
-      (parseInt(toColor.slice(5, 7), 16) - parseInt(fromColor.slice(5, 7), 16)) * progress
-    return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`
+    return U.getMidColor(progress, fromColor, toColor)
   }
 
   const handleMouseDown = (event: React.MouseEvent<HTMLElement>): void => {
@@ -90,7 +77,10 @@ const EmRange: React.FC<EmRangeProps> = ({
           fill={getMidColor(value)}
         />
       </svg>
-      <div className="value-display">{value}</div>
+      <div className="value-display">
+        {label}:{value}
+        <small>{description}</small>
+      </div>
     </div>
   )
 }

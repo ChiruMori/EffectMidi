@@ -14,21 +14,15 @@ export const bgImgSlice = createSlice({
   name: 'bgImg',
   initialState: {
     img: '',
-    maskColor: '#000000',
-    maskOpacity: 0.2
+    dataUrl: '',
+    maskOpacity: 0.8
   },
   reducers: {
     setBgImg: (state, action) => {
-      state.img = action.payload
       return {
         ...state,
-        img: action.payload
-      }
-    },
-    setMaskColor: (state, action) => {
-      return {
-        ...state,
-        maskColor: action.payload
+        img: action.payload.path,
+        dataUrl: action.payload.dataUrl
       }
     },
     setMaskOpacity: (state, action) => {

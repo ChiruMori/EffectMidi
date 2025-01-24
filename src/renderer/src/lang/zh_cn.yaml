@@ -8,5 +8,8 @@ appearance:
   language: 语言
   language-desc: 更换应用的语言
   bgImg: 背景图片
-  bgMaskColor: 遮罩颜色
-  bgMaskOpacity: 遮罩透明度
+  bg-img-label: 背景图片
+  bg-img-desc: 选择一个背景图片
+  bg-img-placeholder: 本地图片文件或网络地址
+  bg-mask-opacity: 遮罩透明度
+  bg-mask-opacity-desc: 调整背景遮罩的透明度

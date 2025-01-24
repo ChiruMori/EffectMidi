@@ -27,7 +27,7 @@ export default function EmSelect({
 }: EmSelectProps): JSX.Element {
   const [selected, setSelected] = useState(initialValue)
   return (
-    <div>
+    <div className="py-2">
       <Field>
         <Label className="text-lg font-medium text-white">{label}</Label>
         <Description className="text-sm/6 text-white/50 mb-2">{description}</Description>
@@ -51,8 +51,8 @@ export default function EmSelect({
           <ListboxOptions
             anchor="bottom"
             transition
-            className="w-[var(--button-width)] rounded-xl border border-white/5 bg-white/5 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none
-          transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0"
+            className="w-[var(--button-width)] rounded-xl border border-white/5 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none
+          transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0 bg-zinc-800"
           >
             {options.map((opt) => (
               <ListboxOption

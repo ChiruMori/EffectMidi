@@ -16,7 +16,7 @@
 ### 使用方法
 
 [原项目帮助文档](https://www.bilibili.com/read/cv6327363)
-  
+
 ### 工作原理
 
 1. Windows 控制端读取 MIDI 输入设备的 MIDI 信号
@@ -31,7 +31,7 @@
 
 ### PC 控制端
 
-项目使用 [electron-vite](https://electron-vite.org/config/) 构建，推荐使用 [Visual Studio Code](https://code.visualstudio.com/) 编辑器（并建议安装 `Tailwind CSS IntelliSense`, `Prettier - Code formatter`, `stylus`）。
+项目使用 [electron-vite](https://electron-vite.org/config/) 构建，推荐使用 [Visual Studio Code](https://code.visualstudio.com/) 编辑器（并建议安装 `Tailwind CSS IntelliSense`, `Prettier - Code formatter`, `EditorConfig for VS Code`, `stylus`）。
 
 开发环境下，启动后可以通过 `F12` 打开开发者工具。
 

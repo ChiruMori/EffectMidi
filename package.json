@@ -28,7 +28,8 @@
     "@reduxjs/toolkit": "^2.5.0",
     "animate.css": "^4.1.1",
     "electron-updater": "^6.1.7",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "serialport": "^13.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

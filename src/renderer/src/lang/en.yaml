@@ -7,6 +7,8 @@ menu:
 appearance:
   language: Language
   language-desc: Change the language of the application
-  bgImg: Background Image
-  bgMaskColor: Mask Color
-  bgMaskOpacity: Mask Opacity
+  bg-img-label: Background Image
+  bg-img-desc: Choose a background image
+  bg-img-placeholder: Local image file or URL
+  bg-mask-opacity: Mask Opacity
+  bg-mask-opacity-desc: Adjust the opacity of the background mask
