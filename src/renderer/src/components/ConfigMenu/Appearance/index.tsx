@@ -1,15 +1,18 @@
 import lang, { selectLang } from '@renderer/lang'
-import { bgImgSlice, langSlice } from '@renderer/config'
+import { bgImgSlice, langSlice, themeSlice } from '@renderer/config'
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
+import C, { ThemeTypeEnum } from '@renderer/common/colors'
 import EmSelect from '../../basic/EmSelect'
 import EmImgPicker from '@renderer/components/basic/EmImgPicker'
 import EmRangeSlider from '@renderer/components/basic/EmRangeSlider'
+import EmCubeChecker from '@renderer/components/basic/EmCubeChecker'
 
 export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element {
   const txt = lang()
   const dispatch = useAppDispatch()
   const nowLang = useAppSelector(selectLang)
   const nowBgImg = useAppSelector((state) => state.bg)
+  const nowColorType = useAppSelector((state) => state.theme.type)
   return (
     <div>
       <div
@@ -35,10 +38,26 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
         <EmRangeSlider
           min={0}
           max={100}
+          fromColor={C(nowColorType).main}
+          toColor={C(nowColorType).sub}
           label={txt('appearance.bg-mask-opacity')}
           description={txt('appearance.bg-mask-opacity-desc')}
           initValue={`${nowBgImg.maskOpacity}`}
           onChange={(val) => dispatch(bgImgSlice.actions.setMaskOpacity(val))}
+        />
+        <EmCubeChecker
+          label={txt('appearance.theme')}
+          description={txt('appearance.theme-desc')}
+          options={[
+            { color: C(ThemeTypeEnum.SKY).ingridient(45), val: ThemeTypeEnum.SKY },
+            { color: C(ThemeTypeEnum.PURPLE).ingridient(45), val: ThemeTypeEnum.PURPLE },
+            { color: C(ThemeTypeEnum.PINK).ingridient(45), val: ThemeTypeEnum.PINK },
+            { color: C(ThemeTypeEnum.GREEN).ingridient(45), val: ThemeTypeEnum.GREEN },
+            { color: C(ThemeTypeEnum.ORANGE).ingridient(45), val: ThemeTypeEnum.ORANGE },
+            { color: C(ThemeTypeEnum.GRAY).ingridient(45), val: ThemeTypeEnum.GRAY }
+          ]}
+          initialValue={nowColorType}
+          onChange={(val) => dispatch(themeSlice.actions.setType(val))}
         />
       </div>
     </div>

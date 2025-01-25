@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { EmRangeProps } from '../types'
-import U from '@renderer/common/utils'
+import { getMidColor } from '@renderer/common/colors'
 import './index.styl'
 import { Description, Field, Label } from '@headlessui/react'
 
@@ -30,7 +30,7 @@ const RangeSelector: React.FC<EmRangeProps> = ({
   }
 
   return (
-    <div className="py-2">
+    <div className="pt-2">
       <Field>
         <Label className="text-lg font-medium text-white">{label}</Label>
         {description && (
@@ -43,7 +43,7 @@ const RangeSelector: React.FC<EmRangeProps> = ({
               className="absolute h-full rounded-lg z-0"
               style={{
                 width: `${((value - min) / (max - min)) * 100}%`,
-                backgroundColor: U.getMidColor((value - min) / (max - min), fromColor, toColor)
+                backgroundColor: getMidColor((value - min) / (max - min), fromColor, toColor)
               }}
             />
             <input
@@ -67,7 +67,7 @@ const RangeSelector: React.FC<EmRangeProps> = ({
               className="slider-cursor absolute w-4 h-4 rounded-full border-white cursor-pointer z-10"
               style={{
                 left: `${((value - min) / (max - min)) * 100}%`,
-                backgroundColor: U.getMidColor((value - min) / (max - min), fromColor, toColor)
+                backgroundColor: getMidColor((value - min) / (max - min), fromColor, toColor)
               }}
             />
           </div>

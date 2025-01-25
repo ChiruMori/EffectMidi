@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import './index.styl'
-import U from '@renderer/common/utils'
+import { getMidColor } from '@renderer/common/colors'
 import { EmRangeProps } from '../types'
 
 const SKIP_GAP = 0.3
@@ -35,9 +35,9 @@ const EmRange: React.FC<EmRangeProps> = ({
     return `${p1 * circumference} ${p2 * circumference} ${Math.max(5, p3 * circumference)} ${circumference}`
   }
 
-  const getMidColor = (val: number): string => {
+  const getColor = (val: number): string => {
     const progress = (val - min) / (max - min)
-    return U.getMidColor(progress, fromColor, toColor)
+    return getMidColor(progress, fromColor, toColor)
   }
 
   const handleMouseDown = (event: React.MouseEvent<HTMLElement>): void => {
@@ -65,7 +65,7 @@ const EmRange: React.FC<EmRangeProps> = ({
           cx={center}
           cy={center}
           r={radius}
-          stroke={getMidColor(value)}
+          stroke={getColor(value)}
           strokeWidth="20"
           fill="none"
           strokeDasharray={strokeArray(value)}
@@ -74,7 +74,7 @@ const EmRange: React.FC<EmRangeProps> = ({
           cx={center + radius * 0.75 * Math.cos(getRotation(value) * (Math.PI / 180) - Math.PI / 2)}
           cy={center + radius * 0.75 * Math.sin(getRotation(value) * (Math.PI / 180) - Math.PI / 2)}
           r="8"
-          fill={getMidColor(value)}
+          fill={getColor(value)}
         />
       </svg>
       <div className="value-display">

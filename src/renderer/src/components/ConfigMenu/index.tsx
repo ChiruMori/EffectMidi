@@ -19,7 +19,7 @@ function ConfigMenu(): JSX.Element {
           nowBgImg.img === ''
             ? {}
             : {
-                backgroundImage: 'url(' + nowBgImg.dataUrl || nowBgImg.img + ')'
+                backgroundImage: 'url(' + (nowBgImg.dataUrl || nowBgImg.img) + ')'
               }
         }
       >

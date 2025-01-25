@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { Lang } from '../lang'
 import 'immer'
+import { ThemeTypeEnum } from '@renderer/common/colors'
 
 export const langSlice = createSlice({
   name: 'lang',
@@ -45,19 +46,14 @@ export const comSlice = createSlice({
 export const themeSlice = createSlice({
   name: 'theme',
   initialState: {
-    main: '#1976D2',
-    sub: '#424242',
-    enableRainbow: false
+    type: ThemeTypeEnum.SKY
   },
   reducers: {
-    setMain: (state, action) => {
-      state.main = action.payload
-    },
-    setSub: (state, action) => {
-      state.sub = action.payload
-    },
-    toggleRainbow: (state) => {
-      state.enableRainbow = !state.enableRainbow
+    setType: (state, action) => {
+      return {
+        ...state,
+        type: action.payload
+      }
     }
   }
 })

@@ -1,4 +1,6 @@
 import lang from '@renderer/lang'
+import { useAppSelector } from '@renderer/common/store'
+import C from '@renderer/common/colors'
 import './index.styl'
 
 export type MenuOptions = 'appearance' | 'devices' | 'led' | 'about'
@@ -11,6 +13,7 @@ export default function MenuSlide({
   onChange: (menu: MenuOptions) => void
 }): JSX.Element {
   const txt = lang()
+  const colorType = useAppSelector((state) => state.theme.type)
   return (
     <div className="menu-side text-center px-4 relative">
       <div className="menu text-2xl relative overflow-hidden">
@@ -22,7 +25,8 @@ export default function MenuSlide({
           </div>
           <div
             hidden={menu !== 'appearance'}
-            className={`ani-bg animate__animated animate__fast bg-violet-900 absolute ${menu === 'appearance' ? 'animate__lightSpeedInLeft' : ''}`}
+            className={`ani-bg animate__animated animate__fast absolute ${menu === 'appearance' ? 'animate__lightSpeedInLeft' : ''}`}
+            style={{ backgroundImage: C(colorType).ingridient(45) }}
           ></div>
         </div>
         <div className="menu-item cursor-pointer" onClick={() => onChange('devices')}>
@@ -33,7 +37,8 @@ export default function MenuSlide({
           </div>
           <div
             hidden={menu !== 'devices'}
-            className={`ani-bg animate__animated animate__fast bg-violet-900 absolute ${menu === 'devices' ? 'animate__lightSpeedInLeft' : ''}`}
+            className={`ani-bg animate__animated animate__fast absolute ${menu === 'devices' ? 'animate__lightSpeedInLeft' : ''}`}
+            style={{ backgroundImage: C(colorType).ingridient(45) }}
           ></div>
         </div>
         <div className="menu-item cursor-pointer" onClick={() => onChange('led')}>
@@ -44,7 +49,8 @@ export default function MenuSlide({
           </div>
           <div
             hidden={menu !== 'led'}
-            className={`ani-bg animate__animated animate__fast bg-violet-900 absolute ${menu === 'led' ? 'animate__lightSpeedInLeft' : ''}`}
+            className={`ani-bg animate__animated animate__fast absolute ${menu === 'led' ? 'animate__lightSpeedInLeft' : ''}`}
+            style={{ backgroundImage: C(colorType).ingridient(45) }}
           ></div>
         </div>
         <hr className="menu-hr my-4 border-gray-600 border-dashed max-w-48" />
@@ -56,7 +62,8 @@ export default function MenuSlide({
           </div>
           <div
             hidden={menu !== 'about'}
-            className={`ani-bg animate__animated animate__fast bg-violet-900 absolute ${menu === 'about' ? 'animate__lightSpeedInLeft' : ''}`}
+            className={`ani-bg animate__animated animate__fast absolute ${menu === 'about' ? 'animate__lightSpeedInLeft' : ''}`}
+            style={{ backgroundImage: C(colorType).ingridient(45) }}
           ></div>
         </div>
       </div>

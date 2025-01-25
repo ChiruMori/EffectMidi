@@ -13,3 +13,5 @@ appearance:
   bg-img-placeholder: 本地图片文件或网络地址
   bg-mask-opacity: 遮罩透明度
   bg-mask-opacity-desc: 调整背景遮罩的透明度
+  theme: 主题
+  theme-desc: 选择一个主题
