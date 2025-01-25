@@ -7,6 +7,7 @@ import {
   ListboxOptions,
   ListboxOption
 } from '@headlessui/react'
+import lang from '@renderer/lang'
 import { useState } from 'react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
 
@@ -16,6 +17,7 @@ interface EmSelectProps {
   options: { label: string; val: string }[]
   initialValue: string
   onChange: (val: string) => void
+  suffixBtn?: JSX.Element
 }
 
 export default function EmSelect({
@@ -23,9 +25,11 @@ export default function EmSelect({
   description,
   options,
   onChange,
-  initialValue
+  initialValue,
+  suffixBtn = undefined
 }: EmSelectProps): JSX.Element {
   const [selected, setSelected] = useState(initialValue)
+  const txt = lang()
   return (
     <div className="py-2">
       <Field>
@@ -38,16 +42,20 @@ export default function EmSelect({
             onChange(val)
           }}
         >
-          <ListboxButton
-            className="relative block w-full rounded-lg bg-white/5 py-1.5 pr-8 pl-3 text-left text-sm/6 text-white
+          <div className="w-full flex gap-1">
+            <ListboxButton
+              className="grow relative block rounded-lg bg-white/5 py-1.5 pr-8 pl-3 text-left text-sm/6 text-white
            focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
-          >
-            {options.filter((o) => o.val === selected)[0].label}
-            <ChevronDownIcon
-              className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
-              aria-hidden="true"
-            />
-          </ListboxButton>
+            >
+              {options.filter((o) => o.val === selected)[0]?.label ??
+                txt('components.select.no-selected')}
+              <ChevronDownIcon
+                className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+                aria-hidden="true"
+              />
+            </ListboxButton>
+            {suffixBtn}
+          </div>
           <ListboxOptions
             anchor="bottom"
             transition

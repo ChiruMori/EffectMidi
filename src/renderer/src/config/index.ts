@@ -16,7 +16,7 @@ export const bgImgSlice = createSlice({
   initialState: {
     img: '',
     dataUrl: '',
-    maskOpacity: 0.8
+    maskOpacity: 80
   },
   reducers: {
     setBgImg: (state, action) => {

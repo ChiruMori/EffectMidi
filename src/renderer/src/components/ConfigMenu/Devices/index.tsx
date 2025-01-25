@@ -1,0 +1,52 @@
+import EmSelect from '@renderer/components/basic/EmSelect'
+import { comSlice } from '@renderer/config'
+import { useAppDispatch, useAppSelector } from '@renderer/common/store'
+import lang from '@renderer/lang'
+import { useEffect, useState } from 'react'
+import { PortInfo } from 'src/preload/index.d'
+import { ArrowPathIcon } from '@heroicons/react/20/solid'
+
+export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
+  const [ports, setPorts] = useState<PortInfo[]>([])
+  const nowCom = useAppSelector((state) => state.com)
+  const txt = lang()
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    window.api.listSerialPorts().then((ports) => {
+      setPorts(ports)
+    })
+  }, [])
+
+  return (
+    <div
+      hidden={hidden}
+      className={`animate__animated animate__faster${hidden ? '' : ' animate__lightSpeedInRight'}`}
+    >
+      <EmSelect
+        label={txt('devices.serial-port')}
+        description={txt('devices.serial-port-desc')}
+        options={ports.map((port) => ({
+          val: port.path,
+          label: port.friendlyName || port.path
+        }))}
+        onChange={(value) => {
+          dispatch(comSlice.actions.setCom(value))
+        }}
+        initialValue={nowCom}
+        suffixBtn={
+          <button
+            className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-9"
+            onClick={() => {
+              window.api.listSerialPorts().then((ports) => {
+                setPorts(ports)
+              })
+            }}
+          >
+            <ArrowPathIcon className="group pointer-events-none size-4 fill-white/60" />
+          </button>
+        }
+      />
+    </div>
+  )
+}

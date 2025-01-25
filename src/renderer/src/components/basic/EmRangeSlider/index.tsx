@@ -11,9 +11,10 @@ const RangeSelector: React.FC<EmRangeProps> = ({
   description = '',
   fromColor = '#FF5252',
   toColor = '#4CAF50',
+  initValue = min,
   onChange
 }) => {
-  const [value, setValue] = useState<number>(min)
+  const [value, setValue] = useState<number>(initValue)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setValue(Number(event.target.value))

@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import MenuSlide, { type MenuOptions } from './MenuSlide'
+import MenuSide, { type MenuOptions } from './MenuSide'
 import Appearance from './Appearance'
-import EmRangeKnob from '../basic/EmRangeKnob'
 import { type RootState, useAppSelector } from '@renderer/common/store'
 import './index.styl'
+import { Devices } from './Devices'
 
 function ConfigMenu(): JSX.Element {
   const [menu, setMenu] = useState<MenuOptions>('appearance')
@@ -36,16 +36,11 @@ function ConfigMenu(): JSX.Element {
         <div className="h-full main-panel mx-auto px-4 grid grid-rows-1 grid-cols-12 gap-4">
           <div className="col-span-1"></div>
           <div className="col-span-2">
-            <MenuSlide menu={menu} onChange={setMenu} />
+            <MenuSide menu={menu} onChange={setMenu} />
           </div>
           <div className="col-span-8 overflow-y-scroll overflow-x-hidden rounded-md bg-neutral-800/50 content-page">
             <Appearance hidden={menu !== 'appearance'} />
-            <div
-              hidden={menu !== 'devices'}
-              className={`animate__animated animate__faster w-32 ${menu === 'devices' ? 'animate__lightSpeedInRight' : ''}`}
-            >
-              <EmRangeKnob max={100} min={0} fromColor="#000000" toColor="#4CAF50" label="Label" />
-            </div>
+            <Devices hidden={menu !== 'devices'} />
           </div>
           <div className="col-span-1"></div>
         </div>

@@ -42,7 +42,7 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
           toColor={C(nowColorType).sub}
           label={txt('appearance.bg-mask-opacity')}
           description={txt('appearance.bg-mask-opacity-desc')}
-          initValue={`${nowBgImg.maskOpacity}`}
+          initValue={nowBgImg.maskOpacity}
           onChange={(val) => dispatch(bgImgSlice.actions.setMaskOpacity(val))}
         />
         <EmCubeChecker

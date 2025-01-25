@@ -10,11 +10,12 @@ const EmRange: React.FC<EmRangeProps> = ({
   description,
   min,
   max,
+  initValue = min,
   fromColor = '#FF5252',
   toColor = '#4CAF50',
   onChange
 }) => {
-  const [value, setValue] = useState<number>(min)
+  const [value, setValue] = useState<number>(initValue)
 
   const radius = 100
   const center = radius + 10

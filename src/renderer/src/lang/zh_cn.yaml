@@ -1,4 +1,7 @@
 # 中文语言配置（默认）
+components:
+  select:
+    no-selected: 未选择
 menu:
   appearance: 外观
   led: 灯光
@@ -15,3 +18,6 @@ appearance:
   bg-mask-opacity-desc: 调整背景遮罩的透明度
   theme: 主题
   theme-desc: 选择一个主题
+devices:
+  serial-port: 串口
+  serial-port-desc: 选择串口

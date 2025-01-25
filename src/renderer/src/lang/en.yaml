@@ -1,4 +1,7 @@
 # English translations
+components:
+  select:
+    no-selected: No selected
 menu:
   appearance: Display
   led: Lights
@@ -14,3 +17,6 @@ appearance:
   bg-mask-opacity-desc: Adjust the opacity of the background mask
   theme: Theme
   theme-desc: Choose a theme
+devices:
+  serial-port: Serial Port
+  serial-port-desc: Select the serial port

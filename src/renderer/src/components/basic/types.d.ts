@@ -3,7 +3,7 @@ export interface EmRangeProps {
   max: number
   label: string
   description?: string
-  initValue?: string
+  initValue?: number
   fromColor?: string
   toColor?: string
   onChange?: (value: number) => void
