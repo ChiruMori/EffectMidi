@@ -8,6 +8,7 @@ function App(): JSX.Element {
 
   return (
     <>
+    鼠标点击效果没做
       <ConfigMenu />
       <Keyboard activeKeys={activeKeys} />
     </>
