@@ -53,6 +53,25 @@ export type ColorFuncType = {
   ingridient: (deg: number) => string
 }
 
+export function hexStringToHue(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h = 0
+  if (max === min) {
+    return 0
+  } else if (max === r) {
+    h = (60 * (g - b)) / (max - min)
+  } else if (max === g) {
+    h = (60 * (b - r)) / (max - min) + 120
+  } else {
+    h = (60 * (r - g)) / (max - min) + 240
+  }
+  return h < 0 ? h + 360 : h
+}
+
 export default function colorOf(type: ThemeTypeEnum): ColorFuncType {
   return {
     main: COLOR_DICT[type].main,

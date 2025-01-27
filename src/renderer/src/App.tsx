@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ConfigMenu from './components/ConfigMenu'
 import Keyboard from './components/Keyboard'
+import ClickGranule from './components/effects/ClickGranule'
 
 function App(): JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -8,7 +9,7 @@ function App(): JSX.Element {
 
   return (
     <>
-    鼠标点击效果没做
+      <ClickGranule />
       <ConfigMenu />
       <Keyboard activeKeys={activeKeys} />
     </>
