@@ -1,21 +1,29 @@
 #include "headers/SerialCommand.hpp"
 
-void WaitingCmd::execute(const String &cmd)
+void WaitingCmd::execute(uint8_t *args)
 {
-  // 使端点灯闪烁（忽略端点灯设置）
-  int realBrightness = counter > WAITING_COUNTER_MAX ? WAITING_COUNTER_MAX * 2 - counter : counter;
-  CRGB color = CRGB(realBrightness, realBrightness, realBrightness);
-  ledController.setEndLightsColor(color);
-  counter = (counter + 1) % WAITING_COUNTER_MAX;
+  // 仅在等待状态下执行
+  if (ledController.isWaiting())
+  {
+    // 使端点灯闪烁（忽略端点灯设置）
+    int realBrightness = counter > (WAITING_COUNTER_MAX / 2) ? WAITING_COUNTER_MAX - counter : counter;
+    CRGB color = CRGB(realBrightness, realBrightness, realBrightness);
+    ledController.setEndLightsColor(color, true);
+    counter = (counter + 1) % WAITING_COUNTER_MAX;
+    // debug("Bright: " + String(realBrightness));
+  }
+  else
+  {
+    delay(WAIT_DELAY);
+  }
 };
 
-String WaitingCmd::getName()
+uint8_t WaitingCmd::getNameByte()
 {
-  return "WAIT";
+  return CMD_BYTE_WAITING;
 }
 
-WaitingCmd &WaitingCmd::getInstance(LEDController &ledController)
+uint8_t WaitingCmd::getArgCount()
 {
-  static WaitingCmd instance(ledController);
-  return instance;
+  return 0;
 }

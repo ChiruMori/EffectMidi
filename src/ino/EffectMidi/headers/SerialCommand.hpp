@@ -1,9 +1,26 @@
 #ifndef SERIAL_COMMAND_H
 #define SERIAL_COMMAND_H
-#define WAITING_COUNTER_MAX 128
-#define DECLARE_COMMAND(ClassName) \
-    void execute(const String &cmd) override; \
-    String getName() override;
+#define WAITING_COUNTER_MAX 256
+#define WAIT_DELAY 10
+#define CMD_BYTE_WAITING 0x00
+#define CMD_BYTE_SET_FOREGROUND_COLOR 0x01
+#define CMD_BYTE_SET_BACKGROUND_COLOR 0x02
+#define CMD_BYTE_KEY_DOWN 0x03
+#define CMD_BYTE_KEY_UP 0x04
+
+#define DECLARE_COMMAND(ClassName, BaseClass)                 \
+public:                                                       \
+  void execute(uint8_t *args) override;                       \
+  uint8_t getNameByte() override;                             \
+  uint8_t getArgCount() override;                             \
+  static ClassName &getInstance(LEDController &ledController) \
+  {                                                           \
+    static ClassName instance(ledController);                 \
+    return instance;                                          \
+  }                                                           \
+                                                              \
+private:                                                      \
+  ClassName(LEDController &ledController) : BaseClass(ledController) {}
 
 #include "LEDController.hpp"
 
@@ -16,29 +33,22 @@ public:
   /**
    * 执行指令
    */
-  virtual void execute(const String &cmd) = 0;
+  virtual void execute(uint8_t *args) = 0;
   /**
-   * 指令前缀
+   * 指令识别字节
    */
-  virtual String getName() = 0;
+  virtual uint8_t getNameByte() = 0;
+  /**
+   * 需要的参数数量
+   */
+  virtual uint8_t getArgCount() = 0;
 
 protected:
   SerialCommand(LEDController &ledController) : ledController(ledController) {}
   // 灯带控制器
   LEDController &ledController;
-};
-
-/**
- * 串口指令基类，拓展了用于解析颜色参数的方法
- */
-class SerialRgbCommand : public SerialCommand
-{
-protected:
-  SerialRgbCommand(LEDController &ledController) : SerialCommand(ledController) {}
-  /**
-   * 解析颜色参数
-   */
-  CRGB parseColor(const String &cmd);
+  // 调试输出到控制台
+  void debug(const String &msg);
 };
 
 /**
@@ -46,39 +56,40 @@ protected:
  */
 class WaitingCmd : public SerialCommand
 {
-public:
-  static WaitingCmd &getInstance(LEDController &ledController);
-  DECLARE_COMMAND(WaitingCmd)
-
-private:
+  DECLARE_COMMAND(WaitingCmd, SerialCommand)
   int counter = 0;
-  WaitingCmd(LEDController &ledController) : SerialCommand(ledController) {}
 };
 
 /**
  * 设置前景色指令
  */
-class SetForegroundColorCmd : public SerialRgbCommand
+class SetForegroundColorCmd : public SerialCommand
 {
-public:
-  static SetForegroundColorCmd &getInstance(LEDController &ledController);
-  DECLARE_COMMAND(WaitingCmd)
-
-private:
-  SetForegroundColorCmd(LEDController &ledController) : SerialRgbCommand(ledController) {}
+  DECLARE_COMMAND(SetForegroundColorCmd, SerialCommand)
 };
 
 /**
  * 设置背景色指令
  */
-class SetBackgroundColorCmd : public SerialRgbCommand
+class SetBackgroundColorCmd : public SerialCommand
 {
-public:
-  static SetBackgroundColorCmd &getInstance(LEDController &ledController);
-  DECLARE_COMMAND(WaitingCmd)
+  DECLARE_COMMAND(SetBackgroundColorCmd, SerialCommand)
+};
 
-private:
-  SetBackgroundColorCmd(LEDController &ledController) : SerialRgbCommand(ledController) {}
+/**
+ * 按键按下指令
+ */
+class KeyDownCommand : public SerialCommand
+{
+  DECLARE_COMMAND(KeyDownCommand, SerialCommand)
+};
+
+/**
+ * 按键松开指令
+ */
+class KeyUpCommand : public SerialCommand
+{
+  DECLARE_COMMAND(KeyUpCommand, SerialCommand)
 };
 
 #endif

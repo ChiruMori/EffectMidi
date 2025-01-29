@@ -1,7 +1,8 @@
 #ifndef LED_CONTROLLER_H
 #define LED_CONTROLLER_H
 #define KEY_NUM 88
-#define DIGITAL_PIN 6
+#define DIGITAL_PIN 7
+#define DEBUG_MODE 1
 
 #include <FastLED.h>
 
@@ -37,7 +38,7 @@ public:
   /**
    * 设置端点灯的颜色
    */
-  void setEndLightsColor(CRGB color);
+  void setEndLightsColor(CRGB color, bool ignoreSettings);
   /**
    * 设置LED灯带的亮度
    */
@@ -49,11 +50,19 @@ public:
   /**
    * 按下某个键
    */
-  void pressKey(int keyIndex);
+  void pressKey(uint8_t keyIndex);
   /**
    * 松开某个键
    */
-  void releaseKey(int keyIndex);
+  void releaseKey(uint8_t keyIndex);
+  /**
+   * 是否正在等待启动
+   */
+  bool isWaiting();
+  /**
+   * 结束等待
+   */
+  void endWaiting();
   // void clear();
   // void updateRainbow(int& rainbowBeginColor);
   // void handleKeyPress(int keyIndex, bool pressed);
@@ -96,6 +105,10 @@ private:
    * 亮度
    */
   int brightness;
+  /**
+   * 等待启动状态
+   */
+  bool waiting;
 };
 
 #endif

@@ -16,7 +16,7 @@ public:
   /**
    * 获取能够执行指定字符串的指令
    */
-  SerialCommand *getCommand(const String &commandStr);
+  SerialCommand *getCommand(uint8_t cmdNameByte);
 
 private:
   // 灯带控制器
@@ -25,8 +25,6 @@ private:
   SerialCommand **commands;
   // 注册单条指令
   void registerCommand(SerialCommand *command);
-  // 已注册的指令数量
-  int commandCount = 0;
 };
 
 #endif

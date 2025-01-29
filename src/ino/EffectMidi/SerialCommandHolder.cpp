@@ -1,13 +1,17 @@
 #include "headers/SerialCommandHolder.hpp"
 
-SerialCommandHolder::SerialCommandHolder(LEDController &ledController) : ledController(ledController), commandCount(0)
+SerialCommandHolder::SerialCommandHolder(LEDController &ledController) : ledController(ledController)
 {
   commands = new SerialCommand *[COMMAND_NUM];
+  for (int i = 0; i < COMMAND_NUM; ++i)
+  {
+    commands[i] = nullptr;
+  }
 }
 
 void SerialCommandHolder::registerCommand(SerialCommand *command)
 {
-  commands[commandCount++] = command;
+  commands[command->getNameByte()] = command;
 }
 
 void SerialCommandHolder::createAllCommands(LEDController &ledController)
@@ -15,17 +19,19 @@ void SerialCommandHolder::createAllCommands(LEDController &ledController)
   registerCommand(&WaitingCmd::getInstance(ledController));
   registerCommand(&SetBackgroundColorCmd::getInstance(ledController));
   registerCommand(&SetForegroundColorCmd::getInstance(ledController));
+  registerCommand(&KeyDownCommand::getInstance(ledController));
+  registerCommand(&KeyUpCommand::getInstance(ledController));
 }
 
-SerialCommand *SerialCommandHolder::getCommand(const String &commandStr)
+SerialCommand *SerialCommandHolder::getCommand(const uint8_t cmdNameByte)
 {
-  int cmdIndex = commandStr.indexOf(' ');
-  String cmdName = commandStr.substring(0, cmdIndex);
-  for (int i = 0; i < commandCount; ++i)
+  if (commands[cmdNameByte])
   {
-    if (commands[i]->getName() == cmdName)
+    if (cmdNameByte != CMD_BYTE_WAITING)
     {
-      return commands[i];
+      Serial.println("Get command: " + String(int(cmdNameByte)));
     }
+    return commands[cmdNameByte];
   }
+  return nullptr;
 }

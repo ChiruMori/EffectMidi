@@ -23,7 +23,6 @@ const createParticle = (x: number, y: number, colorType: ThemeTypeEnum): Particl
   const speedX = (Math.random() - 0.5) * speedBase
   const speedY = (Math.random() - 0.5) * speedBase
   const nowColor = (hexStringToHue(C(colorType).main) + Math.random() * colorOffset) % 360
-  console.log('b', colorType)
   const color =
     colorType !== ThemeTypeEnum.GRAY
       ? `hsl(${nowColor}, 90%, 50%)`
@@ -38,7 +37,6 @@ export default function ClickGranule(): JSX.Element {
 
   // 在这里获取 colorType
   const colorType = useAppSelector((e) => e.theme.type)
-  console.log('a', colorType)
 
   const updateParticles = (): void => {
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -97,8 +95,8 @@ export default function ClickGranule(): JSX.Element {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (ctx) {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      canvas!.width = window.innerWidth
+      canvas!.height = window.innerHeight
       animate(ctx)
       window.addEventListener('mousedown', handleClick)
       window.addEventListener('resize', handleResize)

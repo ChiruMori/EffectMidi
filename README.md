@@ -43,7 +43,7 @@
 
 ### Arduino 开发板端
 
-推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)。
+推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)。暂未发现 VSCode 上 Arduino 的合适插件，仍需依赖 Arduino IDE 完成开发（验证、上传、依赖）。
 
 依赖下列库：
 
