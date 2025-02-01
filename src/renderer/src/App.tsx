@@ -4,7 +4,6 @@ import Keyboard from './components/Keyboard'
 import ClickGranule from './components/effects/ClickGranule'
 
 function App(): JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
   const [activeKeys, setActiveKeys] = useState<string[]>(['C7', 'C7#', 'A3'])
 
   return (

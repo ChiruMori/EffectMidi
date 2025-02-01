@@ -1,34 +1,33 @@
 import { useState } from 'react'
 import MenuSide, { type MenuOptions } from './MenuSide'
 import Appearance from './Appearance'
-import { type RootState, useAppSelector } from '@renderer/common/store'
+import { useAppSelector } from '@renderer/common/store'
 import './index.styl'
 import { Devices } from './Devices'
+import { bgImgSelector } from '@renderer/config'
 
 function ConfigMenu(): JSX.Element {
   const [menu, setMenu] = useState<MenuOptions>('appearance')
-  const nowBgImg = useAppSelector(
-    (state: RootState): { img: string; dataUrl: string; maskOpacity: number } => state.bg
-  )
+  const nowBgImg = useAppSelector(bgImgSelector)
 
   return (
     <>
       <div
         className="absolute w-full h-full bg-cover bg-center -z-10"
         style={
-          nowBgImg.img === ''
+          nowBgImg.bgImg === ''
             ? {}
             : {
-                backgroundImage: 'url(' + (nowBgImg.dataUrl || nowBgImg.img) + ')'
+                backgroundImage: 'url(' + (nowBgImg.bgDataUrl || nowBgImg.bgImg) + ')'
               }
         }
       >
-        {nowBgImg.img === '' ? (
+        {nowBgImg.bgImg === '' ? (
           ''
         ) : (
           <div
             className="absolute w-full h-full bg-black z-10"
-            style={{ opacity: nowBgImg.maskOpacity / 100 }}
+            style={{ opacity: nowBgImg.bgMaskOpacity / 100 }}
           ></div>
         )}
       </div>

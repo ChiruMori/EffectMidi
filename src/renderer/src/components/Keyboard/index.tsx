@@ -2,6 +2,7 @@ import { Score } from '@renderer/common/score'
 import { useAppSelector } from '@renderer/common/store'
 import C from '@renderer/common/colors'
 import './index.styl'
+import { themeSelector } from '@renderer/config'
 
 const whiteKeyCnt = 52
 const startScore = 'A1'
@@ -17,7 +18,7 @@ export default function Keyboard({ activeKeys }: { activeKeys: string[] }): JSX.
     }
     nextScore = nextScore.nextHalfTone()
   }
-  const colorType = useAppSelector((e) => e.theme.type)
+  const colorType = useAppSelector(themeSelector)
 
   return (
     <div className="absolute w-full h-1/6 bg-white bottom-0">

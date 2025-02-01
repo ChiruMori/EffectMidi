@@ -49,6 +49,7 @@ dist-electron
 release
 *.local
 out
+effect-midi.db
 
 # Editor directories and files
 .vscode/.debug.env

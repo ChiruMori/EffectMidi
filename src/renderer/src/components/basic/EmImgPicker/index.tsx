@@ -1,7 +1,10 @@
 import { Button, Description, Field, Input, Label } from '@headlessui/react'
 import { FolderIcon, XCircleIcon } from '@heroicons/react/20/solid'
-import React from 'react'
+import { debounce } from 'lodash'
+import React, { useCallback } from 'react'
 import './index.styl'
+
+const FILE_PATH_PREFIX = '[EM:file] '
 
 interface EmInputProps {
   label: string
@@ -17,9 +20,10 @@ const EmInput: React.FC<EmInputProps> = ({
   description,
   placeholder = '',
   initValue = '',
-  onChange
+  onChange = (): void => {}
 }) => {
   const [filename, setFilename] = React.useState(initValue)
+  const debounced = useCallback(debounce(onChange, 300), [])
 
   return (
     <div className="py-2">
@@ -34,8 +38,9 @@ const EmInput: React.FC<EmInputProps> = ({
             value={filename}
             onChange={(e) => {
               setFilename(e.target.value)
-              onChange && onChange({ path: e.target.value })
+              debounced({ path: e.target.value })
             }}
+            disabled={filename !== '' && filename.startsWith(FILE_PATH_PREFIX)}
           />
           <label
             htmlFor={filename && 'file'}
@@ -72,12 +77,12 @@ const EmInput: React.FC<EmInputProps> = ({
                   if (!filepath) {
                     return
                   }
-                  setFilename(filepath)
+                  setFilename(FILE_PATH_PREFIX + filepath)
                   const reader = new FileReader()
                   reader.onload = (e: ProgressEvent<FileReader>): void => {
                     onChange &&
                       onChange({
-                        path: filepath,
+                        path: FILE_PATH_PREFIX + filepath,
                         dataUrl: e.target?.result as string
                       })
                   }

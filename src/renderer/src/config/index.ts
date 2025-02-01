@@ -2,34 +2,42 @@ import { createSlice } from '@reduxjs/toolkit'
 import { Lang } from '../lang'
 import 'immer'
 import { ThemeTypeEnum } from '@renderer/common/colors'
+import { RootState } from '@renderer/common/store'
 
 export const langSlice = createSlice({
   name: 'lang',
-  initialState: Lang.zh_cn,
+  initialState: {
+    lang: Lang.zh_cn
+  },
   reducers: {
-    setLang: (_, action) => action.payload
+    setLang: (state, action) => {
+      return {
+        ...state,
+        lang: action.payload
+      }
+    }
   }
 })
 
 export const bgImgSlice = createSlice({
   name: 'bgImg',
   initialState: {
-    img: '',
-    dataUrl: '',
-    maskOpacity: 80
+    bgImg: '',
+    bgDataUrl: '',
+    bgMaskOpacity: 80
   },
   reducers: {
     setBgImg: (state, action) => {
       return {
         ...state,
-        img: action.payload.path,
-        dataUrl: action.payload.dataUrl
+        bgImg: action.payload.path,
+        bgDataUrl: action.payload.dataUrl
       }
     },
     setMaskOpacity: (state, action) => {
       return {
         ...state,
-        maskOpacity: action.payload
+        bgMaskOpacity: action.payload
       }
     }
   }
@@ -37,22 +45,29 @@ export const bgImgSlice = createSlice({
 
 export const comSlice = createSlice({
   name: 'com',
-  initialState: '',
+  initialState: {
+    com: ''
+  },
   reducers: {
-    setCom: (_, action) => action.payload
+    setCom: (state, action) => {
+      return {
+        ...state,
+        com: action.payload
+      }
+    }
   }
 })
 
 export const themeSlice = createSlice({
   name: 'theme',
   initialState: {
-    type: ThemeTypeEnum.SKY
+    theme: ThemeTypeEnum.SKY
   },
   reducers: {
     setType: (state, action) => {
       return {
         ...state,
-        type: action.payload
+        theme: action.payload
       }
     }
   }
@@ -61,15 +76,21 @@ export const themeSlice = createSlice({
 export const residueSlice = createSlice({
   name: 'residue',
   initialState: {
-    enable: true,
-    time: 500
+    enableResidue: true,
+    residueTime: 500
   },
   reducers: {
     setTime: (state, action) => {
-      state.time = action.payload
+      return {
+        ...state,
+        residueTime: action.payload
+      }
     },
-    toggleResidue: (state) => {
-      state.enable = !state.enable
+    setEnableResidue: (state, action) => {
+      return {
+        ...state,
+        enableResidue: action.payload
+      }
     }
   }
 })
@@ -77,15 +98,57 @@ export const residueSlice = createSlice({
 export const diffusionSlice = createSlice({
   name: 'diffusion',
   initialState: {
-    enable: false,
-    width: 2
+    enableDiffusion: false,
+    diffusionWidth: 2
   },
   reducers: {
     setWidth: (state, action) => {
-      state.width = action.payload
+      return {
+        ...state,
+        diffusionWidth: action.payload
+      }
     },
-    toggleDiffusion: (state) => {
-      state.enable = !state.enable
+    setDiffusion: (state, action) => {
+      state.enableDiffusion = action.payload
     }
   }
 })
+
+export const langSelector = (state: RootState): Lang => state.lang?.lang || Lang.zh_cn
+export const bgImgSelector = (
+  state: RootState
+): { bgImg: string; bgDataUrl: string; bgMaskOpacity: number } => {
+  return (
+    state.bg || {
+      bgImg: '',
+      bgDataUrl: '',
+      bgMaskOpacity: 80
+    }
+  )
+}
+export const comSelector = (state: RootState): string => state.com?.com || ''
+export const themeSelector = (state: RootState): ThemeTypeEnum =>
+  state.theme?.theme || ThemeTypeEnum.SKY
+export const residueSelector = (
+  state: RootState
+): { enableResidue: boolean; residueTime: number } => {
+  return (
+    state.residue || {
+      enableResidue: true,
+      residueTime: 500
+    }
+  )
+}
+export const diffusionSelector = (
+  state: RootState
+): {
+  enableDiffusion: boolean
+  diffusionWidth: number
+} => {
+  return (
+    state.diffusion || {
+      enableDiffusion: false,
+      diffusionWidth: 2
+    }
+  )
+}

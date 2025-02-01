@@ -16,7 +16,7 @@ void setup()
   cmdHolder.createAllCommands(ledController);
   ledController.setup();
   Serial.begin(SERIAL_BAUD);
-  ledController.show();
+  ledController.stepAndShow();
 }
 
 void loop()
@@ -42,6 +42,6 @@ void loop()
   // 不再等待时，点亮灯带
   if (!ledController.isWaiting() || cmdNameByte == 0)
   {
-    ledController.show();
+    ledController.stepAndShow();
   }
 }

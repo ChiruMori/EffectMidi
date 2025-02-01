@@ -1,7 +1,7 @@
-import { useSelector } from 'react-redux'
-import { type RootState } from '@renderer/common/store'
+import { useAppSelector } from '@renderer/common/store'
 import { get } from 'lodash'
 import { useEffect, useState } from 'react'
+import { langSelector } from '@renderer/config'
 
 export enum Lang {
   en = 'en',
@@ -30,7 +30,7 @@ const loadLangFile = async (lang: Lang): Promise<void> => {
  * 自定义 Hook 用于获取多语言文本
  */
 export default function useGetText(): (key: string) => string {
-  const lang = useSelector((state: RootState) => state.lang)
+  const lang = useAppSelector(langSelector)
   const [text, setText] = useState<LangData>({})
 
   useEffect(() => {
@@ -51,5 +51,3 @@ export default function useGetText(): (key: string) => string {
 
   return getText
 }
-
-export const selectLang = (state: RootState): Lang => state.lang

@@ -1,5 +1,12 @@
-import lang, { selectLang } from '@renderer/lang'
-import { bgImgSlice, langSlice, themeSlice } from '@renderer/config'
+import lang from '@renderer/lang'
+import {
+  bgImgSelector,
+  bgImgSlice,
+  langSelector,
+  langSlice,
+  themeSelector,
+  themeSlice
+} from '@renderer/config'
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
 import C, { ThemeTypeEnum } from '@renderer/common/colors'
 import EmSelect from '../../basic/EmSelect'
@@ -10,9 +17,9 @@ import EmCubeChecker from '@renderer/components/basic/EmCubeChecker'
 export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element {
   const txt = lang()
   const dispatch = useAppDispatch()
-  const nowLang = useAppSelector(selectLang)
-  const nowBgImg = useAppSelector((state) => state.bg)
-  const nowColorType = useAppSelector((state) => state.theme.type)
+  const nowLang = useAppSelector(langSelector)
+  const nowBgImg = useAppSelector(bgImgSelector)
+  const nowColorType = useAppSelector(themeSelector)
   return (
     <div>
       <div
@@ -33,6 +40,7 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
           label={txt('appearance.bg-img-label')}
           description={txt('appearance.bg-img-desc')}
           placeholder={txt('appearance.bg-img-placeholder')}
+          initValue={nowBgImg.bgImg}
           onChange={(val) => dispatch(bgImgSlice.actions.setBgImg(val))}
         />
         <EmRangeSlider
@@ -42,7 +50,7 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
           toColor={C(nowColorType).sub}
           label={txt('appearance.bg-mask-opacity')}
           description={txt('appearance.bg-mask-opacity-desc')}
-          initValue={nowBgImg.maskOpacity}
+          initValue={nowBgImg.bgMaskOpacity}
           onChange={(val) => dispatch(bgImgSlice.actions.setMaskOpacity(val))}
         />
         <EmCubeChecker

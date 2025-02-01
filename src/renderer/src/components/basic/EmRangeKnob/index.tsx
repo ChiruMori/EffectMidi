@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import './index.styl'
 import { getMidColor } from '@renderer/common/colors'
 import { EmRangeProps } from '../types'
@@ -13,9 +13,10 @@ const EmRange: React.FC<EmRangeProps> = ({
   initValue = min,
   fromColor = '#FF5252',
   toColor = '#4CAF50',
-  onChange
+  onChange = (): void => {}
 }) => {
   const [value, setValue] = useState<number>(initValue)
+  const debounced = useCallback(onChange, [])
 
   const radius = 100
   const center = radius + 10
@@ -47,9 +48,7 @@ const EmRange: React.FC<EmRangeProps> = ({
       const deltaY = (-((e as MouseEvent).clientY - dragStartY) / (max - min)) * 30
       const newValue = ~~Math.min(max, Math.max(min, value + deltaY))
       setValue(newValue)
-      if (onChange) {
-        onChange(newValue)
-      }
+      debounced(newValue)
     }
 
     window.addEventListener('mousemove', handleMouseMove)

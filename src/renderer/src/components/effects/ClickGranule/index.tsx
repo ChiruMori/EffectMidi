@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useAppSelector } from '@renderer/common/store'
 import C, { ThemeTypeEnum, hexStringToHue } from '@renderer/common/colors'
+import { themeSelector } from '@renderer/config'
 
 const colorOffset = 50
 const particlesOneClick = 10
@@ -36,7 +37,7 @@ export default function ClickGranule(): JSX.Element {
   const particles: Particle[] = []
 
   // 在这里获取 colorType
-  const colorType = useAppSelector((e) => e.theme.type)
+  const colorType = useAppSelector(themeSelector)
 
   const updateParticles = (): void => {
     for (let i = particles.length - 1; i >= 0; i--) {

@@ -35,3 +35,39 @@ uint8_t SetForegroundColorCmd::getArgCount()
 {
   return 3;
 }
+
+// 颜色预览指令
+
+void ColorPreviewCmd::execute(uint8_t *args)
+{
+  ledController.previewEndLightsColor(CRGB(args[0], args[1], args[2]));
+  debug("PRE: " + String(args[0]) + "," + String(args[1]) + "," + String(args[2]));
+}
+
+uint8_t ColorPreviewCmd::getNameByte()
+{
+  return CMD_BYTE_COLOR_PREVIEW;
+}
+
+uint8_t ColorPreviewCmd::getArgCount()
+{
+  return 3;
+}
+
+// 设置端点灯颜色指令
+
+void SetEndLightsColorCmd::execute(uint8_t *args)
+{
+  ledController.setEndLightsColor(CRGB(args[0], args[1], args[2]), false);
+  debug("E_C: " + String(args[0]) + "," + String(args[1]) + "," + String(args[2]));
+}
+
+uint8_t SetEndLightsColorCmd::getNameByte()
+{
+  return CMD_BYTE_SET_END_LIGHTS_COLOR;
+}
+
+uint8_t SetEndLightsColorCmd::getArgCount()
+{
+  return 3;
+}

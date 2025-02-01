@@ -1,5 +1,5 @@
 import { Description, Field, Input, Label } from '@headlessui/react'
-import React from 'react'
+import React, { useCallback } from 'react'
 
 interface EmInputProps {
   label: string
@@ -15,8 +15,10 @@ const EmInput: React.FC<EmInputProps> = ({
   description,
   placeholder = '',
   initValue = '',
-  onChange
+  onChange = (): void => {}
 }) => {
+  const [val, setVal] = React.useState(initValue)
+  const debounced = useCallback(onChange, [])
   return (
     <div className="py-2">
       <Field>
@@ -28,7 +30,11 @@ const EmInput: React.FC<EmInputProps> = ({
             'mt-3 block w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm/6 text-white focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25'
           }
           defaultValue={initValue}
-          onChange={(e) => onChange && onChange(e.target.value)}
+          onChange={(e) => {
+            setVal(e.target.value)
+            debounced(e.target.value)
+          }}
+          value={val}
         />
       </Field>
     </div>

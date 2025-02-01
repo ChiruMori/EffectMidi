@@ -2,6 +2,7 @@ import lang from '@renderer/lang'
 import { useAppSelector } from '@renderer/common/store'
 import C from '@renderer/common/colors'
 import './index.styl'
+import { themeSelector } from '@renderer/config'
 
 export type MenuOptions = 'appearance' | 'devices' | 'led' | 'about'
 
@@ -13,7 +14,7 @@ export default function MenuSlide({
   onChange: (menu: MenuOptions) => void
 }): JSX.Element {
   const txt = lang()
-  const colorType = useAppSelector((state) => state.theme.type)
+  const colorType = useAppSelector(themeSelector)
   return (
     <div className="menu-side text-center px-4 relative">
       <div className="menu text-2xl relative overflow-hidden">

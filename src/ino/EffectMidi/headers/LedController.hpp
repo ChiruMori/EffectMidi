@@ -3,6 +3,7 @@
 #define KEY_NUM 88
 #define DIGITAL_PIN 7
 #define DEBUG_MODE 1
+#define PREVIEW_TIME 5000
 
 #include <FastLED.h>
 
@@ -20,9 +21,9 @@ public:
    */
   void setup();
   /**
-   * 执行处理步骤并显示
+   * 显示
    */
-  void show();
+  void stepAndShow();
   /**
    * 设置LED灯带的前景色
    */
@@ -38,7 +39,7 @@ public:
   /**
    * 设置端点灯的颜色
    */
-  void setEndLightsColor(CRGB color, bool ignoreSettings);
+  void setEndLightsColor(CRGB color, bool ignoreSetting);
   /**
    * 设置LED灯带的亮度
    */
@@ -63,10 +64,18 @@ public:
    * 结束等待
    */
   void endWaiting();
-  // void clear();
-  // void updateRainbow(int& rainbowBeginColor);
-  // void handleKeyPress(int keyIndex, bool pressed);
-  // void clearBackground();
+  /**
+   * 通过端点灯预览颜色
+   */
+  void previewEndLightsColor(CRGB color);
+  /**
+   * 设置扩散宽度
+   */
+  void setDiffusionWidth(int width);
+  /**
+   * 设置残留时间，单位毫秒，0表示不启用残留
+   */
+  void setResidualTime(int time);
 
 private:
   /**
@@ -82,10 +91,6 @@ private:
    */
   int numLeds;
   /**
-   * 启用端点灯（左右两侧）
-   */
-  bool enableEndLights;
-  /**
    * 前景色
    */
   CRGB foregroundColor;
@@ -93,10 +98,6 @@ private:
    * 背景色
    */
   CRGB backgroundColor;
-  /**
-   * 启用背景灯
-   */
-  bool useBackground;
   /**
    * 端点灯的颜色
    */
@@ -109,6 +110,22 @@ private:
    * 等待启动状态
    */
   bool waiting;
+  /**
+   * 扩散宽度
+   */
+  int diffusionWidth;
+  /**
+   * 残留时间
+   */
+  int residualTime;
+  /**
+   * 端点灯的颜色预览剩余时间
+   */
+  int endLightsPreviewTime;
+  /**
+   * 残留时间计数数组
+   */
+  int residualCounter[KEY_NUM];
 };
 
 #endif

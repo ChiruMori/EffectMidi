@@ -9,6 +9,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "files.associations": {
-    "map": "cpp"
+    "map": "cpp",
+    "xiosbase": "cpp"
   }
 }

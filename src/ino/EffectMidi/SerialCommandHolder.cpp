@@ -21,6 +21,11 @@ void SerialCommandHolder::createAllCommands(LEDController &ledController)
   registerCommand(&SetForegroundColorCmd::getInstance(ledController));
   registerCommand(&KeyDownCommand::getInstance(ledController));
   registerCommand(&KeyUpCommand::getInstance(ledController));
+  registerCommand(&SetBrightnessCmd::getInstance(ledController));
+  registerCommand(&SetResidualTimeCmd::getInstance(ledController));
+  registerCommand(&SetDiffusionWidthCmd::getInstance(ledController));
+  registerCommand(&SetEndLightsColorCmd::getInstance(ledController));
+  registerCommand(&ColorPreviewCmd::getInstance(ledController));
 }
 
 SerialCommand *SerialCommandHolder::getCommand(const uint8_t cmdNameByte)

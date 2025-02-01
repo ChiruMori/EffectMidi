@@ -1,19 +1,25 @@
 #include "headers/LedController.hpp"
 
-LEDController::LEDController(int numLeds) : numLeds(numLeds), enableEndLights(false)
+LEDController::LEDController(int numLeds)
 {
-  leds = new CRGB[numLeds];
+  this->numLeds = numLeds;
   for (int i = 0; i < numLeds; ++i)
   {
-    leds[i] = CRGB::Black;
+    this->leds[i] = CRGB::Black;
   }
   for (int i = 0; i < KEY_NUM; ++i)
   {
-    activeFlag[i] = false;
+    this->activeFlag[i] = false;
+    this->residualCounter[i] = 0;
   }
-  waiting = true;
-  enableEndLights = false;
-  useBackground = true;
+  this->diffusionWidth = 0;
+  this->residualTime = 0;
+  this->endLightsPreviewTime = 0;
+  this->endLightsColor = CRGB::Black;
+  this->foregroundColor = CRGB::White;
+  this->backgroundColor = CRGB::Black;
+  this->brightness = 100;
+  this->waiting = true;
   FastLED.addLeds<WS2812, DIGITAL_PIN, GRB>(leds, numLeds);
 }
 
@@ -31,20 +37,81 @@ bool LEDController::isWaiting()
 void LEDController::endWaiting()
 {
   waiting = false;
-  if (enableEndLights)
-  {
-    leds[0] = endLightsColor;
-    leds[(KEY_NUM << 1) + 1] = endLightsColor;
-  }
-  else
-  {
-    leds[0] = CRGB::Black;
-    leds[(KEY_NUM << 1) + 1] = CRGB::Black;
-  }
+  leds[0] = endLightsColor;
+  leds[(KEY_NUM << 1) + 1] = endLightsColor;
 }
 
-void LEDController::show()
+/**
+ * 混合两种颜色
+ *
+ * @param color1 颜色1
+ * @param color2 颜色2
+ * @param ratio 混合比例，0-255，0表示全color1，255表示全color2
+ * @return 混合后的颜色
+ */
+CRGB mixColor(CRGB color1, CRGB color2, int ratio)
 {
+  return CRGB(
+      (color1.r * ratio + color2.r * (255 - ratio)) >> 8,
+      (color1.g * ratio + color2.g * (255 - ratio)) >> 8,
+      (color1.b * ratio + color2.b * (255 - ratio)) >> 8);
+}
+
+void LEDController::stepAndShow()
+{
+  // 预览模式支持
+  if (endLightsPreviewTime > 0)
+  {
+    endLightsPreviewTime--;
+    if (endLightsPreviewTime == 0)
+    {
+      endLightsColor = endLightsColor;
+    }
+  }
+  // 扩散效果支持（扩散后残留，越靠近扩散边缘，前景色越淡，残留时间越短）
+  if (diffusionWidth > 0)
+  {
+    for (int i = 0; i < KEY_NUM; ++i)
+    {
+      if (activeFlag[i])
+      {
+        auto currentKey = (i + 1) << 1;
+        leds[currentKey] = foregroundColor;
+        for (int j = 1; j <= diffusionWidth; ++j)
+        {
+          if (currentKey - j >= 0)
+          {
+            leds[currentKey - j] = mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth);
+            residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
+          }
+          if (currentKey + j < numLeds)
+          {
+            leds[currentKey + j] = mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth);
+            residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
+          }
+        }
+      }
+    }
+  }
+  // 残留效果支持
+  if (residualTime > 0)
+  {
+    for (int i = 0; i < KEY_NUM; ++i)
+    {
+      if (activeFlag[i])
+      {
+        residualCounter[i] = residualTime;
+      }
+      else if (residualCounter[i] > 0)
+      {
+        // 计算残留效果（混合前景色和背景色）
+        auto currentKey = (i + 1) << 1;
+        leds[currentKey] = mixColor(foregroundColor, backgroundColor, residualCounter[i] << 8 / residualTime);
+        residualCounter[i]--;
+      }
+    }
+  }
+  // 展示灯带
   FastLED.show();
 }
 
@@ -63,42 +130,30 @@ void LEDController::setForegroundColor(CRGB color)
 
 void LEDController::setBackgroundColor(CRGB color)
 {
-  if (useBackground)
+  for (int i = 1; i <= (KEY_NUM << 1); ++i)
   {
-    for (int i = 1; i <= (KEY_NUM << 1); ++i)
+    auto currentKey = (i + 1) >> 1;
+    if (!activeFlag[currentKey])
     {
-      auto currentKey = (i + 1) >> 1;
-      if (!activeFlag[currentKey])
-      {
-        leds[i] = color;
-      }
+      leds[i] = color;
     }
   }
   backgroundColor = color;
 }
 
-void LEDController::setEnableEndLights(bool enable)
+void LEDController::setEndLightsColor(CRGB color, bool ignoreSetting)
 {
-  enableEndLights = enable;
-}
-
-void LEDController::setEndLightsColor(CRGB color, bool ignoreSettings)
-{
-  if (enableEndLights || ignoreSettings)
+  leds[0] = color;
+  leds[(KEY_NUM << 1) + 1] = color;
+  if (!ignoreSetting)
   {
-    leds[0] = color;
-    leds[(KEY_NUM << 1) + 1] = color;
+    endLightsColor = color;
   }
 }
 
 void LEDController::setBrightness(int brightness)
 {
   FastLED.setBrightness(brightness);
-}
-
-void LEDController::setUseBackground(bool use)
-{
-  useBackground = use;
 }
 
 void LEDController::pressKey(uint8_t keyIndex)
@@ -111,15 +166,23 @@ void LEDController::pressKey(uint8_t keyIndex)
 void LEDController::releaseKey(uint8_t keyIndex)
 {
   activeFlag[keyIndex] = false;
-  // TODO: REMAIN、EXTEND
-  if (useBackground)
-  {
-    leds[(keyIndex << 1) + 1] = backgroundColor;
-    leds[(keyIndex << 1) + 2] = backgroundColor;
-  }
-  else
-  {
-    leds[(keyIndex << 1) + 1] = CRGB::Black;
-    leds[(keyIndex << 1) + 2] = CRGB::Black;
-  }
+  leds[(keyIndex << 1) + 1] = backgroundColor;
+  leds[(keyIndex << 1) + 2] = backgroundColor;
+}
+
+void LEDController::previewEndLightsColor(CRGB color)
+{
+  leds[0] = color;
+  leds[(KEY_NUM << 1) + 1] = color;
+  endLightsPreviewTime = PREVIEW_TIME;
+}
+
+void LEDController::setDiffusionWidth(int width)
+{
+  diffusionWidth = width;
+}
+
+void LEDController::setResidualTime(int time)
+{
+  residualTime = time;
 }

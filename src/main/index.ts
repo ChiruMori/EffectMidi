@@ -1,7 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import storage from './storage'
+import ipc from './ipcServer'
 
 function createWindow(): void {
   // 创建窗口
@@ -39,7 +41,7 @@ function createWindow(): void {
 // 部分 API 只能在此事件发生后使用。
 app.whenReady().then(() => {
   // 为 Windows 设置应用程序用户模型 ID
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('plus.mori.effect-midi')
 
   // 默认在开发环境下通过 F12 打开或关闭 DevTools
   // 并在生产环境下忽略 CommandOrControl + R。
@@ -48,10 +50,13 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // 初始化 IPC
+  ipc()
 
-  createWindow()
+  // 数据库初始化后再创建窗口
+  storage.open().then(() => {
+    createWindow()
+  })
 
   app.on('activate', function () {
     // 在 macOS 上，当单击应用程序的 dock 图标并且没有其他窗口打开时，
@@ -66,4 +71,5 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+  storage.close()
 })
