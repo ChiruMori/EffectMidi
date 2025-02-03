@@ -1,3 +1,5 @@
+// 点击粒子效果：点击鼠标时，会在点击位置生成自动消失的光斑
+
 import { useEffect, useRef } from 'react'
 import { useAppSelector } from '@renderer/common/store'
 import C, { ThemeTypeEnum, hexStringToHue } from '@renderer/common/colors'
