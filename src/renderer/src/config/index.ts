@@ -73,6 +73,28 @@ export const themeSlice = createSlice({
   }
 })
 
+export const particleSlice = createSlice({
+  name: 'particle',
+  initialState: {
+    enableFirefiles: true,
+    enableClickGranule: true
+  },
+  reducers: {
+    setFirefiles: (state, action) => {
+      return {
+        ...state,
+        enableFirefiles: action.payload
+      }
+    },
+    setClickGranule: (state, action) => {
+      return {
+        ...state,
+        enableClickGranule: action.payload
+      }
+    }
+  }
+})
+
 export const residueSlice = createSlice({
   name: 'residue',
   initialState: {
@@ -136,6 +158,16 @@ export const residueSelector = (
     state.residue || {
       enableResidue: true,
       residueTime: 500
+    }
+  )
+}
+export const particleSelector = (
+  state: RootState
+): { enableFirefiles: boolean; enableClickGranule: boolean } => {
+  return (
+    state.particle || {
+      enableFirefiles: true,
+      enableClickGranule: true
     }
   )
 }

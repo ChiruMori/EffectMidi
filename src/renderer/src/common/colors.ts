@@ -17,7 +17,7 @@ const COLOR_DICT = {
     sub: '#7FFF00'
   },
   [ThemeTypeEnum.PINK]: {
-    main: '#ea2a6a',
+    main: '#E60000',
     sub: '#ff9f7d'
   },
   [ThemeTypeEnum.ORANGE]: {

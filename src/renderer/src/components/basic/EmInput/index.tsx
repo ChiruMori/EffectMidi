@@ -1,13 +1,9 @@
 import { Description, Field, Input, Label } from '@headlessui/react'
 import React, { useCallback } from 'react'
+import { EmFormProps } from '../types'
 
-interface EmInputProps {
-  label: string
-  description: string
+interface EmInputProps extends EmFormProps<string> {
   placeholder?: string
-  initValue?: string
-  file?: boolean
-  onChange?: (value: string) => void
 }
 
 const EmInput: React.FC<EmInputProps> = ({

@@ -1,12 +1,9 @@
 import { Description, Field, Label } from '@headlessui/react'
 import { useState } from 'react'
+import { EmFormProps } from '../types'
 
-interface EmCheckertProps<V> {
-  label: string
-  description: string
+interface EmCheckertProps<V> extends EmFormProps<V> {
   options: { color: string; val: V }[]
-  initialValue: V
-  onChange: (val: V) => void
 }
 
 export default function EmSelect<T>({
@@ -14,9 +11,9 @@ export default function EmSelect<T>({
   description,
   options,
   onChange,
-  initialValue
+  initValue
 }: EmCheckertProps<T>): JSX.Element {
-  const [selected, setSelected] = useState(initialValue)
+  const [selected, setSelected] = useState(initValue)
   return (
     <div className="py-2">
       <Field>
@@ -37,7 +34,7 @@ export default function EmSelect<T>({
               }}
               onClick={() => {
                 setSelected(opt.val)
-                onChange(opt.val)
+                onChange && onChange(opt.val)
               }}
             ></div>
           ))}

@@ -1,27 +1,33 @@
 // 动画：绘制向右上角随机移动的，具有拖尾效果的粒子
 
-import { getMidColor } from '@renderer/common/colors'
+import { getMidColor, hexStringToHue, ThemeTypeEnum } from '@renderer/common/colors'
 import { useEffect, useRef } from 'react'
+import C from '@renderer/common/colors'
+import timer from '../timer'
 
-const BASE_SPEED_X = 1
-const BASE_SPEED_Y = -0.5625
-const SPEED_SHAKE = 1
+const BASE_SPEED_X = 0.5
+const BASE_SPEED_Y = -0.28125
+const SPEED_RANGE = 0.5
+const ACCELERATION = 0.03
 const PARTICLE_RATE = 0.0002
-const MAX_TRAIL_LENGTH = 0
-const STROKE_WIDTH = 3
-const MAX_ALPHA = 0.2
-const MIN_ALPHA = 0.05
-const ALPHA_CHANGE_RATE = 0.02
-const MAX_END_POINT_RADIUS_RATE = 0.015
+const MAX_TRAIL_LENGTH = 100
+const STROKE_WIDTH = 1
+const MAX_ALPHA = 0.25
+const MIN_ALPHA = 0.1
+const ALPHA_CHANGE_RATE = 0.01
+const MAX_END_POINT_RADIUS_RATE = 0.025
 const MIN_END_POINT_RADIUS_RATE = 0.005
-const BLUR_RADIUS = 10
-const MAX_PARTICLE_CNT = 100
+// const BLUR_RADIUS = 10
+const MAX_PARTICLE_CNT = 200
+const COLOR_OFFSET = 80
 
 class Particle {
   x: number
   y: number
   vx: number
   vy: number
+  ax: number
+  ay: number
   alpha: number
   endPointRadius: number
   color: string
@@ -32,6 +38,8 @@ class Particle {
     this.y = y
     this.vx = vx
     this.vy = vy
+    this.ax = 0
+    this.ay = 0
     this.endPointRadius = endPointRadius
     this.color = color
     this.trail = []
@@ -52,10 +60,11 @@ class Particle {
     ctx.moveTo(this.x, this.y)
     ctx.arc(this.x, this.y, this.endPointRadius, 0, Math.PI * 2)
     ctx.fillStyle = color
-    ctx.shadowBlur = BLUR_RADIUS
-    ctx.shadowColor = color
-    ctx.shadowOffsetX = 0
-    ctx.shadowOffsetY = 0
+    // shadow 将导致 FPS 大幅下降
+    // ctx.shadowBlur = BLUR_RADIUS
+    // ctx.shadowColor = color
+    // ctx.shadowOffsetX = 0
+    // ctx.shadowOffsetY = 0
     ctx.closePath()
     ctx.fill()
     // 拖尾
@@ -69,17 +78,19 @@ class Particle {
     }
     ctx.strokeStyle = color
     ctx.lineWidth = STROKE_WIDTH
+    ctx.setLineDash([STROKE_WIDTH, STROKE_WIDTH * 4])
     ctx.stroke()
   }
 
   update(canvas: HTMLCanvasElement): void {
-    this.x += this.vx
-    this.y += this.vy
-    this.vx += (Math.random() - 0.5) * SPEED_SHAKE
-    this.vy += (Math.random() - 0.5) * SPEED_SHAKE
-    this.vx = Math.min(Math.max(this.vx, BASE_SPEED_X - SPEED_SHAKE), BASE_SPEED_X + SPEED_SHAKE)
-    this.vy = Math.min(Math.max(this.vy, BASE_SPEED_Y - SPEED_SHAKE), BASE_SPEED_Y + SPEED_SHAKE)
-
+    this.x += this.vx + BASE_SPEED_X
+    this.y += this.vy + BASE_SPEED_Y
+    this.vx += this.ax
+    this.vy += this.ay
+    this.ax += (Math.random() - 0.5) * ACCELERATION
+    this.ay += (Math.random() - 0.5) * ACCELERATION
+    this.vx = Math.min(Math.max(this.vx / BASE_SPEED_X, -SPEED_RANGE), SPEED_RANGE) * BASE_SPEED_X
+    this.vy = Math.min(Math.max(this.vy / BASE_SPEED_Y, -SPEED_RANGE), SPEED_RANGE) * BASE_SPEED_Y
     const overflowX = this.x < -this.endPointRadius || this.x > canvas.width + this.endPointRadius
     const overflowY = this.y < -this.endPointRadius || this.y > canvas.height + this.endPointRadius
     if (MAX_TRAIL_LENGTH > 0) {
@@ -103,8 +114,7 @@ class Particle {
 
   static createRandom(
     canvas: HTMLCanvasElement,
-    fromColor: string,
-    toColor: string,
+    theme: ThemeTypeEnum,
     radiusBase: number
   ): Particle {
     const x = Math.random() * canvas.width
@@ -115,17 +125,21 @@ class Particle {
       (Math.random() * (MAX_END_POINT_RADIUS_RATE - MIN_END_POINT_RADIUS_RATE) +
         MIN_END_POINT_RADIUS_RATE) *
       radiusBase
-    const color = getMidColor(Math.random(), fromColor, toColor)
+
+    const nowColor =
+      (hexStringToHue(getMidColor(0.5, C(theme).main, C(theme).sub)) +
+        Math.random() * COLOR_OFFSET) %
+      360
+    const color =
+      theme !== ThemeTypeEnum.GRAY ? `hsl(${nowColor}, 80%, 40%)` : `hsl(0, 0%, ${nowColor % 100}%)`
     return new Particle(x, y, vx, vy, color, endPointRadius)
   }
 }
 
 export default function Firefiles({
-  fromColor = '#0bf4fe',
-  toColor = '#ff97ff'
+  theme = ThemeTypeEnum.SKY
 }: {
-  fromColor?: string
-  toColor?: string
+  theme: ThemeTypeEnum
 }): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -133,6 +147,7 @@ export default function Firefiles({
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     const particles: Particle[] = []
+    let unmounted = false
 
     const refreshAll = (): void => {
       particles.length = 0
@@ -163,24 +178,37 @@ export default function Firefiles({
     }
 
     const loop = (): void => {
+      if (unmounted) {
+        return
+      }
       update()
       draw()
       requestAnimationFrame(loop)
+      timer('Fireflies')
     }
 
     const addParticle = (): void => {
       const radiusBase = Math.sqrt(canvas!.width * canvas!.width + canvas!.height * canvas!.height)
-      particles.unshift(Particle.createRandom(canvas!, fromColor, toColor, radiusBase))
+      particles.unshift(Particle.createRandom(canvas!, theme, radiusBase))
     }
 
     window.addEventListener('resize', resize)
     resize()
     loop()
-  }, [])
+
+    // 组件销毁时，清理事件监听、退出循环
+    return (): void => {
+      window.removeEventListener('resize', resize)
+      unmounted = true
+    }
+  }, [theme])
 
   return (
     <>
-      <canvas ref={canvasRef}></canvas>
+      <canvas
+        ref={canvasRef}
+        className="size-full absolute top-0 left-0 pointer-events-none z-40"
+      ></canvas>
     </>
   )
 }

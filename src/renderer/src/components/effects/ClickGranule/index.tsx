@@ -1,9 +1,8 @@
 // 点击粒子效果：点击鼠标时，会在点击位置生成自动消失的光斑
 
 import { useEffect, useRef } from 'react'
-import { useAppSelector } from '@renderer/common/store'
-import C, { ThemeTypeEnum, hexStringToHue } from '@renderer/common/colors'
-import { themeSelector } from '@renderer/config'
+import C, { ThemeTypeEnum, getMidColor, hexStringToHue } from '@renderer/common/colors'
+import timer from '../timer'
 
 const colorOffset = 50
 const particlesOneClick = 10
@@ -25,7 +24,10 @@ const createParticle = (x: number, y: number, colorType: ThemeTypeEnum): Particl
   const radius = Math.random() * radiusBase + 2
   const speedX = (Math.random() - 0.5) * speedBase
   const speedY = (Math.random() - 0.5) * speedBase
-  const nowColor = (hexStringToHue(C(colorType).main) + Math.random() * colorOffset) % 360
+  const nowColor =
+    (hexStringToHue(getMidColor(0.5, C(colorType).main, C(colorType).sub)) +
+      Math.random() * colorOffset) %
+    360
   const color =
     colorType !== ThemeTypeEnum.GRAY
       ? `hsl(${nowColor}, 90%, 50%)`
@@ -34,12 +36,13 @@ const createParticle = (x: number, y: number, colorType: ThemeTypeEnum): Particl
   return { x, y, radius, color, speedX, speedY }
 }
 
-export default function ClickGranule(): JSX.Element {
+export default function ClickGranule({
+  theme = ThemeTypeEnum.SKY
+}: {
+  theme: ThemeTypeEnum
+}): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const particles: Particle[] = []
-
-  // 在这里获取 colorType
-  const colorType = useAppSelector(themeSelector)
 
   const updateParticles = (): void => {
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -66,12 +69,6 @@ export default function ClickGranule(): JSX.Element {
     }
   }
 
-  const animate = (ctx: CanvasRenderingContext2D): void => {
-    updateParticles()
-    drawParticles(ctx)
-    requestAnimationFrame(() => animate(ctx))
-  }
-
   const handleClick = (e: MouseEvent): void => {
     const canvas = canvasRef.current
     if (canvas) {
@@ -81,7 +78,7 @@ export default function ClickGranule(): JSX.Element {
 
       // 使用顶层的 colorType 作为参数传递
       for (let i = 0; i < particlesOneClick; i++) {
-        particles.push(createParticle(x, y, colorType))
+        particles.push(createParticle(x, y, theme))
       }
     }
   }
@@ -97,10 +94,22 @@ export default function ClickGranule(): JSX.Element {
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
+    let unmounted = false
+
+    const animate = (): void => {
+      if (unmounted) {
+        return
+      }
+      updateParticles()
+      drawParticles(ctx!)
+      requestAnimationFrame(animate)
+      timer('ClickGranule')
+    }
+
     if (ctx) {
       canvas!.width = window.innerWidth
       canvas!.height = window.innerHeight
-      animate(ctx)
+      animate()
       window.addEventListener('mousedown', handleClick)
       window.addEventListener('resize', handleResize)
     }
@@ -110,8 +119,9 @@ export default function ClickGranule(): JSX.Element {
       particles.length = 0
       window.removeEventListener('mousedown', handleClick)
       window.removeEventListener('resize', handleResize)
+      unmounted = true
     }
-  }, [colorType])
+  }, [theme])
 
   return (
     <div>

@@ -8,15 +8,20 @@ menu:
   devices: Device
   about: About
 appearance:
-  language: Language
+  language-label: Language
   language-desc: Change the language of the application
   bg-img-label: Background Image
   bg-img-desc: Choose a background image
   bg-img-placeholder: Local image file or URL
   bg-mask-opacity: Mask Opacity
   bg-mask-opacity-desc: Adjust the opacity of the background mask
-  theme: Theme
+  theme-label: Theme
   theme-desc: Choose a theme
+  particle:
+    fireflies-label: Background Animation
+    fireflies-desc: Enable background firefly animation, disabling can improve performance
+    granule-label: Click Animation
+    granule-desc: Enable click particle animation, disabling can improve performance
 devices:
   serial-port: Serial Port
   serial-port-desc: Select the serial port

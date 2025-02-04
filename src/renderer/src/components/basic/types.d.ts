@@ -1,10 +1,13 @@
-export interface EmRangeProps {
-  min: number
-  max: number
+export interface EmFormProps<V> {
   label: string
   description?: string
-  initValue?: number
+  initValue?: V
+  onChange?: (value: V) => void
+}
+
+export interface EmRangeProps extends EmFormProps<number> {
+  min: number
+  max: number
   fromColor?: string
   toColor?: string
-  onChange?: (value: number) => void
 }

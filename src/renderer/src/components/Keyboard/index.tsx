@@ -21,7 +21,7 @@ export default function Keyboard({ activeKeys }: { activeKeys: string[] }): JSX.
   const colorType = useAppSelector(themeSelector)
 
   return (
-    <div className="absolute w-full h-1/6 bg-white bottom-0">
+    <div className="absolute w-full h-1/6 bg-white bottom-0 z-40">
       <div className="flex flex-nowrap size-full kb-container">
         {keyboards.map((scoreTuple, idx) => (
           <div

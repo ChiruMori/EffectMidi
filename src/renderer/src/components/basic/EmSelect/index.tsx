@@ -10,13 +10,10 @@ import {
 import lang from '@renderer/lang'
 import { useState } from 'react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
+import { EmFormProps } from '../types'
 
-interface EmSelectProps {
-  label: string
-  description: string
+interface EmSelectProps extends EmFormProps<string> {
   options: { label: string; val: string }[]
-  initialValue: string
-  onChange: (val: string) => void
   suffixBtn?: JSX.Element
 }
 
@@ -25,10 +22,10 @@ export default function EmSelect({
   description,
   options,
   onChange,
-  initialValue,
+  initValue,
   suffixBtn = undefined
 }: EmSelectProps): JSX.Element {
-  const [selected, setSelected] = useState(initialValue)
+  const [selected, setSelected] = useState(initValue)
   const txt = lang()
   return (
     <div className="py-2">
@@ -39,7 +36,7 @@ export default function EmSelect({
           value={selected}
           onChange={(val) => {
             setSelected(val)
-            onChange(val)
+            onChange && onChange(val)
           }}
         >
           <div className="w-full flex gap-1">

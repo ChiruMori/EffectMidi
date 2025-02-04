@@ -8,16 +8,20 @@ menu:
   devices: 外设
   about: 关于
 appearance:
-  language: 语言
+  language-label: 语言
   language-desc: 更换应用的语言
-  bgImg: 背景图片
   bg-img-label: 背景图片
   bg-img-desc: 选择一个背景图片
   bg-img-placeholder: 本地图片文件或网络地址
   bg-mask-opacity: 遮罩透明度
   bg-mask-opacity-desc: 调整背景遮罩的透明度
-  theme: 主题
+  theme-label: 主题
   theme-desc: 选择一个主题
+  particle:
+    fireflies-label: 背景动画
+    fireflies-desc: 是否启用背景光斑动画，关闭后可节约🔋
+    granule-label: 点击动画
+    granule-desc: 是否启用点击粒子动画，关闭后可可节约🔋
 devices:
   serial-port: 串口
   serial-port-desc: 选择串口

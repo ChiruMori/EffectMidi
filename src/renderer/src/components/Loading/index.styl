@@ -9,17 +9,29 @@
   position: fixed;
   z-index: 9999;
   top: 0;
-  left: 0;
+  left: 0; /* * 黑色遮罩透明度闪烁 */
 
-  /** 黑色遮罩透明度闪烁 */
   .loading__mask {
-    background-color: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;
     position: absolute;
     z-index: 1;
     top: 0;
     left: 0;
-    animation: mask 1s infinite;
+    animation: mask 5s infinite;
+  }
+
+  @keyframes mask {
+    0% {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    50% {
+      background-color: rgba(0, 0, 0, 0);
+    }
+
+    100% {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
   }
 }

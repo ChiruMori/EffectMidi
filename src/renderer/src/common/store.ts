@@ -44,6 +44,8 @@ export const store = configureStore({
     com: persistReducer(storePersistConfigOf('com'), configManger.comSlice.reducer),
     // 主题颜色
     theme: persistReducer(storePersistConfigOf('theme'), configManger.themeSlice.reducer),
+    // 粒子效果
+    particle: persistReducer(storePersistConfigOf('particle'), configManger.particleSlice.reducer),
     // 残留模式
     residue: persistReducer(storePersistConfigOf('residue'), configManger.residueSlice.reducer),
     // 扩散模式

@@ -11,5 +11,6 @@
   "files.associations": {
     "map": "cpp",
     "xiosbase": "cpp"
-  }
+  },
+  "files.eol": "\n"
 }
