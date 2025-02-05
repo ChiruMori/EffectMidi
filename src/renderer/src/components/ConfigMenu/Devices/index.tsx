@@ -1,11 +1,12 @@
+import { useEffect, useState } from 'react'
+import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import EmSelect from '@renderer/components/basic/EmSelect'
 import { comSelector, comSlice } from '@renderer/config'
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
+import { PortInfo } from '@renderer/common/common'
 import ipc from '@renderer/common/ipcClient'
 import lang from '@renderer/lang'
-import { useEffect, useState } from 'react'
-import { ArrowPathIcon } from '@heroicons/react/20/solid'
-import { PortInfo } from '@renderer/common/common'
+import './index.styl'
 
 export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const [ports, setPorts] = useState<PortInfo[]>([])
@@ -34,17 +35,17 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
         onChange={(value) => {
           dispatch(comSlice.actions.setCom(value))
         }}
-        initialValue={nowCom}
+        initValue={nowCom}
         suffixBtn={
           <button
-            className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-9"
+            className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-9 ref-btn"
             onClick={() => {
               ipc.listSerialPorts().then((ports) => {
                 setPorts(ports)
               })
             }}
           >
-            <ArrowPathIcon className="group pointer-events-none size-4 fill-white/60" />
+            <ArrowPathIcon className="group pointer-events-none size-4 fill-white/60 animate__animated" />
           </button>
         }
       />

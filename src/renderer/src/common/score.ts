@@ -44,6 +44,19 @@ export class Score {
   }
 
   /**
+   * 通过 88 键 MIDI 键位索引构造音符（A1 - C8）
+   */
+  static fromMidi(midi: number): Score {
+    // 第一八度到第二八度的音符数为 3 (A1, A#1, B1)
+    const letter = HALF_TONE_TABLE[(midi + 9) % 12][0].charAt(0)
+    // 计算八度，A1 为 1，A2 为 2，midi 从 0 开始编号，0~3 为 1，4~16 为 2...
+    const octave = Math.floor((midi + 9) / 12) + 1
+    // 升降号
+    const sharp = HALF_TONE_TABLE[(midi + 9) % 12][0].charAt(1) === '#' ? '#' : null
+    return new Score(letter, octave, sharp)
+  }
+
+  /**
    * 下一个半音
    */
   nextHalfTone(): Score {

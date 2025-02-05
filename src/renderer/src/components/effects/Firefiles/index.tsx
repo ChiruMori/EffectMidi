@@ -8,7 +8,7 @@ import timer from '../timer'
 const BASE_SPEED_X = 0.5
 const BASE_SPEED_Y = -0.28125
 const SPEED_RANGE = 0.5
-const ACCELERATION = 0.03
+const ACCELERATION = 0.1
 const PARTICLE_RATE = 0.0002
 const MAX_TRAIL_LENGTH = 100
 const STROKE_WIDTH = 1
@@ -87,8 +87,8 @@ class Particle {
     this.y += this.vy + BASE_SPEED_Y
     this.vx += this.ax
     this.vy += this.ay
-    this.ax += (Math.random() - 0.5) * ACCELERATION
-    this.ay += (Math.random() - 0.5) * ACCELERATION
+    this.ax = (Math.random() - 0.5) * ACCELERATION
+    this.ay = (Math.random() - 0.5) * ACCELERATION
     this.vx = Math.min(Math.max(this.vx / BASE_SPEED_X, -SPEED_RANGE), SPEED_RANGE) * BASE_SPEED_X
     this.vy = Math.min(Math.max(this.vy / BASE_SPEED_Y, -SPEED_RANGE), SPEED_RANGE) * BASE_SPEED_Y
     const overflowX = this.x < -this.endPointRadius || this.x > canvas.width + this.endPointRadius

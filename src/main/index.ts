@@ -1,13 +1,16 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/EffectMidi_1024.png?asset'
 import storage from './storage'
 import ipc from './ipcServer'
+import midi from './midi'
+
+let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
   // 创建窗口
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -20,7 +23,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow!.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -49,13 +52,15 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  // 初始化 IPC
-  ipc()
-
   // 数据库初始化后再创建窗口
   storage.open().then(() => {
     createWindow()
+
+    // 初始化 IPC
+    ipc(mainWindow!)
+
+    // TODO: MIDI 设备监听
+    midi.init(mainWindow!)
   })
 
   app.on('activate', function () {
