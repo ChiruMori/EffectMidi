@@ -26,5 +26,4 @@ export default function ipc(mainWindow: BrowserWindow): void {
   ipcMain.handle('storage.remove', async (_, key) => {
     return await storage.remove(key as string)
   })
-  // 
 }

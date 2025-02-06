@@ -44,13 +44,13 @@ const EmInput: React.FC<EmInputProps> = ({
           />
           <label
             htmlFor={filename && 'file'}
-            className="absolute top-0 right-0 h-full cursor-pointer"
+            className="absolute top-0 right-0 h-full cursor-pointer img-picker-btn"
           >
             <Button className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-full">
               {filename ? (
                 <>
                   <XCircleIcon
-                    className="top-2.5 right-2.5 size-4 fill-white/60"
+                    className="top-2.5 right-2.5 size-4 fill-white/60 img-picker-icon animate__animated"
                     onClick={(e) => {
                       setFilename('')
                       onChange && onChange({ path: '' })
@@ -60,7 +60,7 @@ const EmInput: React.FC<EmInputProps> = ({
                 </>
               ) : (
                 <>
-                  <FolderIcon className="top-2.5 right-2.5 size-4 fill-white/60" />
+                  <FolderIcon className="top-2.5 right-2.5 size-4 fill-white/60 img-picker-icon animate__animated" />
                 </>
               )}
             </Button>

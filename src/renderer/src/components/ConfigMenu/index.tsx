@@ -5,6 +5,7 @@ import { useAppSelector } from '@renderer/common/store'
 import './index.styl'
 import { Devices } from './Devices'
 import { bgImgSelector } from '@renderer/config'
+import Lights from './Lights'
 
 function ConfigMenu(): JSX.Element {
   const [menu, setMenu] = useState<MenuOptions>('appearance')
@@ -40,6 +41,7 @@ function ConfigMenu(): JSX.Element {
           <div className="col-span-8 overflow-y-scroll overflow-x-hidden rounded-md bg-neutral-800/50 content-page">
             <Appearance hidden={menu !== 'appearance'} />
             <Devices hidden={menu !== 'devices'} />
+            <Lights hidden={menu !== 'led'} />
           </div>
           <div className="col-span-1"></div>
         </div>
