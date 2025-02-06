@@ -10,7 +10,19 @@
   },
   "files.associations": {
     "map": "cpp",
-    "xiosbase": "cpp"
+    "xiosbase": "cpp",
+    "array": "cpp",
+    "chrono": "cpp",
+    "deque": "cpp",
+    "format": "cpp",
+    "forward_list": "cpp",
+    "initializer_list": "cpp",
+    "list": "cpp",
+    "vector": "cpp",
+    "xhash": "cpp",
+    "xstring": "cpp",
+    "xtree": "cpp",
+    "xutility": "cpp"
   },
   "files.eol": "\n"
 }

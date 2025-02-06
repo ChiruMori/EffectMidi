@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import EmSelect from '@renderer/components/basic/EmSelect'
-import { comSelector, comSlice } from '@renderer/config'
+import { comSelector, comSlice, enableComSelector, enableComSlice } from '@renderer/config'
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
 import { PortInfo } from '@renderer/common/common'
 import ipc from '@renderer/common/ipcClient'
 import lang from '@renderer/lang'
+import EmSwitch from '@renderer/components/basic/EmSwitch'
 import './index.styl'
 
 export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const [ports, setPorts] = useState<PortInfo[]>([])
   const nowCom = useAppSelector(comSelector)
+  const enableCom = useAppSelector(enableComSelector)
   const txt = lang()
   const dispatch = useAppDispatch()
 
@@ -26,7 +28,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
       className={`animate__animated animate__faster${hidden ? '' : ' animate__lightSpeedInRight'}`}
     >
       <EmSelect
-        label={txt('devices.serial-port')}
+        label={txt('devices.serial-port-label')}
         description={txt('devices.serial-port-desc')}
         options={ports.map((port) => ({
           val: port.path,
@@ -48,6 +50,14 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
             <ArrowPathIcon className="group pointer-events-none size-4 fill-white/60 animate__animated" />
           </button>
         }
+      />
+      <EmSwitch
+        label={txt('devices.serial-enable-label')}
+        description={txt('devices.serial-enable-desc')}
+        initValue={enableCom}
+        onChange={(value) => {
+          dispatch(enableComSlice.actions.setEnableCom(value))
+        }}
       />
     </div>
   )

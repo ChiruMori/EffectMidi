@@ -23,5 +23,7 @@ appearance:
     granule-label: Click Animation
     granule-desc: Enable click particle animation, disabling can improve performance
 devices:
-  serial-port: Serial Port
+  serial-port-label: Serial Port
   serial-port-desc: Select the serial port
+  serial-enable-label: Enable Serial Port
+  serial-enable-desc: Must be activated after selecting the serial port, otherwise the light effect settings cannot be used

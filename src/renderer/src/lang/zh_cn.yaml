@@ -23,5 +23,7 @@ appearance:
     granule-label: 点击动画
     granule-desc: 是否启用点击粒子动画，关闭后可可节约🔋
 devices:
-  serial-port: 串口
+  serial-port-label: 串口
   serial-port-desc: 选择串口
+  serial-enable-label: 激活串口
+  serial-enable-desc: 选择串口后必须激活才能使用，否则无法进行灯光效果设置

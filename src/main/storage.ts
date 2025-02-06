@@ -6,6 +6,36 @@ import path from 'path'
 // DB 文件存储在当前目录下，名为 effect-midi.db
 const db = new SQLite.Database(path.join(app.getAppPath(), 'effect-midi.db'))
 
+// 读取数据
+const innerGet = (key: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT value FROM state WHERE key = ?', key, (err, row) => {
+      if (err) {
+        console.error(err.message)
+        reject(err)
+      } else {
+        resolve(row ? (row as any).value : null)
+      }
+    })
+  })
+}
+
+// 写入数据
+const innerSet = (key: string, value: any): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    db.run('INSERT OR REPLACE INTO state (key, value) VALUES (?, ?)', key, value, (err) => {
+      if (err) {
+        console.error(err.message)
+        reject(err)
+      } else {
+        resolve()
+      }
+    })
+  })
+}
+
+const getInnerKey = (key: string): string => `persist:${key}`
+
 export default {
   // 打开数据库连接
   open: (): Promise<void> => {
@@ -21,31 +51,10 @@ export default {
       })
     })
   },
-  // 获取数据
-  get: (key: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      db.get('SELECT value FROM state WHERE key = ?', key, (err, row) => {
-        if (err) {
-          console.error(err.message)
-          reject(err)
-        } else {
-          resolve(row ? (row as any).value : null)
-        }
-      })
-    })
-  },
-  // 设置数据
-  set: (key: string, value: any): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      db.run('INSERT OR REPLACE INTO state (key, value) VALUES (?, ?)', key, value, (err) => {
-        if (err) {
-          console.error(err.message)
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
+  get: innerGet,
+  set: async (key: string, value: any): Promise<void> => {
+    await innerSet(key, value)
+    // TODO: 拓展灯带控制
   },
   // 删除数据
   remove: (key: string): Promise<void> => {
@@ -68,5 +77,17 @@ export default {
       }
       console.log('Closed the database connection.')
     })
+  },
+  // 主进程读取数据
+  main: {
+    getCom: async (): Promise<string> => {
+      const raw = await innerGet(getInnerKey('com'))
+      const obj = JSON.parse(raw)
+      const com = obj.com
+      if (com.startsWith('"') && com.endsWith('"')) {
+        return com.substring(1, com.length - 1)
+      }
+      return com
+    }
   }
 }

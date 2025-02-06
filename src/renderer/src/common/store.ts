@@ -34,6 +34,34 @@ const storePersistConfigOf = (
   }
 })
 
+// 不进行持久化存储的配置
+const storeSessionConfigOf = (
+  key: string
+): {
+  key: string
+  storage: {
+    getItem: (key: string) => Promise<any>
+    setItem: (key: string, value: any) => Promise<void>
+    removeItem: (key: string) => Promise<void>
+  }
+} => ({
+  key: key,
+  storage: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getItem: async (_: string): Promise<any> => {
+      return Promise.resolve(null)
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    setItem: async (_k: string, _v: any): Promise<void> => {
+      return Promise.resolve()
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    removeItem: async (_: string): Promise<void> => {
+      return Promise.resolve()
+    }
+  }
+})
+
 export const store = configureStore({
   reducer: {
     // 语言设置，
@@ -42,6 +70,11 @@ export const store = configureStore({
     bg: persistReducer(storePersistConfigOf('bg'), configManger.bgImgSlice.reducer),
     // 启用的串口
     com: persistReducer(storePersistConfigOf('com'), configManger.comSlice.reducer),
+    // 是否已激活串口设备（该配置不能持久化存储，每次启动程序都默认设置为否）
+    enableCom: persistReducer(
+      storeSessionConfigOf('enableCom'),
+      configManger.enableComSlice.reducer
+    ),
     // 主题颜色
     theme: persistReducer(storePersistConfigOf('theme'), configManger.themeSlice.reducer),
     // 粒子效果

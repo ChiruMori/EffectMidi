@@ -5,6 +5,7 @@ import icon from '../../resources/EffectMidi_1024.png?asset'
 import storage from './storage'
 import ipc from './ipcServer'
 import midi from './midi'
+import { closeSerial } from './serial/serial'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -74,7 +75,8 @@ app.whenReady().then(() => {
 // 通常会保持活动状态，直到用户通过 Cmd + Q 明确退出。
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    storage.close()
+    closeSerial()
     app.quit()
   }
-  storage.close()
 })

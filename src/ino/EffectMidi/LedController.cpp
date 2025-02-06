@@ -3,6 +3,7 @@
 LEDController::LEDController(int numLeds)
 {
   this->numLeds = numLeds;
+  this->leds = new CRGB[numLeds];
   for (int i = 0; i < numLeds; ++i)
   {
     this->leds[i] = CRGB::Black;

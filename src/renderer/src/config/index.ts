@@ -58,6 +58,21 @@ export const comSlice = createSlice({
   }
 })
 
+export const enableComSlice = createSlice({
+  name: 'enableCom',
+  initialState: {
+    enableCom: false
+  },
+  reducers: {
+    setEnableCom: (state, action) => {
+      return {
+        ...state,
+        enableCom: action.payload
+      }
+    }
+  }
+})
+
 export const themeSlice = createSlice({
   name: 'theme',
   initialState: {
@@ -149,6 +164,7 @@ export const bgImgSelector = (
   )
 }
 export const comSelector = (state: RootState): string => state.com?.com || ''
+export const enableComSelector = (state: RootState): boolean => state.enableCom?.enableCom || false
 export const themeSelector = (state: RootState): ThemeTypeEnum =>
   state.theme?.theme || ThemeTypeEnum.SKY
 export const residueSelector = (

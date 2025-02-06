@@ -1,4 +1,6 @@
 import { BrowserWindow } from 'electron'
+import { sendCmd } from './serial/serial'
+import SerialCmds from './serial/cmds'
 
 let window: BrowserWindow | null = null
 const activeArr: number[] = []
@@ -15,11 +17,13 @@ export default {
       if (!activeArr.includes(key)) {
         activeArr.push(key)
         window!.webContents.send('midi-keydown', key)
+        sendCmd(SerialCmds.keyDown, key)
       }
     } else {
       if (activeArr.length > 0) {
         const key = activeArr.shift()!
         window!.webContents.send('midi-keyup', key)
+        sendCmd(SerialCmds.keyUp, key)
       }
     }
   }
