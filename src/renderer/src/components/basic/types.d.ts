@@ -2,7 +2,7 @@ export interface EmFormProps<V> {
   label: string
   description?: string
   initValue?: V
-  onChange?: (value: V) => void
+  onChange?: (value: V) => boolean | void
 }
 
 export interface EmRangeProps extends EmFormProps<number> {

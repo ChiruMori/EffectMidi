@@ -33,8 +33,11 @@ export default function EmSelect<T>({
                 border: selected === opt.val ? '2px solid white' : 'none'
               }}
               onClick={() => {
+                const cancel = onChange && onChange(opt.val)
+                if (cancel) {
+                  return
+                }
                 setSelected(opt.val)
-                onChange && onChange(opt.val)
               }}
             ></div>
           ))}

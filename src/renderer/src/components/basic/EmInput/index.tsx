@@ -27,8 +27,11 @@ const EmInput: React.FC<EmInputProps> = ({
           }
           defaultValue={initValue}
           onChange={(e) => {
+            const cancel = debounced(e.target.value)
+            if (cancel) {
+              return
+            }
             setVal(e.target.value)
-            debounced(e.target.value)
           }}
           value={val}
         />

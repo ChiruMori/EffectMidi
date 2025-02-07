@@ -37,7 +37,9 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
             { label: '简体中文', val: 'zh_cn' },
             { label: 'English', val: 'en' }
           ]}
-          onChange={(val) => dispatch(langSlice.actions.setLang(val))}
+          onChange={(val) => {
+            dispatch(langSlice.actions.setLang(val))
+          }}
           initValue={nowLang}
         />
         <EmImgPicker
@@ -55,7 +57,9 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
           label={txt('appearance.bg-mask-opacity')}
           description={txt('appearance.bg-mask-opacity-desc')}
           initValue={nowBgImg.bgMaskOpacity}
-          onChange={(val) => dispatch(bgImgSlice.actions.setMaskOpacity(val))}
+          onChange={(val) => {
+            dispatch(bgImgSlice.actions.setMaskOpacity(val))
+          }}
         />
         <EmCubeChecker
           label={txt('appearance.theme-label')}
@@ -69,19 +73,25 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
             { color: C(ThemeTypeEnum.GRAY).ingridient(45), val: ThemeTypeEnum.GRAY }
           ]}
           initValue={nowColorType}
-          onChange={(val) => dispatch(themeSlice.actions.setType(val))}
+          onChange={(val) => {
+            dispatch(themeSlice.actions.setType(val))
+          }}
         />
         <EmSwitch
           label={txt('appearance.particle.fireflies-label')}
           description={txt('appearance.particle.fireflies-desc')}
           initValue={nowParticle.enableFirefiles}
-          onChange={(val) => dispatch(particleSlice.actions.setFirefiles(val))}
+          onChange={(val) => {
+            dispatch(particleSlice.actions.setFirefiles(val))
+          }}
         />
         <EmSwitch
           label={txt('appearance.particle.granule-label')}
           description={txt('appearance.particle.granule-desc')}
           initValue={nowParticle.enableClickGranule}
-          onChange={(val) => dispatch(particleSlice.actions.setClickGranule(val))}
+          onChange={(val) => {
+            dispatch(particleSlice.actions.setClickGranule(val))
+          }}
         />
       </div>
     </div>

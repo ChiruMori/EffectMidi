@@ -79,13 +79,8 @@ export const store = configureStore({
     theme: persistReducer(storePersistConfigOf('theme'), configManger.themeSlice.reducer),
     // 粒子效果
     particle: persistReducer(storePersistConfigOf('particle'), configManger.particleSlice.reducer),
-    // 残留模式
-    residue: persistReducer(storePersistConfigOf('residue'), configManger.residueSlice.reducer),
-    // 扩散模式
-    diffusion: persistReducer(
-      storePersistConfigOf('diffusion'),
-      configManger.diffusionSlice.reducer
-    )
+    // led 配置
+    led: persistReducer(storePersistConfigOf('led'), configManger.ledSlice.reducer)
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

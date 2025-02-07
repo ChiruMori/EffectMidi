@@ -6,6 +6,11 @@ import path from 'path'
 // DB 文件存储在当前目录下，名为 effect-midi.db
 const db = new SQLite.Database(path.join(app.getAppPath(), 'effect-midi.db'))
 
+const getparsedJson = async (key: string): Promise<any> => {
+  const raw = await innerGet(getInnerKey(key))
+  return JSON.parse(raw)
+}
+
 // 读取数据
 const innerGet = (key: string): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -81,13 +86,15 @@ export default {
   // 主进程读取数据
   main: {
     getCom: async (): Promise<string> => {
-      const raw = await innerGet(getInnerKey('com'))
-      const obj = JSON.parse(raw)
-      const com = obj.com
+      const com = (await getparsedJson('com')).com
       if (com.startsWith('"') && com.endsWith('"')) {
         return com.substring(1, com.length - 1)
       }
       return com
+    },
+    getLedConfig: async (key: string): Promise<string> => {
+      const ledConfig = await getparsedJson('led')
+      return ledConfig[key]
     }
   }
 }

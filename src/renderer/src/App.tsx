@@ -5,6 +5,7 @@ import ClickGranule from './components/effects/ClickGranule'
 import Filefiles from './components/effects/Firefiles'
 import { useAppSelector } from './common/store'
 import { useEffect } from 'react'
+import { NotificationProvider } from './components/basic/EmNotifacation'
 
 function App(): JSX.Element {
   const theme = useAppSelector(themeSelector)
@@ -18,10 +19,12 @@ function App(): JSX.Element {
 
   return (
     <>
-      {particleConfig.enableFirefiles && <Filefiles theme={theme} />}
-      {particleConfig.enableClickGranule && <ClickGranule theme={theme} />}
-      <ConfigMenu />
-      <Keyboard />
+      <NotificationProvider>
+        {particleConfig.enableFirefiles && <Filefiles theme={theme} />}
+        {particleConfig.enableClickGranule && <ClickGranule theme={theme} />}
+        <ConfigMenu />
+        <Keyboard />
+      </NotificationProvider>
     </>
   )
 }

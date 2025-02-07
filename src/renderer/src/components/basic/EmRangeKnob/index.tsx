@@ -47,8 +47,11 @@ const EmRange: React.FC<EmRangeProps> = ({
     const handleMouseMove = function (e: Event): void {
       const deltaY = (-((e as MouseEvent).clientY - dragStartY) / (max - min)) * 30
       const newValue = ~~Math.min(max, Math.max(min, value + deltaY))
+      const cancel = debounced(newValue)
+      if (cancel) {
+        return
+      }
       setValue(newValue)
-      debounced(newValue)
     }
 
     window.addEventListener('mousemove', handleMouseMove)

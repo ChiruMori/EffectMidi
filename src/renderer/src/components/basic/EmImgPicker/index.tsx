@@ -37,8 +37,11 @@ const EmInput: React.FC<EmInputProps> = ({
             placeholder={placeholder}
             value={filename}
             onChange={(e) => {
+              const cancel = debounced({ path: e.target.value })
+              if (cancel) {
+                return
+              }
               setFilename(e.target.value)
-              debounced({ path: e.target.value })
             }}
             disabled={filename !== '' && filename.startsWith(FILE_PATH_PREFIX)}
           />

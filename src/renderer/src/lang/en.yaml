@@ -27,3 +27,11 @@ devices:
   serial-port-desc: Select the serial port
   serial-enable-label: Enable Serial Port
   serial-enable-desc: Must be activated after selecting the serial port, otherwise the light effect settings cannot be used
+led:
+  bg-color-label: Background Color
+  bg-color-desc: The background color of the light strip, the color of the light when the key is not pressed, can be set to black to turn off the light
+notify:
+  serial-disable-title: Serial Port Not Activated
+  serial-disable-content: You need to activate the serial port before you can use the light effect settings
+  serial-unselected-title: Unselected Serial Port
+  serial-unselected-content: Cannot activate the serial port, you must first select the serial port to activate

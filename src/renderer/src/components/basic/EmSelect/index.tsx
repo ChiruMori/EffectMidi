@@ -35,8 +35,12 @@ export default function EmSelect({
         <Listbox
           value={selected}
           onChange={(val) => {
+            const cancel = onChange && onChange(val)
+            if (cancel) {
+              console.log('cancel', cancel)
+              return
+            }
             setSelected(val)
-            onChange && onChange(val)
           }}
         >
           <div className="w-full flex gap-1">

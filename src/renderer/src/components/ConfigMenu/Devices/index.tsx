@@ -8,11 +8,13 @@ import ipc from '@renderer/common/ipcClient'
 import lang from '@renderer/lang'
 import EmSwitch from '@renderer/components/basic/EmSwitch'
 import './index.styl'
+import { useNotification } from '@renderer/components/basic/EmNotifacation'
 
 export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const [ports, setPorts] = useState<PortInfo[]>([])
   const nowCom = useAppSelector(comSelector)
   const enableCom = useAppSelector(enableComSelector)
+  const { notify } = useNotification()
   const txt = lang()
   const dispatch = useAppDispatch()
 
@@ -56,7 +58,21 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
         description={txt('devices.serial-enable-desc')}
         initValue={enableCom}
         onChange={(value) => {
+          if (nowCom === '' || ports.length === 0) {
+            notify({
+              type: 'error',
+              title: txt('notify.serial-unselected-title'),
+              content: txt('notify.serial-unselected-content'),
+              key: 'serial-unselected'
+            })
+            // 不要改变 enableCom 的值
+            return true
+          }
+          console.log('enableCom', value, nowCom)
+          // 通知主进程初始化灯带
+          ipc.initLed()
           dispatch(enableComSlice.actions.setEnableCom(value))
+          return false
         }}
       />
     </div>

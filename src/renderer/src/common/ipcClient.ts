@@ -1,15 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { PortInfo } from './common.d'
 
 const server = window.electron.ipcRenderer
 
+// 渲染进程调用主进程的方法
 export default {
   // IPC Test
   ping: (): void => server.send('ping'),
   // List all serial ports
   listSerialPorts: async (): Promise<PortInfo[]> => {
     return await server.invoke('listSerialPorts')
+  },
+  // Enable serial port
+  initLed: (): void => {
+    server.send('initLed')
+  },
+  // Disable serial port
+  closeLed: (): void => {
+    server.send('closeLed')
+  },
+  // Set background color
+  setBgColor: (color: string): void => {
+    server.send('setBgColor', color)
   },
   // Storage
   storage: {

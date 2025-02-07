@@ -65,8 +65,11 @@ export default function EmColorPicker({
               }}
               value={color}
               onChange={(e) => {
+                const cancel = debounced(e.target.value)
+                if (cancel) {
+                  return
+                }
                 setColor(e.target.value)
-                debounced(e.target.value)
               }}
             />
             <div className="absolute right-0 top-0 h-full">

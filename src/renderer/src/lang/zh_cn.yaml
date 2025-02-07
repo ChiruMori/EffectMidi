@@ -27,3 +27,11 @@ devices:
   serial-port-desc: 选择串口
   serial-enable-label: 激活串口
   serial-enable-desc: 选择串口后必须激活才能使用，否则无法进行灯光效果设置
+led:
+  bg-color-label: 背景颜色
+  bg-color-desc: 灯带背景颜色，按键没有按下时灯光的颜色，可以设置为黑色以关闭灯光
+notify:
+  serial-disable-title: 串口未激活
+  serial-disable-content: 你需要先激活串口才能使用灯光效果设置
+  serial-unselected-title: 未选择串口
+  serial-unselected-content: 无法激活串口，必须先选择要激活的串口

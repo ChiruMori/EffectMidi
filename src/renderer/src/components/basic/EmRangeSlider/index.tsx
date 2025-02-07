@@ -19,7 +19,11 @@ const RangeSelector: React.FC<EmRangeProps> = ({
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setValue(Number(event.target.value))
-    debounced(Number(event.target.value))
+    const cancel = debounced(Number(event.target.value))
+    if (cancel) {
+      return
+    }
+    setValue(initValue)
   }
 
   const getTicks = (): number[] => {

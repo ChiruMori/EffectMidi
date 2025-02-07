@@ -25,8 +25,11 @@ export default function EmSwitch({
         <Switch
           checked={enabled}
           onChange={() => {
+            const cancel = onChange && onChange(!enabled)
+            if (cancel) {
+              return
+            }
             setEnabled(!enabled)
-            onChange && onChange(!enabled)
           }}
           className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition"
           style={enabled ? { backgroundColor: theme.main } : {}}

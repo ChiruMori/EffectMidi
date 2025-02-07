@@ -110,43 +110,31 @@ export const particleSlice = createSlice({
   }
 })
 
-export const residueSlice = createSlice({
-  name: 'residue',
+export const ledSlice = createSlice({
+  name: 'led',
   initialState: {
-    enableResidue: true,
-    residueTime: 500
+    bgColor: '#000000',
+    residue: 0,
+    diffusion: 0
   },
   reducers: {
-    setTime: (state, action) => {
+    setBgColor: (state, action) => {
       return {
         ...state,
-        residueTime: action.payload
+        bgColor: action.payload
       }
     },
-    setEnableResidue: (state, action) => {
+    setResidue: (state, action) => {
       return {
         ...state,
-        enableResidue: action.payload
-      }
-    }
-  }
-})
-
-export const diffusionSlice = createSlice({
-  name: 'diffusion',
-  initialState: {
-    enableDiffusion: false,
-    diffusionWidth: 2
-  },
-  reducers: {
-    setWidth: (state, action) => {
-      return {
-        ...state,
-        diffusionWidth: action.payload
+        residue: action.payload
       }
     },
     setDiffusion: (state, action) => {
-      state.enableDiffusion = action.payload
+      return {
+        ...state,
+        diffusion: action.payload
+      }
     }
   }
 })
@@ -167,16 +155,6 @@ export const comSelector = (state: RootState): string => state.com?.com || ''
 export const enableComSelector = (state: RootState): boolean => state.enableCom?.enableCom || false
 export const themeSelector = (state: RootState): ThemeTypeEnum =>
   state.theme?.theme || ThemeTypeEnum.SKY
-export const residueSelector = (
-  state: RootState
-): { enableResidue: boolean; residueTime: number } => {
-  return (
-    state.residue || {
-      enableResidue: true,
-      residueTime: 500
-    }
-  )
-}
 export const particleSelector = (
   state: RootState
 ): { enableFirefiles: boolean; enableClickGranule: boolean } => {
@@ -187,16 +165,14 @@ export const particleSelector = (
     }
   )
 }
-export const diffusionSelector = (
+export const ledSelector = (
   state: RootState
-): {
-  enableDiffusion: boolean
-  diffusionWidth: number
-} => {
+): { bgColor: string; residue: number; diffusion: number } => {
   return (
-    state.diffusion || {
-      enableDiffusion: false,
-      diffusionWidth: 2
+    state.led || {
+      bgColor: '#000000',
+      residue: 0,
+      diffusion: 0
     }
   )
 }

@@ -2,7 +2,8 @@ import lang from '@renderer/lang'
 import { useAppSelector } from '@renderer/common/store'
 import C from '@renderer/common/colors'
 import './index.styl'
-import { themeSelector } from '@renderer/config'
+import { enableComSelector, themeSelector } from '@renderer/config'
+import { useNotification } from '@renderer/components/basic/EmNotifacation'
 
 export type MenuOptions = 'appearance' | 'devices' | 'led' | 'about'
 
@@ -15,6 +16,8 @@ export default function MenuSlide({
 }): JSX.Element {
   const txt = lang()
   const colorType = useAppSelector(themeSelector)
+  const enableCom = useAppSelector(enableComSelector)
+  const { notify } = useNotification()
   return (
     <div className="menu-side text-center px-4 relative">
       <div className="menu text-2xl relative overflow-hidden">
@@ -42,8 +45,31 @@ export default function MenuSlide({
             style={{ backgroundImage: C(colorType).ingridient(45) }}
           ></div>
         </div>
-        <div className="menu-item cursor-pointer" onClick={() => onChange('led')}>
+        <div
+          className="menu-item cursor-pointer"
+          onClick={() => {
+            if (enableCom) {
+              onChange('led')
+              return
+            }
+            onChange('devices')
+            // 添加 shake 动画
+            const menu = document.getElementById('menu-led')
+            menu?.classList.add('animate__headShake')
+            setTimeout(() => {
+              menu?.classList.remove('animate__headShake')
+            }, 1000)
+            // 提示
+            notify({
+              title: txt('notify.serial-disable-title'),
+              content: txt('notify.serial-disable-content'),
+              key: 'led-tip',
+              type: 'error'
+            })
+          }}
+        >
           <div
+            id="menu-led"
             className={`animate__animated animate__fast ani-txt text-nowrap ${menu === 'led' ? 'animate__bounceIn font-bold' : 'hover:bg-sky-500/[.06]'}`}
           >
             {txt('menu.led')}
