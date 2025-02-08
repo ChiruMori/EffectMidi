@@ -5,7 +5,6 @@
 void SetBackgroundColorCmd::execute(uint8_t *args)
 {
   ledController.setBackgroundColor(CRGB(args[0], args[1], args[2]));
-  debug("B_C: " + String(args[0]) + "," + String(args[1]) + "," + String(args[2]));
 }
 
 uint8_t SetBackgroundColorCmd::getNameByte()
@@ -23,7 +22,6 @@ uint8_t SetBackgroundColorCmd::getArgCount()
 void SetForegroundColorCmd::execute(uint8_t *args)
 {
   ledController.setForegroundColor(CRGB(args[0], args[1], args[2]));
-  debug("F_C: " + String(args[0]) + "," + String(args[1]) + "," + String(args[2]));
 }
 
 uint8_t SetForegroundColorCmd::getNameByte()
@@ -41,7 +39,6 @@ uint8_t SetForegroundColorCmd::getArgCount()
 void ColorPreviewCmd::execute(uint8_t *args)
 {
   ledController.previewEndLightsColor(CRGB(args[0], args[1], args[2]));
-  debug("PRE: " + String(args[0]) + "," + String(args[1]) + "," + String(args[2]));
 }
 
 uint8_t ColorPreviewCmd::getNameByte()
@@ -59,7 +56,6 @@ uint8_t ColorPreviewCmd::getArgCount()
 void SetEndLightsColorCmd::execute(uint8_t *args)
 {
   ledController.setEndLightsColor(CRGB(args[0], args[1], args[2]), false);
-  debug("E_C: " + String(args[0]) + "," + String(args[1]) + "," + String(args[2]));
 }
 
 uint8_t SetEndLightsColorCmd::getNameByte()

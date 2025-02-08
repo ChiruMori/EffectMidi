@@ -6,7 +6,6 @@ void KeyDownCommand::execute(uint8_t * args)
 {
   auto keyIndex = args[0];
   ledController.pressKey(keyIndex);
-  debug("DOWN: " + String(keyIndex));
 }
 
 uint8_t KeyDownCommand::getNameByte()
@@ -25,7 +24,6 @@ void KeyUpCommand::execute(uint8_t * args)
 {
   auto keyIndex = args[0];
   ledController.releaseKey(keyIndex);
-  debug("UP: " + String(keyIndex));
 }
 
 uint8_t KeyUpCommand::getNameByte()

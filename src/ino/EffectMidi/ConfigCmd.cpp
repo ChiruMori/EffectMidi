@@ -5,7 +5,6 @@
 void SetBrightnessCmd::execute(uint8_t *args)
 {
   ledController.setBrightness(args[0]);
-  debug("BRI: " + String(args[0]));
 }
 
 uint8_t SetBrightnessCmd::getNameByte()
@@ -23,7 +22,6 @@ uint8_t SetBrightnessCmd::getArgCount()
 void SetResidualTimeCmd::execute(uint8_t *args)
 {
   ledController.setResidualTime(args[0]);
-  debug("RES: " + String(args[0]));
 }
 
 uint8_t SetResidualTimeCmd::getNameByte()
@@ -41,7 +39,6 @@ uint8_t SetResidualTimeCmd::getArgCount()
 void SetDiffusionWidthCmd::execute(uint8_t *args)
 {
   ledController.setDiffusionWidth(args[0]);
-  debug("DIF: " + String(args[0]) + "," + String(args[1]));
 }
 
 uint8_t SetDiffusionWidthCmd::getNameByte()

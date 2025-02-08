@@ -52,8 +52,6 @@ protected:
   SerialCommand(LEDController &ledController) : ledController(ledController) {}
   // 灯带控制器
   LEDController &ledController;
-  // 调试输出到控制台
-  void debug(const String &msg);
 };
 
 /**

@@ -10,7 +10,6 @@ void WaitingCmd::execute(uint8_t *args)
     CRGB color = CRGB(realBrightness, realBrightness, realBrightness);
     ledController.setEndLightsColor(color, true);
     counter = (counter + 1) % WAITING_COUNTER_MAX;
-    // debug("Bright: " + String(realBrightness));
   }
   else
   {
