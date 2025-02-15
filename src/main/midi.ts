@@ -26,5 +26,8 @@ export default {
         sendCmd(SerialCmds.keyUp, key)
       }
     }
+  },
+  close: function (): void {
+    window = null
   }
 }

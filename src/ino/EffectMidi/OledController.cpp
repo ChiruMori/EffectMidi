@@ -1,10 +1,5 @@
 #include "headers/OledController.hpp"
 
-OledController::OledController()
-{
-  oled = nullptr;
-}
-
 OledController::~OledController()
 {
   if (oled != nullptr)

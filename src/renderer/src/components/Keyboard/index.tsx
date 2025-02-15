@@ -3,6 +3,7 @@ import { useAppSelector } from '@renderer/common/store'
 import C from '@renderer/common/colors'
 import { themeSelector } from '@renderer/config'
 import { useEffect, useState } from 'react'
+import midi from './midi'
 import './index.styl'
 
 const whiteKeyCnt = 52
@@ -21,17 +22,24 @@ export default function Keyboard(): JSX.Element {
     nextScore = nextScore.nextHalfTone()
   }
   const colorType = useAppSelector(themeSelector)
+
+  const keyDown = (index: number): void => {
+    const targetScore = Score.fromMidi(index)
+    setActiveKeys([...activeKeys, targetScore.toString()])
+    console.debug('keydown', targetScore.toString())
+  }
+  const keyUp = (index: number): void => {
+    const targetScore = Score.fromMidi(index)
+    setActiveKeys(activeKeys.filter((key) => key !== targetScore.toString()))
+    console.debug('keyup', targetScore.toString())
+  }
   useEffect(() => {
-    window.api.onKeyDown((index) => {
-      const targetScore = Score.fromMidi(index)
-      setActiveKeys([...activeKeys, targetScore.toString()])
-      console.debug('keydown', targetScore.toString())
-    })
-    window.api.onKeyUp((index) => {
-      const targetScore = Score.fromMidi(index)
-      setActiveKeys(activeKeys.filter((key) => key !== targetScore.toString()))
-      console.debug('keyup', targetScore.toString())
-    })
+    window.api.onKeyDown(keyDown)
+    window.api.onKeyUp(keyUp)
+    midi.init(keyDown, keyUp)
+    return (): void => {
+      midi.close()
+    }
   }, [activeKeys])
 
   return (

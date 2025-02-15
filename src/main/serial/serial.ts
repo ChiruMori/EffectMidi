@@ -18,7 +18,8 @@ const connectSerial = async (): Promise<void> => {
     activedSerial = (await getActivedSerial()) || null
   }
   if (!activedSerial) {
-    throw new Error('No active serial port found.')
+    console.error('No active serial port found.')
+    return
   }
 
   if (!serial) {
