@@ -9,7 +9,7 @@ export default function report(key: string): void {
   if (nowSecond - secondTimer > 1) {
     secondTimer = nowSecond
     counterMap.forEach((value, key) => {
-      console.debug(`FPS of ${key}: ${value}`)
+      // console.debug(`FPS of ${key}: ${value}`)
     })
     counterMap.clear()
   }

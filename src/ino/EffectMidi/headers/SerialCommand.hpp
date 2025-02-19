@@ -13,6 +13,9 @@
 #define CMD_BYTE_SET_END_LIGHTS_COLOR 0x08
 #define CMD_BYTE_COLOR_PREVIEW 0x09
 
+// 最大参数数量
+#define MAX_ARG_COUNT 3
+
 #define DECLARE_COMMAND(ClassName, BaseClass)                 \
 public:                                                       \
   void execute(uint8_t *args) override;                       \

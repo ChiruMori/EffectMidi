@@ -29,6 +29,8 @@ public:
 
   void displayData(uint8_t leadByte, uint8_t *data, int length);
 
+  void log(String message);
+
 #ifdef USE_OLED
 private:
   Adafruit_SSD1306 *oled;

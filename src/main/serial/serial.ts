@@ -2,10 +2,17 @@ import { SerialPort } from 'serialport'
 import { PortInfo } from '@serialport/bindings-interface'
 import storage from '../storage'
 import { CmdParser } from './cmds'
+import { resolve } from 'path'
 
 let activedSerial: PortInfo | null = null
 let serial: SerialPort | null = null
-const SERIAL_BAUD = 19200
+let lastCmd: string | null = null
+let lastResolve: null | ((value: number) => void) = null
+const SERIAL_BAUD = 300
+const MAX_RETRY = 30
+const SUCCESS_RESP_BYTE = 0x00
+const FAIL_RESP_BYTE = 0x01
+const TIMEOUT_RESP_BYTE = -1
 
 const getActivedSerial = async (): Promise<PortInfo | undefined> => {
   const ports = await SerialPort.list()
@@ -35,6 +42,15 @@ const connectSerial = async (): Promise<void> => {
             return reject(err)
           }
           console.log(`Serial port opened: ${activedSerial!.path}`)
+          serial!.on('data', (data) => {
+            const resp = data.readInt8(0)
+            console.log('Data received:', resp)
+            if (lastCmd) {
+              lastCmd = null
+              lastResolve!(resp)
+              lastResolve = null
+            }
+          })
           resolve()
         }
       )
@@ -55,35 +71,63 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
       await connectSerial()
     }
 
-    // 发送指令
-    await new Promise<void>((resolve, reject) => {
-      serial!.write(Buffer.from(parser(arg)), 'hex', (err) => {
-        if (err) {
-          console.error('Error writing to serial port:', err)
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
-    })
+    let retry = 0
 
-    // 清空串口缓冲区（可选）
-    await new Promise<void>((resolve, reject) => {
-      serial!.flush((err) => {
-        if (err) {
-          console.error('Error flushing serial port:', err)
-          reject(err)
-        } else {
-          resolve()
-        }
+    const sendAndWait = async (): Promise<void> => {
+      // 发送指令
+      await new Promise<void>((resolve, reject) => {
+        serial!.write(Buffer.from(parser(arg)), 'hex', (err) => {
+          if (err) {
+            console.error('Error writing to serial port:', err)
+            reject(err)
+            return
+          }
+          serial!.drain((err) => {
+            if (err) {
+              console.error('Error draining serial port:', err)
+              reject(err)
+              return
+            }
+            resolve()
+          })
+        })
       })
-    })
 
-    // 等待开发板发送的结束信号 (0x00)
-    const response = await waitForEndSignal()
-    if (response !== 0x00) {
-      throw new Error('Unexpected response from device, expected 0x00')
+      // 清空串口缓冲区（可选）
+      await new Promise<void>((resolve, reject) => {
+        serial!.flush((err) => {
+          if (err) {
+            console.error('Error flushing serial port:', err)
+            reject(err)
+          } else {
+            resolve()
+          }
+        })
+      })
+
+      // 等待开发板发送的信号
+      const response = await waitForEndSignal(`${parser.name}(${arg})`)
+      if (response === FAIL_RESP_BYTE) {
+        throw new Error('Unexpected response from device, expected 0x00')
+      } else if (response === TIMEOUT_RESP_BYTE) {
+        if (retry < MAX_RETRY) {
+          retry++
+          console.log('Timeout, retry:', retry)
+          serial!.flush(async (err) => {
+            if (err) {
+              console.error('Error flushing serial port:', err)
+              return
+            }
+            await sendAndWait()
+          })
+        } else {
+          throw new Error('Timeout after max retries')
+        }
+      } else if (response !== SUCCESS_RESP_BYTE) {
+        resolve()
+      }
     }
+    sendAndWait()
 
     lock = false
   } catch (error) {
@@ -93,15 +137,13 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
   }
 }
 
-const waitForEndSignal = async (): Promise<number> => {
+const waitForEndSignal = async (key: string): Promise<number> => {
   return new Promise((resolve) => {
-    serial!.on('data', (data) => {
-      // 假设 data 是 Buffer，读取第一个字节
-      const signal = data[0]
-      if (signal === 0x00) {
-        resolve(signal)
-      }
-    })
+    lastCmd = key
+    lastResolve = (data: number): void => {
+      resolve(data)
+      console.log(`Response of ${key}: ${data}`)
+    }
   })
 }
 

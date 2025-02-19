@@ -11,10 +11,7 @@ void WaitingCmd::execute(uint8_t *args)
     ledController.setEndLightsColor(color, true);
     counter = (counter + 1) % WAITING_COUNTER_MAX;
   }
-  else
-  {
-    delay(WAIT_DELAY);
-  }
+  delay(WAIT_DELAY);
 };
 
 uint8_t WaitingCmd::getNameByte()
