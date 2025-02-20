@@ -23,7 +23,8 @@ export default function ipc(mainWindow: BrowserWindow): void {
   ipcMain.on('initLed', async () => {
     // 通过发送一系列指令完成配置的初始化
     // 背景色设置
-    sendCmd(cmds.setBackgroundColor, await storage.main.getLedConfig('bgColor'))
+    const bgColor = await storage.main.getLedConfig('bgColor')
+    sendCmd(cmds.setBackgroundColor, bgColor.length === 9 ? bgColor.substring(1, 8) : bgColor)
   })
   // 关闭 LED
   ipcMain.on('closeLed', closeSerial)

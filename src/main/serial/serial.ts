@@ -8,8 +8,10 @@ let activedSerial: PortInfo | null = null
 let serial: SerialPort | null = null
 let lastCmd: string | null = null
 let lastResolve: null | ((value: number) => void) = null
-const SERIAL_BAUD = 300
-const MAX_RETRY = 30
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cmdQueue: { parser: CmdParser; arg?: any }[] = []
+const SERIAL_BAUD = 9600
+const MAX_RETRY = 3
 const SUCCESS_RESP_BYTE = 0x00
 const FAIL_RESP_BYTE = 0x01
 const TIMEOUT_RESP_BYTE = -1
@@ -44,7 +46,7 @@ const connectSerial = async (): Promise<void> => {
           console.log(`Serial port opened: ${activedSerial!.path}`)
           serial!.on('data', (data) => {
             const resp = data.readInt8(0)
-            console.log('Data received:', resp)
+            // console.log('Data received:', resp)
             if (lastCmd) {
               lastCmd = null
               lastResolve!(resp)
@@ -58,14 +60,8 @@ const connectSerial = async (): Promise<void> => {
   }
 }
 
-let lock = false
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
-  if (lock) {
-    console.warn('Serial port is locked.')
-    return
-  }
   try {
     if (!serial) {
       await connectSerial()
@@ -108,7 +104,8 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
       // 等待开发板发送的信号
       const response = await waitForEndSignal(`${parser.name}(${arg})`)
       if (response === FAIL_RESP_BYTE) {
-        throw new Error('Unexpected response from device, expected 0x00')
+        console.error('Unexpected response from device, expected 0x00')
+        await sendAndWait()
       } else if (response === TIMEOUT_RESP_BYTE) {
         if (retry < MAX_RETRY) {
           retry++
@@ -128,8 +125,6 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
       }
     }
     sendAndWait()
-
-    lock = false
   } catch (error) {
     console.error('Error in sendAndFlush:', error)
     closeSerial() // 关闭串口
@@ -140,21 +135,43 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
 const waitForEndSignal = async (key: string): Promise<number> => {
   return new Promise((resolve) => {
     lastCmd = key
-    lastResolve = (data: number): void => {
-      resolve(data)
-      console.log(`Response of ${key}: ${data}`)
-    }
+    // lastResolve = (data: number): void => {
+    //   resolve(data)
+    //   console.log(`Response of ${key}: ${data}`)
+    // }
+    lastResolve = resolve
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sendCmd = async (parser: CmdParser, arg?: any): Promise<void> => {
-  try {
-    await connectSerial()
-    await sendAndFlush(parser, arg)
-  } catch (error) {
-    console.error('Error in sendCmd:', error)
+let lock = false
+const handleCmdQueue = async (): Promise<void> => {
+  if (lock) {
+    return
   }
+  lock = true
+  while (cmdQueue.length !== 0) {
+    const { parser, arg } = cmdQueue.shift()!
+    try {
+      await connectSerial()
+      await sendAndFlush(parser, arg)
+    } catch (error) {
+      console.error('Error in handleCmdQueue:', error)
+    }
+  }
+  lock = false
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const sendCmd = (parser: CmdParser, arg?: any): void => {
+  if (cmdQueue.length !== 0) {
+    // 如果队列中已有相同指令（Parser相同），则删掉之前的指令
+    const index = cmdQueue.findIndex((item) => item.parser === parser)
+    if (index !== -1) {
+      cmdQueue.splice(index, 1)
+    }
+  }
+  cmdQueue.push({ parser, arg })
+  handleCmdQueue()
 }
 
 export const closeSerial = (): void => {

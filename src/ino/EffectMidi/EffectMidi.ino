@@ -5,7 +5,7 @@
 #include "headers/OledController.hpp"
 
 #define NUM_LEDS 288
-#define SERIAL_BAUD 300
+#define SERIAL_BAUD 9600
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -26,8 +26,6 @@ void setup()
   oled.setup();
 
   ledController.stepAndShow();
-  // FastLED.addLeds<WS2812, 7, GRB>(leds, NUM_LEDS);
-  // FastLED.show();
 }
 
 
@@ -54,8 +52,4 @@ void loop()
   {
     return;
   }
-  // oled.log("Fuck: " + String(currentByte, HEX));
-  // ledController.pressKey(uint8_t(currentByte));
-  // leds[currentByte] = CRGB::Red;
-  // FastLED.show();
 }

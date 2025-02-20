@@ -59,7 +59,6 @@ export default {
   get: innerGet,
   set: async (key: string, value: any): Promise<void> => {
     await innerSet(key, value)
-    // TODO: 拓展灯带控制
   },
   // 删除数据
   remove: (key: string): Promise<void> => {

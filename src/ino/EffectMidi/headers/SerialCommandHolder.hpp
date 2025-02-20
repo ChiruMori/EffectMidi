@@ -4,8 +4,11 @@
 #define SUCCESS_RESP_BYTE 0x00
 #define FAIL_RESP_BYTE 0x01
 #define TIMEOUT_RESP_BYTE -1
+#define CMD_SPLIT_INT -2
 
 // state 大于 0 时表示正在读取参数
+// 等待指令分割字节（分割字节后指令开始）
+#define STATE_SPLIT -2
 // 等待指令字节
 #define STATE_INIT -1
 // 解析单条指令的超时时间（ms）

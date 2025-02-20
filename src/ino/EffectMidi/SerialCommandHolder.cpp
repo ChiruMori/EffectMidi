@@ -46,8 +46,24 @@ SerialCommand *SerialCommandHolder::getCommand(const int cmdNameByte)
 
 void SerialCommandHolder::processByte(const int byte, const bool noData, OledController &oled)
 {
-  if (state == STATE_INIT)
+  if (state == STATE_SPLIT)
   {
+    if (byte == CMD_SPLIT_INT)
+    {
+      state = STATE_INIT;
+    }
+  }
+  else if (state == STATE_INIT)
+  {
+    // TODO: 不按预期干活，出现 Timeout，Lead Byte 可能有问题，高频指令问题并未解决
+    // 指令意外中断时，丢弃当前指令
+    if (byte == CMD_SPLIT_INT)
+    {
+      state = STATE_SPLIT;
+      Serial.write(FAIL_RESP_BYTE);
+      oled.log("Split byte received before command byte.");
+      return;
+    }
     // 根据字节获取指令对象
     auto command = getCommand(byte);
     if (command == nullptr)
@@ -85,6 +101,14 @@ void SerialCommandHolder::processByte(const int byte, const bool noData, OledCon
       Serial.write(TIMEOUT_RESP_BYTE);
     }
     // 未超时，滚回去等数据
+    return;
+  }
+  if (byte == CMD_SPLIT_INT)
+  {
+    // 指令中断，清空缓冲区，返回失败响应
+    state = STATE_INIT;
+    Serial.write(FAIL_RESP_BYTE);
+    oled.log("Terminate: " + String(currentCommand->getNameByte()) + "Data: [" + String(argsBuffer[0], HEX) + "," + String(argsBuffer[1], HEX) + "," + String(argsBuffer[2], HEX) + "]");
     return;
   }
   // 读取参数，参数数量足够时执行指令

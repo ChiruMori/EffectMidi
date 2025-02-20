@@ -52,9 +52,9 @@ void OledController::setup()
   if (!oled->begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
   {
     Serial.println("Failed to initialize OLED.");
-    delete oled;    // 清理内存
-    oled = nullptr; // 避免悬空指针
-    return;         // 如果初始化失败，退出 setup
+    delete oled;
+    oled = nullptr;
+    return;
   }
 
   oled->clearDisplay();
