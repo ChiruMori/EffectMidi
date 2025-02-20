@@ -24,5 +24,6 @@
     "xtree": "cpp",
     "xutility": "cpp"
   },
+  "C_Cpp.errorSquiggles": "enabled",
   "files.eol": "\n"
 }

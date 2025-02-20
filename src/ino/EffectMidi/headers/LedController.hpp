@@ -126,6 +126,17 @@ private:
    * 残留时间计数数组
    */
   int residualCounter[KEY_NUM];
+  /**
+   * 是否需要刷新
+   */
+  bool needRefresh;
+  /**
+   * 设置某个灯的颜色
+   * 
+   * @param ledIndex 灯珠索引，-1表示端点灯
+   * @param color 颜色
+   */
+  void setLedColor(int ledIndex, CRGB color);
 };
 
 #endif
