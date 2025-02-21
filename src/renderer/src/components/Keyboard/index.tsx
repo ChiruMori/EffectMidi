@@ -2,7 +2,7 @@ import { Score } from '@renderer/common/score'
 import { useAppSelector } from '@renderer/common/store'
 import C from '@renderer/common/colors'
 import { themeSelector } from '@renderer/config'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import midi from './midi'
 import './index.styl'
 
@@ -11,7 +11,7 @@ const startScore = 'A1'
 
 export default function Keyboard(): JSX.Element {
   const keyboards = [] as Score[][]
-  const [activeKeys, setActiveKeys] = useState<string[]>([])
+  const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   let nextScore = Score.fromString(startScore)
   while (keyboards.length < whiteKeyCnt) {
     if (nextScore.sharp !== null) {
@@ -23,33 +23,48 @@ export default function Keyboard(): JSX.Element {
   }
   const colorType = useAppSelector(themeSelector)
 
-  const keyDown = (index: number): void => {
+  // 使用useCallback稳定事件处理器
+  const handleKeyDown = useCallback((index: number): void => {
     const targetScore = Score.fromMidi(index)
-    setActiveKeys([...activeKeys, targetScore.toString()])
-    console.debug('keydown', targetScore.toString())
-  }
-  const keyUp = (index: number): void => {
+    const key = targetScore.toString()
+    setActiveKeys(prev => {
+      if (prev.has(key)) return prev
+      const next = new Set(prev)
+      next.add(key)
+      return next
+    })
+  }, [])
+
+  const handleKeyUp = useCallback((index: number): void => {
     const targetScore = Score.fromMidi(index)
-    setActiveKeys(activeKeys.filter((key) => key !== targetScore.toString()))
-    console.debug('keyup', targetScore.toString())
-  }
+    const key = targetScore.toString()
+    setActiveKeys(prev => {
+      if (!prev.has(key)) return prev
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
+  }, [])
+
   useEffect(() => {
-    window.api.onKeyDown(keyDown)
-    window.api.onKeyUp(keyUp)
-    midi.init(keyDown, keyUp)
-    return (): void => {
+    window.api.onKeyDown(handleKeyDown)
+    window.api.onKeyUp(handleKeyUp)
+    midi.init(handleKeyDown, handleKeyUp)
+    return () => {
+      window.api.offEvent('midi-keydown')
+      window.api.offEvent('midi-keyup')
       midi.close()
     }
-  }, [activeKeys])
+  }, [handleKeyDown, handleKeyUp]) // 依赖稳定的回调函数
 
   return (
     <div className="absolute w-full h-1/6 bg-white bottom-0 z-40">
       <div className="flex flex-nowrap size-full kb-container">
         {keyboards.map((scoreTuple, idx) => (
           <div
-            className={`kb kb-w ${activeKeys.includes(scoreTuple[0].toString()) ? '' : 'bg-white'}`}
+            className={`kb kb-w ${activeKeys.has(scoreTuple[0].toString()) ? '' : 'bg-white'}`}
             style={
-              activeKeys.includes(scoreTuple[0].toString())
+              activeKeys.has(scoreTuple[0].toString())
                 ? { backgroundImage: C(colorType).ingridient(0) }
                 : {}
             }
@@ -58,9 +73,9 @@ export default function Keyboard(): JSX.Element {
           >
             {scoreTuple.length === 2 && (
               <div
-                className={`kb kb-b ${activeKeys.includes(scoreTuple[1].toString()) ? '' : 'bg-black'}`}
+                className={`kb kb-b ${activeKeys.has(scoreTuple[1].toString()) ? '' : 'bg-black'}`}
                 style={
-                  activeKeys.includes(scoreTuple[1].toString())
+                  activeKeys.has(scoreTuple[1].toString())
                     ? { backgroundImage: C(colorType).ingridient(0) }
                     : {}
                 }

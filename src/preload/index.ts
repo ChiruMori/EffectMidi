@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import type { RegisteredEvent } from './index.d'
 
 // 暴露给渲染进程的自定义 API，由渲染进程执行
 // IPC 通信，主进程通知渲染进程执行操作
@@ -17,6 +18,9 @@ const api = {
   onKeyUp: (callback: (data: number) => void): void => {
     ipcRenderer.removeAllListeners('midi-keyup')
     ipcRenderer.on('midi-keyup', (_, data) => callback(data))
+  },
+  offEvent: (eventName: RegisteredEvent): void => {
+    ipcRenderer.removeAllListeners(eventName)
   }
 }
 
