@@ -127,11 +127,13 @@ void LEDController::stepAndShow()
       }
     }
   }
-  // 展示灯带
-  if (needRefresh)
+  // 展示灯带，需要控制刷新频率
+  auto now = millis();
+  if (needRefresh && now - lastRefreshTime > REFRESH_INTERVAL)
   {
     FastLED.show();
     needRefresh = false;
+    lastRefreshTime = now;
   }
 }
 

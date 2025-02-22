@@ -19,6 +19,14 @@ export default {
   closeLed: (): void => {
     server.send('closeLed')
   },
+  // Key down
+  keyDown: (key: number): void => {
+    server.send('midi-keydown', key)
+  },
+  // Key up
+  keyUp: (key: number): void => {
+    server.send('midi-keyup', key)
+  },
   // Set background color
   setBgColor: (color: string): void => {
     server.send('setBgColor', color)

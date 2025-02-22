@@ -69,8 +69,12 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
             return true
           }
           console.log('enableCom', value, nowCom)
-          // 通知主进程初始化灯带
-          ipc.initLed()
+          // 通知主进程操作串口
+          if (value) {
+            ipc.initLed()
+          } else {
+            ipc.closeLed()
+          }
           dispatch(enableComSlice.actions.setEnableCom(value))
           return false
         }}

@@ -5,6 +5,7 @@ import { themeSelector } from '@renderer/config'
 import { useEffect, useState, useCallback } from 'react'
 import midi from './midi'
 import './index.styl'
+import ipcClient from '@renderer/common/ipcClient'
 
 const whiteKeyCnt = 52
 const startScore = 'A1'
@@ -27,10 +28,11 @@ export default function Keyboard(): JSX.Element {
   const handleKeyDown = useCallback((index: number): void => {
     const targetScore = Score.fromMidi(index)
     const key = targetScore.toString()
-    setActiveKeys(prev => {
+    setActiveKeys((prev) => {
       if (prev.has(key)) return prev
       const next = new Set(prev)
       next.add(key)
+      ipcClient.keyDown(index)
       return next
     })
   }, [])
@@ -38,10 +40,11 @@ export default function Keyboard(): JSX.Element {
   const handleKeyUp = useCallback((index: number): void => {
     const targetScore = Score.fromMidi(index)
     const key = targetScore.toString()
-    setActiveKeys(prev => {
+    setActiveKeys((prev) => {
       if (!prev.has(key)) return prev
       const next = new Set(prev)
       next.delete(key)
+      ipcClient.keyUp(index)
       return next
     })
   }, [])
@@ -50,7 +53,7 @@ export default function Keyboard(): JSX.Element {
     window.api.onKeyDown(handleKeyDown)
     window.api.onKeyUp(handleKeyUp)
     midi.init(handleKeyDown, handleKeyUp)
-    return () => {
+    return (): void => {
       window.api.offEvent('midi-keydown')
       window.api.offEvent('midi-keyup')
       midi.close()

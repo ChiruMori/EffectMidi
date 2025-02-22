@@ -2,6 +2,7 @@ import { HexColorPicker } from 'react-colorful'
 import { Button, Description, Field, Input, Label } from '@headlessui/react'
 import { EyeDropperIcon } from '@heroicons/react/20/solid'
 import { useCallback, useEffect, useState } from 'react'
+import { debounce } from 'lodash'
 import { EmFormProps } from '../types'
 import './index.styl'
 
@@ -17,7 +18,7 @@ export default function EmColorPicker({
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [enableFadeOut, setEnableFadeOut] = useState(false)
 
-  const debounced = useCallback(onChange, [])
+  const debouncedOnChanged = useCallback(debounce(onChange, 100), [])
 
   // 组件失焦后隐藏颜色选择器
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function EmColorPicker({
               }}
               value={color}
               onChange={(e) => {
-                const cancel = debounced(e.target.value)
+                const cancel = debouncedOnChanged(e.target.value)
                 if (cancel) {
                   return
                 }
@@ -91,7 +92,7 @@ export default function EmColorPicker({
               color={color}
               onChange={(color) => {
                 setColor(color)
-                debounced(color)
+                debouncedOnChanged(color)
               }}
             />
           </div>

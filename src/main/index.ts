@@ -4,7 +4,6 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/EffectMidi_1024.png?asset'
 import storage from './storage'
 import ipc from './ipcServer'
-import midi from './midi'
 import { closeSerial } from './serial/serial'
 
 let mainWindow: BrowserWindow | null = null
@@ -59,9 +58,6 @@ app.whenReady().then(() => {
 
     // 初始化 IPC
     ipc(mainWindow!)
-
-    // TODO: MIDI 设备监听
-    midi.init(mainWindow!)
   })
 
   app.on('activate', function () {

@@ -4,6 +4,8 @@
 #define DIGITAL_PIN 7
 #define DEBUG_MODE 1
 #define PREVIEW_TIME 5000
+//（60fps，16ms）
+#define REFRESH_INTERVAL 16
 
 #include <FastLED.h>
 
@@ -131,8 +133,12 @@ private:
    */
   bool needRefresh;
   /**
+   * 上次刷新时间
+   */
+  unsigned long lastRefreshTime;
+  /**
    * 设置某个灯的颜色
-   * 
+   *
    * @param ledIndex 灯珠索引，-1表示端点灯
    * @param color 颜色
    */

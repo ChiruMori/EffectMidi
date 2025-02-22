@@ -5,7 +5,7 @@
 #include "headers/OledController.hpp"
 
 #define NUM_LEDS 288
-#define SERIAL_BAUD 9600
+#define SERIAL_BAUD 115200
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -48,8 +48,4 @@ void loop()
   // 处理当前字节
   cmdHolder.processByte(currentByte, noData, oled);
   ledController.stepAndShow();
-  if (noData)
-  {
-    return;
-  }
 }

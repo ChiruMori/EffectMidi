@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define USE_OLED
+// #define USE_OLED
 
 #ifdef USE_OLED
 
@@ -22,7 +22,15 @@ class OledController
 {
 
 public:
-  OledController() : oled(nullptr) {}
+  OledController()
+#ifdef USE_OLED
+      : oled(nullptr)
+  {
+  }
+#else
+  {
+  }
+#endif
   ~OledController();
 
   void setup();
