@@ -28,15 +28,21 @@ void SerialCommandHolder::createAllCommands(LEDController &ledController)
   registerCommand(&SetForegroundColorCmd::getInstance(ledController));
   registerCommand(&KeyDownCommand::getInstance(ledController));
   registerCommand(&KeyUpCommand::getInstance(ledController));
-  registerCommand(&SetBrightnessCmd::getInstance(ledController));
   registerCommand(&SetResidualTimeCmd::getInstance(ledController));
   registerCommand(&SetDiffusionWidthCmd::getInstance(ledController));
   registerCommand(&SetEndLightsColorCmd::getInstance(ledController));
-  registerCommand(&ColorPreviewCmd::getInstance(ledController));
 }
 
 SerialCommand *SerialCommandHolder::getCommand(const int cmdNameByte)
 {
+  if (cmdNameByte >= CMD_OFFSET_KEY_DOWN && cmdNameByte < CMD_OFFSET_KEY_UP)
+  {
+    return commands[CMD_BYTE_KEY_DOWN];
+  }
+  if (cmdNameByte >= CMD_OFFSET_KEY_UP)
+  {
+    return commands[CMD_BYTE_KEY_UP];
+  }
   if (commands[cmdNameByte])
   {
     return commands[cmdNameByte];
@@ -68,7 +74,20 @@ void SerialCommandHolder::processByte(const int byte, const bool noData, OledCon
       currentCommand = command;
       return;
     }
-    command->execute(nullptr);
+    // 无需参数的指令，直接执行
+    // key down
+    uint8_t *args = nullptr;
+    if (byte >= CMD_OFFSET_KEY_DOWN && byte < CMD_OFFSET_KEY_UP)
+    {
+      args = new uint8_t[1];
+      args[0] = byte - CMD_OFFSET_KEY_DOWN;
+    }
+    else if (byte >= CMD_OFFSET_KEY_UP)
+    {
+      args = new uint8_t[1];
+      args[0] = byte - CMD_OFFSET_KEY_UP;
+    }
+    command->execute(args);
     state = STATE_INIT;
     return;
   }

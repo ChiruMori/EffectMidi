@@ -1,7 +1,7 @@
 import { Description, Field, Label, Switch } from '@headlessui/react'
 import C from '@renderer/common/colors'
 import { themeSelector } from '@renderer/config'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { EmFormProps } from '../types'
 import { useAppSelector } from '@renderer/common/store'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
@@ -16,6 +16,10 @@ export default function EmSwitch({
 }: EmSwitchProps): JSX.Element {
   const [enabled, setEnabled] = useState(initValue)
   const theme = C(useAppSelector(themeSelector))
+
+  useEffect(() => {
+    setEnabled(initValue)
+  }, [initValue])
 
   return (
     <div className="py-2">

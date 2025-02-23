@@ -1,15 +1,14 @@
-import { useState } from 'react'
-import MenuSide, { type MenuOptions } from './MenuSide'
+import MenuSide from './MenuSide'
 import Appearance from './Appearance'
 import { useAppSelector } from '@renderer/common/store'
-import './index.styl'
 import { Devices } from './Devices'
-import { bgImgSelector } from '@renderer/config'
+import { bgImgSelector, menuSelector } from '@renderer/config'
 import Lights from './Lights'
+import './index.styl'
 
 function ConfigMenu(): JSX.Element {
-  const [menu, setMenu] = useState<MenuOptions>('appearance')
   const nowBgImg = useAppSelector(bgImgSelector)
+  const menu = useAppSelector(menuSelector)
 
   return (
     <>
@@ -36,7 +35,7 @@ function ConfigMenu(): JSX.Element {
         <div className="h-full main-panel mx-auto px-4 grid grid-rows-1 grid-cols-12 gap-4">
           <div className="col-span-1"></div>
           <div className="col-span-2">
-            <MenuSide menu={menu} onChange={setMenu} />
+            <MenuSide />
           </div>
           <div className="col-span-8 overflow-y-scroll overflow-x-hidden rounded-md bg-neutral-800/50 content-page">
             <Appearance hidden={menu !== 'appearance'} />

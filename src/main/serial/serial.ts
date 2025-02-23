@@ -8,6 +8,7 @@ let activedSerial: PortInfo | null = null
 let serial: SerialPort | null = null
 let lastCmd: string | null = null
 let lastResolve: null | ((value: number) => void) = null
+let win: Electron.BrowserWindow | null = null
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cmdQueue: { parser: CmdParser; arg?: any }[] = []
 const SERIAL_BAUD = 115200
@@ -60,6 +61,12 @@ const connectSerial = async (): Promise<void> => {
               lastResolve = null
             }
           })
+          // 意外中断时，关闭串口，并通知渲染进程
+          serial!.on('close', () => {
+            console.log('Serial port closed.')
+            serial = null
+            win?.webContents.send('serial-abort')
+          })
           // 新连接，需要等待一定时间，清空板子上发飙的指令
           setTimeout(resolve, 1000)
         }
@@ -109,8 +116,7 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
         })
       })
 
-      console.log(`Command sent: ${parser.name}(${arg})`)
-
+      // console.log(`Command sent: ${parser.name}(${arg})`)
       // 等待开发板发送的信号
       const response = await waitForEndSignal(`${parser.name}(${arg})`)
       if (response === FAIL_RESP_BYTE) {
@@ -155,11 +161,9 @@ const waitForEndSignal = async (key: string): Promise<number> => {
 
 let lock = false
 const handleCmdQueue = async (): Promise<void> => {
-  // if (lock) {
-  //   return
-  // }
-  // TODO: 当前延迟问题已解决，但多个键按下时，会出现程序错误
-  // TODO: 透明度调整时，滑条慢一拍
+  if (lock) {
+    return
+  }
   lock = true
   while (cmdQueue.length !== 0) {
     const { parser, arg } = cmdQueue.shift()!
@@ -222,4 +226,8 @@ export const closeSerial = (): void => {
   } catch (error) {
     console.error('Error in closeSerial:', error)
   }
+}
+
+export const initSerial = (mainWindow: Electron.BrowserWindow): void => {
+  win = mainWindow
 }

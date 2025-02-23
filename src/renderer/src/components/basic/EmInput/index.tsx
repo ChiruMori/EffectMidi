@@ -1,5 +1,5 @@
 import { Description, Field, Input, Label } from '@headlessui/react'
-import React, { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { EmFormProps } from '../types'
 
 interface EmInputProps extends EmFormProps<string> {
@@ -12,9 +12,12 @@ const EmInput: React.FC<EmInputProps> = ({
   placeholder = '',
   initValue = '',
   onChange = (): void => {}
-}) => {
-  const [val, setVal] = React.useState(initValue)
+}: EmInputProps) => {
+  const [val, setVal] = useState(initValue)
   const debounced = useCallback(onChange, [])
+  useEffect(() => {
+    setVal(initValue)
+  }, [initValue])
   return (
     <div className="py-2">
       <Field>

@@ -34,23 +34,6 @@ uint8_t SetForegroundColorCmd::getArgCount()
   return 3;
 }
 
-// 颜色预览指令
-
-void ColorPreviewCmd::execute(uint8_t *args)
-{
-  ledController.previewEndLightsColor(CRGB(args[0], args[1], args[2]));
-}
-
-uint8_t ColorPreviewCmd::getNameByte()
-{
-  return CMD_BYTE_COLOR_PREVIEW;
-}
-
-uint8_t ColorPreviewCmd::getArgCount()
-{
-  return 3;
-}
-
 // 设置端点灯颜色指令
 
 void SetEndLightsColorCmd::execute(uint8_t *args)

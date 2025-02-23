@@ -1,7 +1,7 @@
 import { Button, Description, Field, Input, Label } from '@headlessui/react'
 import { FolderIcon, XCircleIcon } from '@heroicons/react/20/solid'
 import { debounce } from 'lodash'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import './index.styl'
 
 const FILE_PATH_PREFIX = '[EM:file] '
@@ -24,6 +24,10 @@ const EmInput: React.FC<EmInputProps> = ({
 }) => {
   const [filename, setFilename] = React.useState(initValue)
   const debounced = useCallback(debounce(onChange, 300), [])
+
+  useEffect(() => {
+    setFilename(initValue)
+  }, [initValue])
 
   return (
     <div className="py-2">

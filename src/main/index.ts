@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/EffectMidi_1024.png?asset'
 import storage from './storage'
 import ipc from './ipcServer'
-import { closeSerial } from './serial/serial'
+import { closeSerial, initSerial } from './serial/serial'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -58,6 +58,8 @@ app.whenReady().then(() => {
 
     // 初始化 IPC
     ipc(mainWindow!)
+    // 初始化串口工具
+    initSerial(mainWindow!)
   })
 
   app.on('activate', function () {

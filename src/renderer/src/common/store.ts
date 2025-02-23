@@ -80,7 +80,9 @@ export const store = configureStore({
     // 粒子效果
     particle: persistReducer(storePersistConfigOf('particle'), configManger.particleSlice.reducer),
     // led 配置
-    led: persistReducer(storePersistConfigOf('led'), configManger.ledSlice.reducer)
+    led: persistReducer(storePersistConfigOf('led'), configManger.ledSlice.reducer),
+    // Menu 配置
+    menu: persistReducer(storeSessionConfigOf('menu'), configManger.menuSlice.reducer)
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

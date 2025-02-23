@@ -36,6 +36,10 @@ export default function ipc(mainWindow: BrowserWindow): void {
   ipcMain.on('setBgColor', (_, color) => {
     sendCmd(cmds.setBackgroundColor, color)
   })
+  // 前景色设置
+  ipcMain.on('setFgColor', (_, color) => {
+    sendCmd(cmds.setForegroundColor, color)
+  })
   // SQLite
   ipcMain.handle('storage.get', async (_, key) => {
     return await storage.get(key as string)

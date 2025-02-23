@@ -30,8 +30,12 @@ devices:
 led:
   bg-color-label: Background Color
   bg-color-desc: The background color of the light strip, the color of the light when the key is not pressed, can be set to black to turn off the light
+  fg-color-label: Foreground Color
+  fg-color-desc: The color of the light when the key is pressed
 notify:
   serial-disable-title: Serial Port Not Activated
   serial-disable-content: You need to activate the serial port before you can use the light effect settings
   serial-unselected-title: Unselected Serial Port
   serial-unselected-content: Cannot activate the serial port, you must first select the serial port to activate
+  serial-abort-title: Serial Port Disconnected
+  serial-abort-content: The serial port connection has been disconnected, please reselect and activate the serial port

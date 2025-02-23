@@ -15,7 +15,7 @@ uint8_t KeyDownCommand::getNameByte()
 
 uint8_t KeyDownCommand::getArgCount()
 {
-  return 1;
+  return 0;
 }
 
 // 按键松开指令
@@ -33,5 +33,5 @@ uint8_t KeyUpCommand::getNameByte()
 
 uint8_t KeyUpCommand::getArgCount()
 {
-  return 1;
+  return 0;
 }

@@ -21,6 +21,10 @@ const api = {
   },
   offEvent: (eventName: RegisteredEvent): void => {
     ipcRenderer.removeAllListeners(eventName)
+  },
+  onSerialAbort: (callback: () => void): void => {
+    ipcRenderer.removeAllListeners('serial-abort')
+    ipcRenderer.on('serial-abort', callback)
   }
 }
 

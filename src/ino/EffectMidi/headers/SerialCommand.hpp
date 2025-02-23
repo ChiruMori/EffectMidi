@@ -2,16 +2,18 @@
 #define SERIAL_COMMAND_H
 #define WAITING_COUNTER_MAX 256
 #define WAIT_DELAY 10
+
 #define CMD_BYTE_WAITING 0x00
 #define CMD_BYTE_SET_FOREGROUND_COLOR 0x01
 #define CMD_BYTE_SET_BACKGROUND_COLOR 0x02
 #define CMD_BYTE_KEY_DOWN 0x03
 #define CMD_BYTE_KEY_UP 0x04
-#define CMD_BYTE_SET_BRIGHTNESS 0x05
-#define CMD_BYTE_SET_RESIDUAL_TIME 0x06
-#define CMD_BYTE_SET_DIFFUSION_WIDTH 0x07
-#define CMD_BYTE_SET_END_LIGHTS_COLOR 0x08
-#define CMD_BYTE_COLOR_PREVIEW 0x09
+#define CMD_BYTE_SET_RESIDUAL_TIME 0x05
+#define CMD_BYTE_SET_DIFFUSION_WIDTH 0x06
+#define CMD_BYTE_SET_END_LIGHTS_COLOR 0x07
+
+#define CMD_OFFSET_KEY_DOWN 0x50
+#define CMD_OFFSET_KEY_UP 0xa8
 
 // 最大参数数量
 #define MAX_ARG_COUNT 3
@@ -99,14 +101,6 @@ class KeyUpCommand : public SerialCommand
 };
 
 /**
- * 设置亮度指令
- */
-class SetBrightnessCmd : public SerialCommand
-{
-  DECLARE_COMMAND(SetBrightnessCmd, SerialCommand)
-};
-
-/**
  * 设置残留时间指令
  */
 class SetResidualTimeCmd : public SerialCommand
@@ -128,14 +122,6 @@ class SetDiffusionWidthCmd : public SerialCommand
 class SetEndLightsColorCmd : public SerialCommand
 {
   DECLARE_COMMAND(SetEndLightsColorCmd, SerialCommand)
-};
-
-/**
- * 颜色预览指令
- */
-class ColorPreviewCmd : public SerialCommand
-{
-  DECLARE_COMMAND(ColorPreviewCmd, SerialCommand)
 };
 
 #endif

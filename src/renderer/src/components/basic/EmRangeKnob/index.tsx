@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import './index.styl'
 import { getMidColor } from '@renderer/common/colors'
 import { EmRangeProps } from '../types'
@@ -21,6 +21,10 @@ const EmRange: React.FC<EmRangeProps> = ({
   const radius = 100
   const center = radius + 10
   const circumference = 2 * Math.PI * radius
+
+  useEffect(() => {
+    setValue(initValue)
+  }, [initValue])
 
   const getRotation = (value: number): number => {
     const progress = ((value - min) / (max - min)) * (1 - SKIP_GAP)

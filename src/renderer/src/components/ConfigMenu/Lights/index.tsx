@@ -22,6 +22,15 @@ export default function Lights({ hidden }: { hidden: boolean }): JSX.Element {
         }}
         initValue={led.bgColor}
       />
+      <EmColorPicker
+        label={txt('led.fg-color-label')}
+        description={txt('led.fg-color-desc')}
+        onChange={(color) => {
+          ipcClient.setFgColor(color)
+          dispatch(ledSlice.actions.setFgColor(color))
+        }}
+        initValue={led.fgColor}
+      />
     </div>
   )
 }

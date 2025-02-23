@@ -20,6 +20,10 @@ export default function EmColorPicker({
 
   const debouncedOnChanged = useCallback(debounce(onChange, 100), [])
 
+  useEffect(() => {
+    setColor(initValue)
+  }, [initValue])
+
   // 组件失焦后隐藏颜色选择器
   useEffect(() => {
     const enableFadeOut = (e: MouseEvent): void => {

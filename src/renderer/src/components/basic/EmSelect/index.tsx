@@ -8,7 +8,7 @@ import {
   ListboxOption
 } from '@headlessui/react'
 import lang from '@renderer/lang'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDownIcon, CheckIcon } from '@heroicons/react/20/solid'
 import { EmFormProps } from '../types'
 
@@ -27,6 +27,11 @@ export default function EmSelect({
 }: EmSelectProps): JSX.Element {
   const [selected, setSelected] = useState(initValue)
   const txt = lang()
+
+  useEffect(() => {
+    setSelected(initValue)
+  }, [initValue])
+
   return (
     <div className="py-2">
       <Field>

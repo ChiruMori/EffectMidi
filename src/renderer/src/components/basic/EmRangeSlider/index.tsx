@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { EmRangeProps } from '../types'
 import { getMidColor } from '@renderer/common/colors'
 import './index.styl'
@@ -17,13 +17,16 @@ const RangeSelector: React.FC<EmRangeProps> = ({
   const [value, setValue] = useState<number>(initValue)
   const debounced = useCallback(onChange, [])
 
+  useEffect(() => {
+    setValue(initValue)
+  }, [initValue])
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    setValue(Number(event.target.value))
     const cancel = debounced(Number(event.target.value))
     if (cancel) {
       return
     }
-    setValue(initValue)
+    setValue(Number(event.target.value))
   }
 
   const getTicks = (): number[] => {

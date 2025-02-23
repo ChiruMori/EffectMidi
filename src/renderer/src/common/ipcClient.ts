@@ -31,6 +31,10 @@ export default {
   setBgColor: (color: string): void => {
     server.send('setBgColor', color)
   },
+  // Set foreground color
+  setFgColor: (color: string): void => {
+    server.send('setFgColor', color)
+  },
   // Storage
   storage: {
     get: async (key: string): Promise<any> => {

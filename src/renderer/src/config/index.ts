@@ -114,6 +114,7 @@ export const ledSlice = createSlice({
   name: 'led',
   initialState: {
     bgColor: '#000000',
+    fgColor: '#ffffff',
     residue: 0,
     diffusion: 0
   },
@@ -122,6 +123,12 @@ export const ledSlice = createSlice({
       return {
         ...state,
         bgColor: action.payload
+      }
+    },
+    setFgColor: (state, action) => {
+      return {
+        ...state,
+        fgColor: action.payload
       }
     },
     setResidue: (state, action) => {
@@ -134,6 +141,21 @@ export const ledSlice = createSlice({
       return {
         ...state,
         diffusion: action.payload
+      }
+    }
+  }
+})
+
+export const menuSlice = createSlice({
+  name: 'menu',
+  initialState: {
+    menu: 'appearance'
+  },
+  reducers: {
+    setMenu: (state, action) => {
+      return {
+        ...state,
+        menu: action.payload
       }
     }
   }
@@ -167,12 +189,14 @@ export const particleSelector = (
 }
 export const ledSelector = (
   state: RootState
-): { bgColor: string; residue: number; diffusion: number } => {
+): { bgColor: string; fgColor: string; residue: number; diffusion: number } => {
   return (
     state.led || {
       bgColor: '#000000',
+      fgColor: '#ffffff',
       residue: 0,
       diffusion: 0
     }
   )
 }
+export const menuSelector = (state: RootState): string => state.menu?.menu || 'appearance'

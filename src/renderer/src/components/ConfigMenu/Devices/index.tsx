@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import EmSelect from '@renderer/components/basic/EmSelect'
-import { comSelector, comSlice, enableComSelector, enableComSlice } from '@renderer/config'
+import {
+  comSelector,
+  comSlice,
+  enableComSelector,
+  enableComSlice,
+  menuSlice
+} from '@renderer/config'
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
 import { PortInfo } from '@renderer/common/common'
 import ipc from '@renderer/common/ipcClient'
@@ -18,10 +24,30 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const txt = lang()
   const dispatch = useAppDispatch()
 
+  const comAbortedNotify = (): void => {
+    notify({
+      type: 'info',
+      title: txt('notify.serial-abort-title'),
+      content: txt('notify.serial-abort-content'),
+      key: 'serial-abort'
+    })
+  }
+
   useEffect(() => {
+    window.api.onSerialAbort(() => {
+      // 选项置为未开启，串口置为空
+      dispatch(enableComSlice.actions.setEnableCom(false))
+      dispatch(comSlice.actions.setCom(''))
+      comAbortedNotify()
+      // 跳转到当前页面
+      dispatch(menuSlice.actions.setMenu('devices'))
+    })
     ipc.listSerialPorts().then((ports) => {
       setPorts(ports)
     })
+    return (): void => {
+      window.api.offEvent('serial-abort')
+    }
   }, [])
 
   return (
@@ -70,6 +96,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
           }
           console.log('enableCom', value, nowCom)
           // 通知主进程操作串口
+          // TODO: 选好串口但未连接，此时断开串口然后操作启用，会触发问题：启用了已断开的串口导致报错，需要等待等待串口成功连接后再返回 true
           if (value) {
             ipc.initLed()
           } else {

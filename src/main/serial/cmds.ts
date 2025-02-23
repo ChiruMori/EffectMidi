@@ -2,13 +2,12 @@
 const CMD_BYTE_WAITING = 0x00
 const CMD_BYTE_SET_FOREGROUND_COLOR = 0x01
 const CMD_BYTE_SET_BACKGROUND_COLOR = 0x02
-const CMD_BYTE_KEY_DOWN = 0x03
-const CMD_BYTE_KEY_UP = 0x04
-const CMD_BYTE_SET_BRIGHTNESS = 0x05
-const CMD_BYTE_SET_RESIDUAL_TIME = 0x06
-const CMD_BYTE_SET_DIFFUSION_WIDTH = 0x07
-const CMD_BYTE_SET_END_LIGHTS_COLOR = 0x08
-const CMD_BYTE_COLOR_PREVIEW = 0x09
+const CMD_BYTE_SET_RESIDUAL_TIME = 0x05
+const CMD_BYTE_SET_DIFFUSION_WIDTH = 0x06
+const CMD_BYTE_SET_END_LIGHTS_COLOR = 0x07
+
+const CMD_OFFSET_KEY_DOWN = 0x50
+const CMD_OFFSET_KEY_UP = 0xa8
 
 function parseColor(colorHex: string): number[] {
   const r = parseInt(colorHex.substring(1, 3), 16)
@@ -34,9 +33,8 @@ export default {
     CMD_BYTE_SET_BACKGROUND_COLOR,
     ...parseColor(colorHex)
   ],
-  keyDown: (key: number): number[] => [CMD_BYTE_KEY_DOWN, key],
-  keyUp: (key: number): number[] => [CMD_BYTE_KEY_UP, key],
-  setBrightness: (brightness: number): number[] => [CMD_BYTE_SET_BRIGHTNESS, brightness],
+  keyDown: (key: number): number[] => [key + CMD_OFFSET_KEY_DOWN],
+  keyUp: (key: number): number[] => [key + CMD_OFFSET_KEY_UP],
   setResidualTime: (residualTime: number): number[] => [CMD_BYTE_SET_RESIDUAL_TIME, residualTime],
   setDiffusionWidth: (diffusionWidth: number): number[] => [
     CMD_BYTE_SET_DIFFUSION_WIDTH,
@@ -45,6 +43,5 @@ export default {
   setEndLightsColor: (colorHex: string): number[] => [
     CMD_BYTE_SET_END_LIGHTS_COLOR,
     ...parseColor(colorHex)
-  ],
-  colorPreview: (colorHex: string): number[] => [CMD_BYTE_COLOR_PREVIEW, ...parseColor(colorHex)]
+  ]
 } as Record<string, CmdParser>
