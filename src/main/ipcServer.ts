@@ -16,11 +16,19 @@ export default function ipc(mainWindow: BrowserWindow): void {
   // 列出全部串口
   ipcMain.handle('listSerialPorts', SerialPort.list)
   // 初始化 LED
-  ipcMain.on('initLed', async () => {
+  ipcMain.on('initLed', async (): Promise<void> => {
     // 通过发送一系列指令完成配置的初始化
-    // 背景色设置
-    const bgColor = await storage.main.getLedConfig('bgColor')
-    sendCmd(cmds.setBackgroundColor, bgColor.length === 9 ? bgColor.substring(1, 8) : bgColor)
+    try {
+      // 背景色设置
+      const bgColor = await storage.main.getLedConfig('bgColor')
+      sendCmd(cmds.setBackgroundColor, bgColor.length === 9 ? bgColor.substring(1, 8) : bgColor)
+      // 前景色设置
+      const fgColor = await storage.main.getLedConfig('fgColor')
+      sendCmd(cmds.setForegroundColor, fgColor.length === 9 ? fgColor.substring(1, 8) : fgColor)
+    } catch (err) {
+      mainWindow.webContents.send('serial-abort')
+      console.error('Init LED failed:', err)
+    }
   })
   // 关闭 LED
   ipcMain.on('closeLed', closeSerial)
@@ -39,6 +47,18 @@ export default function ipc(mainWindow: BrowserWindow): void {
   // 前景色设置
   ipcMain.on('setFgColor', (_, color) => {
     sendCmd(cmds.setForegroundColor, color)
+  })
+  // 端点灯颜色设置
+  ipcMain.on('setEndColor', (_, color) => {
+    sendCmd(cmds.setEndLightsColor, color)
+  })
+  // 延迟时间设置
+  ipcMain.on('setResidualTime', (_, time) => {
+    sendCmd(cmds.setResidualTime, time)
+  })
+  // 扩散宽度设置
+  ipcMain.on('setDiffusionWidth', (_, width) => {
+    sendCmd(cmds.setDiffusionWidth, width)
   })
   // SQLite
   ipcMain.handle('storage.get', async (_, key) => {

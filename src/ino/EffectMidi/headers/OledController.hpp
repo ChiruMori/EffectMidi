@@ -39,6 +39,8 @@ public:
 
   void log(String message);
 
+  void logMemory();
+
 #ifdef USE_OLED
 private:
   Adafruit_SSD1306 *oled;

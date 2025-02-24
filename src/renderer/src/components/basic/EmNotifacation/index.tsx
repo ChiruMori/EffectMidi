@@ -8,6 +8,17 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<NotificationParams[]>([])
+  // 鼠标悬停时，所在的通知暂停计时
+  const handleHover = (key: string, isHover: boolean): void => {
+    setNotifications(prev =>
+      prev.map(msg =>
+        msg.key === key ? {
+          ...msg,
+          paused: isHover
+        } : msg
+      )
+    )
+  }
 
   const notify = (message: NotificationParams): void => {
     // key 已存在时，仅增加徽标，并重置持续时间，更新顺序
@@ -56,6 +67,9 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
             msg.life -= COUNTER_DELAY
             return true
           }
+          if (msg.paused) {
+            return true
+          }
           return false
         })
       )
@@ -66,7 +80,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   return (
     <NotificationContext.Provider value={{ notify, cancel }}>
       {children}
-      <NotificationList notifications={notifications} />
+      <NotificationList notifications={notifications} onHover={handleHover} />
     </NotificationContext.Provider>
   )
 }

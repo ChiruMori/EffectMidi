@@ -27,11 +27,18 @@ devices:
   serial-port-desc: 选择串口
   serial-enable-label: 激活串口
   serial-enable-desc: 选择串口后必须激活才能使用，否则无法进行灯光效果设置
+  midi-device-label: MIDI设备
+  midi-device-desc: 选择MIDI输入设备
+  unknown-midi-device: 未知MIDI设备
 led:
   bg-color-label: 背景颜色
   bg-color-desc: 灯带背景颜色，按键没有按下时灯光的颜色，可以设置为黑色以关闭灯光
   fg-color-label: 前景颜色
   fg-color-desc: 按键按下时灯光的颜色
+  diffusion-width-label: 扩散宽度
+  diffusion-width-desc: 按键按下时，灯光扩散到的最大键盘数量
+  residual-time-label: 延迟时间
+  residual-time-desc: 按键按下后，灯光残留的持续时间（帧数，每秒约60帧）
 notify:
   serial-disable-title: 串口未激活
   serial-disable-content: 你需要先激活串口才能使用灯光效果设置
@@ -39,3 +46,7 @@ notify:
   serial-unselected-content: 无法激活串口，必须先选择要激活的串口
   serial-abort-title: 串口断开
   serial-abort-content: 串口连接已断开，请重新选择并激活串口
+  midi-connect-error-title: MIDI连接错误
+  midi-connect-error-content: MIDI设备连接错误，请检查设备后重启应用
+  midi-disconnect-title: MIDI断开
+  midi-disconnect-content: MIDI设备连接已断开，请重新选择MIDI输入设备

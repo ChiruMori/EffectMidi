@@ -161,6 +161,21 @@ export const menuSlice = createSlice({
   }
 })
 
+export const midiSlice = createSlice({
+  name: 'midi',
+  initialState: {
+    midi: ''
+  },
+  reducers: {
+    setMidi: (state, action) => {
+      return {
+        ...state,
+        midi: action.payload
+      }
+    }
+  }
+})
+
 export const langSelector = (state: RootState): Lang => state.lang?.lang || Lang.zh_cn
 export const bgImgSelector = (
   state: RootState
@@ -200,3 +215,4 @@ export const ledSelector = (
   )
 }
 export const menuSelector = (state: RootState): string => state.menu?.menu || 'appearance'
+export const midiSelector = (state: RootState): string => state.midi?.midi || ''

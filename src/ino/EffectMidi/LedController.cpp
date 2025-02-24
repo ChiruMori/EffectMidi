@@ -91,18 +91,18 @@ void LEDController::stepAndShow()
     {
       if (activeFlag[i])
       {
-        auto currentKey = (i + 1) << 1;
-        this->setLedColor(currentKey, foregroundColor);
+        auto currentIndex = (i + 1) << 1;
+        this->setLedColor(currentIndex, foregroundColor);
         for (int j = 1; j <= diffusionWidth; ++j)
         {
-          if (currentKey - j >= 0)
+          if (currentIndex - j >= 0)
           {
-            this->setLedColor(currentKey - j, mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth));
+            this->setLedColor(currentIndex - j, mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth));
             residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
           }
-          if (currentKey + j < numLeds)
+          if (currentIndex + j < numLeds)
           {
-            this->setLedColor(currentKey + j, mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth));
+            this->setLedColor(currentIndex + j, mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth));
             residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
           }
         }
@@ -121,8 +121,8 @@ void LEDController::stepAndShow()
       else if (residualCounter[i] > 0)
       {
         // 计算残留效果（混合前景色和背景色）
-        auto currentKey = (i + 1) << 1;
-        this->setLedColor(currentKey, mixColor(foregroundColor, backgroundColor, residualCounter[i] << 8 / residualTime));
+        auto currentIndex = (i + 1) << 1;
+        this->setLedColor(currentIndex, mixColor(foregroundColor, backgroundColor, residualCounter[i] << 8 / residualTime));
         residualCounter[i]--;
       }
     }
@@ -141,7 +141,7 @@ void LEDController::setForegroundColor(CRGB color)
 {
   for (int i = 1; i <= (KEY_NUM << 1); ++i)
   {
-    auto currentKey = (i + 1) >> 1;
+    auto currentKey = (i - 1) >> 1;
     if (activeFlag[currentKey])
     {
       this->setLedColor(i, color);
@@ -154,7 +154,7 @@ void LEDController::setBackgroundColor(CRGB color)
 {
   for (int i = 1; i <= (KEY_NUM << 1); ++i)
   {
-    auto currentKey = (i + 1) >> 1;
+    auto currentKey = (i - 1) >> 1;
     if (!activeFlag[currentKey])
     {
       this->setLedColor(i, color);

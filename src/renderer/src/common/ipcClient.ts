@@ -35,6 +35,18 @@ export default {
   setFgColor: (color: string): void => {
     server.send('setFgColor', color)
   },
+  // Set end light color
+  setEndColor: (color: string): void => {
+    server.send('setEndColor', color)
+  },
+  // Set residual time
+  setResidualTime: (time: number): void => {
+    server.send('setResidualTime', time)
+  },
+  // Set diffusion width
+  setDiffusionWidth: (width: number): void => {
+    server.send('setDiffusionWidth', width)
+  },
   // Storage
   storage: {
     get: async (key: string): Promise<any> => {

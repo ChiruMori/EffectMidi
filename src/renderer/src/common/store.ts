@@ -81,8 +81,10 @@ export const store = configureStore({
     particle: persistReducer(storePersistConfigOf('particle'), configManger.particleSlice.reducer),
     // led 配置
     led: persistReducer(storePersistConfigOf('led'), configManger.ledSlice.reducer),
-    // Menu 配置
-    menu: persistReducer(storeSessionConfigOf('menu'), configManger.menuSlice.reducer)
+    // Menu 配置（非持久化）
+    menu: persistReducer(storeSessionConfigOf('menu'), configManger.menuSlice.reducer),
+    // Midi 配置
+    midi: persistReducer(storePersistConfigOf('midi'), configManger.midiSlice.reducer)
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

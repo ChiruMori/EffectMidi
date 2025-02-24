@@ -21,6 +21,8 @@ const NotificationList: React.FC<NotificationListProps> = ({ notifications }) =>
         <div
           key={message.key}
           className={`relative focus:outline-none float-right pointer-events-auto animate__animated animate__faster ${!message.life || message.life === -1 || message.life > EXIT_ANIMATION_DURATION ? 'animate__fadeInRight' : 'animate__fadeOutRight'}`}
+          onMouseEnter={() => onHover(message.key, true)}
+          onMouseLeave={() => onHover(message.key, false)}
         >
           <div className="z-10 overflow-y-auto">
             <div className="min-h-full m-2">

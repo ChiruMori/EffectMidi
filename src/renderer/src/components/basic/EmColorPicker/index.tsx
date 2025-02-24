@@ -1,7 +1,7 @@
 import { HexColorPicker } from 'react-colorful'
 import { Button, Description, Field, Input, Label } from '@headlessui/react'
 import { EyeDropperIcon } from '@heroicons/react/20/solid'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { debounce } from 'lodash'
 import { EmFormProps } from '../types'
 import './index.styl'
@@ -17,18 +17,16 @@ export default function EmColorPicker({
   const [color, setColor] = useState(initValue)
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [enableFadeOut, setEnableFadeOut] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const debouncedOnChanged = useCallback(debounce(onChange, 100), [])
 
-  useEffect(() => {
-    setColor(initValue)
-  }, [initValue])
-
   // 组件失焦后隐藏颜色选择器
   useEffect(() => {
+    setColor(initValue)
     const enableFadeOut = (e: MouseEvent): void => {
       // 点击了组件区域，不隐藏
-      if ((e.target as HTMLElement).closest('.picker-container')) {
+      if (containerRef.current?.contains(e.target as Node)) {
         return
       }
       setShowColorPicker(false)
@@ -40,10 +38,10 @@ export default function EmColorPicker({
     return (): void => {
       document.removeEventListener('click', enableFadeOut)
     }
-  }, [])
+  }, [initValue])
 
   return (
-    <div className="py-2">
+    <div className="py-2" ref={containerRef}>
       <Field>
         <Label className="text-lg font-medium text-white">{label}</Label>
         <Description className="text-sm/6 text-white/50 mb-2">{description}</Description>
@@ -56,7 +54,7 @@ export default function EmColorPicker({
         >
           <div className="relative">
             <Input
-              className="mt-3 block w-full rounded-lg border-none py-1.5 px-3 text-sm/6 cursor-pointer text-left z-10 focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
+              className="mt-3 block w-full rounded-lg border-none py-1.5 px-3 text-sm/6 cursor-pointer text-left z-0 focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
               style={{
                 backgroundColor: color + '88',
                 color:
@@ -84,7 +82,7 @@ export default function EmColorPicker({
             </div>
           </div>
           <div
-            className={`color-picker absolute top-full right-0 p-2 animate__animated animate__faster z-0 ${
+            className={`color-picker absolute top-full right-0 p-2 animate__animated animate__faster z-10 ${
               showColorPicker
                 ? 'animate__fadeInDown'
                 : enableFadeOut

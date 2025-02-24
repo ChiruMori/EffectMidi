@@ -7,7 +7,7 @@ declare interface NotificationParams {
   type: 'success' | 'error' | 'warning' | 'info'
   // 内容
   content: string
-  // 持续时间
+  // 持续时间（ms）
   duration?: number
   // 关闭回调
   onClose?: () => void
@@ -17,6 +17,8 @@ declare interface NotificationParams {
   badge?: number
   // 残余时间
   life?: number
+  // 暂停计时
+  paused?: boolean
 }
 
 declare interface NotificationContextType {
@@ -26,4 +28,5 @@ declare interface NotificationContextType {
 
 declare interface NotificationListProps {
   notifications: NotificationParams[]
+  onHover: (key: string, isHover: boolean) => void
 }

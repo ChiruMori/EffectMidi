@@ -63,3 +63,20 @@ void OledController::setup()
   this->log("OLED initialized.");
 #endif
 }
+
+void OledController::logMemory()
+{
+#ifdef USE_OLED
+  extern int __heap_start, *__brkval;
+  int free_memory;
+  if ((int)__brkval == 0)
+  {
+    free_memory = (int)&free_memory - (int)&__heap_start;
+  }
+  else
+  {
+    free_memory = (int)&free_memory - (int)__brkval;
+  }
+  this->log("Free memory: " + String(free_memory));
+#endif
+}

@@ -52,11 +52,11 @@ export default function Keyboard(): JSX.Element {
   useEffect(() => {
     window.api.onKeyDown(handleKeyDown)
     window.api.onKeyUp(handleKeyUp)
-    midi.init(handleKeyDown, handleKeyUp)
+    midi.setMidiEventHandlers({ keyDown: handleKeyDown, keyUp: handleKeyUp })
     return (): void => {
       window.api.offEvent('midi-keydown')
       window.api.offEvent('midi-keyup')
-      midi.close()
+      midi.disconnectDevice()
     }
   }, [handleKeyDown, handleKeyUp]) // 依赖稳定的回调函数
 
