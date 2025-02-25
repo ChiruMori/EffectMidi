@@ -5,45 +5,38 @@ let activeDeviceId: string | null = null
 const KEY_INDEX_OFFSET = 21
 
 const eventHandlers = {
-  keyDown: (key: number) => {},
-  keyUp: (key: number) => {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  keyDown: (_ignore: number): void => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  keyUp: (_ignore: number): void => {}
 }
 
 export default {
-  init: async function (deviceId: string, abortCb: (event: ???) => void): Promise<boolean> {
-    try {
-      if (midiAccess != null) {
-        // 取消监听
-        midiAccess.onstatechange = null
-      }
-      midiAccess = await navigator.requestMIDIAccess()
-      if (midiAccess === null || !midiAccess.inputs.get(deviceId)) {
-        return false
-      }
-
-    } catch (error) {
-      console.error('Error initializing MIDI Access:', error)
-    }
-  },
-  connectDevice: async function (deviceId: string, abortCb: (event: ???) => void): Promise<void> {
+  connectDevice: async function (
+    deviceId: string,
+    abortCb: (event: WebMidi.MIDIConnectionEvent) => void
+  ): Promise<void> {
     if (!midiAccess) {
       midiAccess = await navigator.requestMIDIAccess()
       // 设置热插拔监听
-      midiAccess!.onstatechange = (event) => {
+      midiAccess!.onstatechange = (event: WebMidi.MIDIConnectionEvent): void => {
         // 选中的设备断开时处理
-        if (event.port.type === 'input' && !event.port.connection.endsWith('closed')) {
+        if (event.port.type === 'input' && event.port.connection.endsWith('closed')) {
           if (event.port.id === activeDeviceId) {
             abortCb(event)
           }
         }
       }
     }
-    
+
     // 关闭现有连接
     if (midiInput) {
       midiInput.close()
     }
 
+    if (deviceId === '') {
+      return
+    }
     const device = midiAccess.inputs.get(deviceId)
     if (!device) {
       return Promise.reject(new Error('Device not found'))
@@ -64,7 +57,7 @@ export default {
     }
   },
 
-  handleMidiMessage: (event: WebMidi.MIDIMessageEvent) => {
+  handleMidiMessage: (event: WebMidi.MIDIMessageEvent): void => {
     const { keyDown, keyUp } = eventHandlers
     if ((event.data[0] & 0xf0) === 0x90) {
       keyDown(event.data[1] - KEY_INDEX_OFFSET)
@@ -72,8 +65,8 @@ export default {
       keyUp(event.data[1] - KEY_INDEX_OFFSET)
     }
   },
-  
-  setMidiEventHandlers(handlers: typeof eventHandlers) {
+
+  setMidiEventHandlers(handlers: typeof eventHandlers): void {
     Object.assign(eventHandlers, handlers)
   },
 

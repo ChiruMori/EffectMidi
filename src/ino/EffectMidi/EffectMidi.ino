@@ -4,13 +4,12 @@
 #include "headers/SerialCommandHolder.hpp"
 #include "headers/OledController.hpp"
 
-#define NUM_LEDS 288
+#define LED_COUNTS 178
 #define SERIAL_BAUD 115200
 
-LEDController ledController(NUM_LEDS);
+LEDController ledController(LED_COUNTS);
 SerialCommandHolder cmdHolder(ledController);
 OledController oled;
-CRGB leds[NUM_LEDS];
 
 void setup()
 {
@@ -29,10 +28,10 @@ void loop() {
     ledController.endWaiting();
     cmdHolder.processByte(currentByte, false, oled);
   }
-  
+
   if(ledController.isWaiting()) {
     WaitingCmd::getInstance(ledController).execute(nullptr);
   }
-  
+
   ledController.stepAndShow();
 }

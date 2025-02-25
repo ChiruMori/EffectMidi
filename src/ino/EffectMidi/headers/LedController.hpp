@@ -6,6 +6,7 @@
 #define PREVIEW_TIME 5000
 //（60fps，16ms）
 #define REFRESH_INTERVAL 16
+#define LED_COUNTER_MAX 60
 
 #include <FastLED.h>
 
@@ -18,6 +19,10 @@ public:
    * @param numLeds LED灯带的灯珠数量
    */
   LEDController(int numLeds);
+  /**
+   * 析构函数
+   */
+  ~LEDController();
   /**
    * 初始化LED灯带
    */
@@ -35,13 +40,9 @@ public:
    */
   void setBackgroundColor(CRGB color);
   /**
-   * 设置是否启用端点灯
-   */
-  void setEnableEndLights(bool enable);
-  /**
    * 设置端点灯的颜色
    */
-  void setEndLightsColor(CRGB color, bool ignoreSetting);
+  void setEndLightsColor(CRGB color);
   /**
    * 设置LED灯带的亮度
    */
@@ -66,10 +67,6 @@ public:
    * 结束等待
    */
   void endWaiting();
-  /**
-   * 通过端点灯预览颜色
-   */
-  void previewEndLightsColor(CRGB color);
   /**
    * 设置扩散宽度
    */
@@ -121,10 +118,6 @@ private:
    */
   int residualTime;
   /**
-   * 端点灯的颜色预览剩余时间
-   */
-  int endLightsPreviewTime;
-  /**
    * 残留时间计数数组
    */
   int residualCounter[KEY_NUM];
@@ -136,6 +129,10 @@ private:
    * 上次刷新时间
    */
   unsigned long lastRefreshTime;
+  /**
+   * 动画缓冲计时器
+   */
+  uint8_t counter;
   /**
    * 设置某个灯的颜色
    *

@@ -53,22 +53,22 @@ export default function Lights({ hidden }: { hidden: boolean }): JSX.Element {
         description={txt('led.diffusion-width-desc')}
         onChange={(value) => {
           ipcClient.setDiffusionWidth(value)
-          dispatch(ledSlice.actions.setDiffusionWidth(value))
+          dispatch(ledSlice.actions.setDiffusion(value))
         }}
         initValue={led.diffusion}
       />
       <EmRangeSlider
         min={0}
-        max={100}
+        max={255}
         fromColor={C(nowColorType).main}
         toColor={C(nowColorType).sub}
         label={txt('led.residual-time-label')}
         description={txt('led.residual-time-desc')}
         onChange={(value) => {
           ipcClient.setResidualTime(value)
-          dispatch(ledSlice.actions.setResidualTime(value))
+          dispatch(ledSlice.actions.setResidue(value))
         }}
-        initValue={led.residual}
+        initValue={led.residue}
       />
     </div>
   )

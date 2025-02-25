@@ -10,12 +10,14 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [notifications, setNotifications] = useState<NotificationParams[]>([])
   // 鼠标悬停时，所在的通知暂停计时
   const handleHover = (key: string, isHover: boolean): void => {
-    setNotifications(prev =>
-      prev.map(msg =>
-        msg.key === key ? {
-          ...msg,
-          paused: isHover
-        } : msg
+    setNotifications((prev) =>
+      prev.map((msg) =>
+        msg.key === key
+          ? {
+              ...msg,
+              paused: isHover
+            }
+          : msg
       )
     )
   }
@@ -57,6 +59,9 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     const timer = setInterval(() => {
       setNotifications((prev) =>
         prev.filter((msg) => {
+          if (msg.paused) {
+            return true
+          }
           if (msg.life === -1) {
             return true
           }
@@ -65,9 +70,6 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
           }
           if (msg.life > 0) {
             msg.life -= COUNTER_DELAY
-            return true
-          }
-          if (msg.paused) {
             return true
           }
           return false

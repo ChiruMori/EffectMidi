@@ -115,6 +115,7 @@ export const ledSlice = createSlice({
   initialState: {
     bgColor: '#000000',
     fgColor: '#ffffff',
+    endColor: '#000000',
     residue: 0,
     diffusion: 0
   },
@@ -129,6 +130,12 @@ export const ledSlice = createSlice({
       return {
         ...state,
         fgColor: action.payload
+      }
+    },
+    setEndColor: (state, action) => {
+      return {
+        ...state,
+        endColor: action.payload
       }
     },
     setResidue: (state, action) => {
@@ -204,11 +211,12 @@ export const particleSelector = (
 }
 export const ledSelector = (
   state: RootState
-): { bgColor: string; fgColor: string; residue: number; diffusion: number } => {
+): { bgColor: string; fgColor: string; endColor: string; residue: number; diffusion: number } => {
   return (
     state.led || {
       bgColor: '#000000',
       fgColor: '#ffffff',
+      endColor: '#000000',
       residue: 0,
       diffusion: 0
     }

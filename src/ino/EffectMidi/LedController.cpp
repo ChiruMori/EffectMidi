@@ -15,7 +15,6 @@ LEDController::LEDController(int numLeds)
   }
   this->diffusionWidth = 0;
   this->residualTime = 0;
-  this->endLightsPreviewTime = 0;
   this->endLightsColor = CRGB::Black;
   this->foregroundColor = CRGB::White;
   this->backgroundColor = CRGB::Black;
@@ -23,6 +22,12 @@ LEDController::LEDController(int numLeds)
   this->waiting = true;
   FastLED.addLeds<WS2812, DIGITAL_PIN, GRB>(leds, numLeds);
   this->needRefresh = false;
+  this->counter = 0;
+}
+
+LEDController::~LEDController()
+{
+  delete[] leds;
 }
 
 void LEDController::setup()
@@ -67,23 +72,16 @@ void LEDController::endWaiting()
  */
 CRGB mixColor(CRGB color1, CRGB color2, int ratio)
 {
+  auto ratioF = ratio / 255.0;
   return CRGB(
-      (color1.r * ratio + color2.r * (255 - ratio)) >> 8,
-      (color1.g * ratio + color2.g * (255 - ratio)) >> 8,
-      (color1.b * ratio + color2.b * (255 - ratio)) >> 8);
+      (uint8_t)(color1.r * ratioF + color2.r * (1.0 - ratioF)),
+      (uint8_t)(color1.g * ratioF + color2.g * (1.0 - ratioF)),
+      (uint8_t)(color1.b * ratioF + color2.b * (1.0 - ratioF)));
 }
 
 void LEDController::stepAndShow()
 {
-  // 预览模式支持
-  if (endLightsPreviewTime > 0)
-  {
-    endLightsPreviewTime--;
-    if (endLightsPreviewTime == 0)
-    {
-      this->setLedColor(-1, endLightsColor);
-    }
-  }
+  // TODO: 扩散效果无效、端点灯效果无效
   // 扩散效果支持（扩散后残留，越靠近扩散边缘，前景色越淡，残留时间越短）
   if (diffusionWidth > 0)
   {
@@ -95,14 +93,14 @@ void LEDController::stepAndShow()
         this->setLedColor(currentIndex, foregroundColor);
         for (int j = 1; j <= diffusionWidth; ++j)
         {
-          if (currentIndex - j >= 0)
+          if (currentIndex - 1 - j >= 0)
           {
-            this->setLedColor(currentIndex - j, mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth));
+            this->setLedColor(currentIndex - 1 - j, mixColor(foregroundColor, backgroundColor, (int)(255.0 * j / diffusionWidth)));
             residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
           }
           if (currentIndex + j < numLeds)
           {
-            this->setLedColor(currentIndex + j, mixColor(foregroundColor, backgroundColor, j << 8 / diffusionWidth));
+            this->setLedColor(currentIndex + j, mixColor(foregroundColor, backgroundColor, (int)(255.0 * j / diffusionWidth)));
             residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
           }
         }
@@ -112,18 +110,21 @@ void LEDController::stepAndShow()
   // 残留效果支持
   if (residualTime > 0)
   {
+    this->counter = (this->counter + 1) % LED_COUNTER_MAX;
     for (int i = 0; i < KEY_NUM; ++i)
     {
       if (activeFlag[i])
       {
         residualCounter[i] = residualTime;
       }
-      else if (residualCounter[i] > 0)
+      else if (residualCounter[i] > 0 && counter == 0)
       {
         // 计算残留效果（混合前景色和背景色）
-        auto currentIndex = (i + 1) << 1;
-        this->setLedColor(currentIndex, mixColor(foregroundColor, backgroundColor, residualCounter[i] << 8 / residualTime));
         residualCounter[i]--;
+        auto currentIndex = (i + 1) << 1;
+        auto mixedColor = mixColor(foregroundColor, backgroundColor, (int) (255.0 * residualCounter[i] / residualTime));
+        this->setLedColor(currentIndex, mixedColor);
+        this->setLedColor(currentIndex - 1, mixedColor);
       }
     }
   }
@@ -163,13 +164,10 @@ void LEDController::setBackgroundColor(CRGB color)
   backgroundColor = color;
 }
 
-void LEDController::setEndLightsColor(CRGB color, bool ignoreSetting)
+void LEDController::setEndLightsColor(CRGB color)
 {
   this->setLedColor(-1, color);
-  if (!ignoreSetting)
-  {
-    endLightsColor = color;
-  }
+  this->endLightsColor = color;
 }
 
 void LEDController::setBrightness(int brightness)
@@ -191,12 +189,6 @@ void LEDController::releaseKey(uint8_t keyIndex)
   activeFlag[keyIndex] = false;
   this->setLedColor((keyIndex << 1) + 1, backgroundColor);
   this->setLedColor((keyIndex << 1) + 2, backgroundColor);
-}
-
-void LEDController::previewEndLightsColor(CRGB color)
-{
-  this->setLedColor(-1, color);
-  endLightsPreviewTime = PREVIEW_TIME;
 }
 
 void LEDController::setDiffusionWidth(int width)

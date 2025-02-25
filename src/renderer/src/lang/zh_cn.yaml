@@ -35,6 +35,8 @@ led:
   bg-color-desc: 灯带背景颜色，按键没有按下时灯光的颜色，可以设置为黑色以关闭灯光
   fg-color-label: 前景颜色
   fg-color-desc: 按键按下时灯光的颜色
+  end-color-label: 端点灯颜色
+  end-color-desc: 灯带两端指示灯的颜色，可以设置为黑色以关闭指示灯
   diffusion-width-label: 扩散宽度
   diffusion-width-desc: 按键按下时，灯光扩散到的最大键盘数量
   residual-time-label: 延迟时间

@@ -19,12 +19,22 @@ export default function ipc(mainWindow: BrowserWindow): void {
   ipcMain.on('initLed', async (): Promise<void> => {
     // 通过发送一系列指令完成配置的初始化
     try {
+      // TODO: 连续发送指令出错
       // 背景色设置
       const bgColor = await storage.main.getLedConfig('bgColor')
       sendCmd(cmds.setBackgroundColor, bgColor.length === 9 ? bgColor.substring(1, 8) : bgColor)
       // 前景色设置
       const fgColor = await storage.main.getLedConfig('fgColor')
       sendCmd(cmds.setForegroundColor, fgColor.length === 9 ? fgColor.substring(1, 8) : fgColor)
+      // 端点灯颜色设置
+      const endColor = await storage.main.getLedConfig('endColor')
+      sendCmd(cmds.setEndLightsColor, endColor.length === 9 ? endColor.substring(1, 8) : endColor)
+      // 延迟时间设置
+      const residualTime = await storage.main.getLedConfig('residualTime')
+      sendCmd(cmds.setResidualTime, residualTime)
+      // 扩散宽度设置
+      const diffusionWidth = await storage.main.getLedConfig('diffusionWidth')
+      sendCmd(cmds.setDiffusionWidth, diffusionWidth)
     } catch (err) {
       mainWindow.webContents.send('serial-abort')
       console.error('Init LED failed:', err)

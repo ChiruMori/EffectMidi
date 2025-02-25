@@ -31,6 +31,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const comAbortedNotify = (): void => {
     notify({
       type: 'info',
+      // TODO: i18n 无效
       title: txt('notify.serial-abort-title'),
       content: txt('notify.serial-abort-content'),
       key: 'serial-abort'
@@ -38,16 +39,11 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   }
 
   const connectDeviceById = (deviceId: string): void => {
-    if (deviceId) {
-      midi.connectDevice(deviceId, () => {
+    midi
+      .connectDevice(deviceId, () => {
         dispatch(midiSlice.actions.setMidi(''))
-        notify({
-          type: 'info',
-          title: txt('notify.midi-connect-error-title'),
-          content: txt('notify.midi-connect-error-content'),
-          key: 'midi-disconnected'
-        })
-      }).catch(() => {
+      })
+      .catch(() => {
         dispatch(midiSlice.actions.setMidi(''))
         notify({
           type: 'error',
@@ -57,8 +53,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
           key: 'midi-error'
         })
       })
-      dispatch(midiSlice.actions.setMidi(deviceId))
-    }
+    dispatch(midiSlice.actions.setMidi(deviceId))
   }
 
   useEffect(() => {
@@ -89,7 +84,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
       <EmSelect
         label={txt('devices.midi-device-label')}
         description={txt('devices.midi-device-desc')}
-        options={midi.listAllDevices().map(device => ({
+        options={midi.listAllDevices().map((device) => ({
           val: device.id,
           label: device.name || device.manufacturer || txt('devices.unknown-midi-device')
         }))}
@@ -98,7 +93,8 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
         suffixBtn={
           <button
             className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-9 ref-btn"
-            onClick={() => connectDeviceById(selectedDeviceId)}>
+            onClick={() => connectDeviceById(selectedDeviceId)}
+          >
             <ArrowPathIcon className="group pointer-events-none size-4 fill-white/60 animate__animated" />
           </button>
         }
@@ -137,7 +133,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
           setPorts(latestPorts)
 
           // 检查串口是否有效
-          const isValidPort = latestPorts.some(p => p.path === nowCom)
+          const isValidPort = latestPorts.some((p) => p.path === nowCom)
 
           if (!isValidPort) {
             notify({

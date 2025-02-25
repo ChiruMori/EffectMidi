@@ -8,7 +8,7 @@ void WaitingCmd::execute(uint8_t *args)
     // 使端点灯闪烁（忽略端点灯设置）
     int realBrightness = counter > (WAITING_COUNTER_MAX / 2) ? WAITING_COUNTER_MAX - counter : counter;
     CRGB color = CRGB(realBrightness, realBrightness, realBrightness);
-    ledController.setEndLightsColor(color, true);
+    ledController.setEndLightsColor(color);
     counter = (counter + 1) % WAITING_COUNTER_MAX;
   }
   delay(WAIT_DELAY);

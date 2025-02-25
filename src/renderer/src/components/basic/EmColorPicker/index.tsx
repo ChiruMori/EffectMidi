@@ -82,7 +82,7 @@ export default function EmColorPicker({
             </div>
           </div>
           <div
-            className={`color-picker absolute top-full right-0 p-2 animate__animated animate__faster z-10 ${
+            className={`color-picker absolute top-full right-0 p-2 animate__animated animate__faster z-50 ${
               showColorPicker
                 ? 'animate__fadeInDown'
                 : enableFadeOut

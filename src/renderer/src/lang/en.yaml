@@ -35,6 +35,8 @@ led:
   bg-color-desc: The background color of the light strip, the color of the light when the key is not pressed, can be set to black to turn off the light
   fg-color-label: Foreground Color
   fg-color-desc: The color of the light when the key is pressed
+  end-color-label: Endpoint Light Color
+  end-color-desc: The color of the indicator light at both ends of the light strip, can be set to black to turn off the indicator light
   diffusion-width-label: Diffusion Width
   diffusion-width-desc: The maximum number of keys that the light can diffuse to when the key is pressed
   residual-time-label: Delay Time

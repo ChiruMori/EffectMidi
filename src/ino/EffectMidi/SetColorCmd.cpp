@@ -38,7 +38,7 @@ uint8_t SetForegroundColorCmd::getArgCount()
 
 void SetEndLightsColorCmd::execute(uint8_t *args)
 {
-  ledController.setEndLightsColor(CRGB(args[0], args[1], args[2]), false);
+  ledController.setEndLightsColor(CRGB(args[0], args[1], args[2]));
 }
 
 uint8_t SetEndLightsColorCmd::getNameByte()

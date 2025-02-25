@@ -28,8 +28,8 @@ export default function EmSwitch({
         <Description className="text-sm/6 text-white/50 mb-2">{description}</Description>
         <Switch
           checked={enabled}
-          onChange={() => {
-            const cancel = onChange && onChange(!enabled)
+          onChange={async () => {
+            const cancel = onChange && (await onChange(!enabled))
             if (cancel) {
               return
             }

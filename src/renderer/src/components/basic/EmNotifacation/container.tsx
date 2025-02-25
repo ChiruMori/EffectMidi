@@ -12,7 +12,7 @@ import './index.d'
 import { EXIT_ANIMATION_DURATION } from './index'
 import { themeSelector } from '@renderer/config'
 
-const NotificationList: React.FC<NotificationListProps> = ({ notifications }) => {
+const NotificationList: React.FC<NotificationListProps> = ({ notifications, onHover }) => {
   const colorType = useAppSelector(themeSelector)
 
   return (
