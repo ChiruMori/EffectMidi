@@ -23,7 +23,7 @@ interface Rect {
   grow?: boolean
 }
 
-const baseSpeed = 1.5
+const baseSpeed = 2
 const minHeight = 5
 const padelAreaHeight = 20
 const padelPadding = 10
@@ -55,10 +55,8 @@ const Waterfall = React.forwardRef(
         // 更新踏板符号位置
         padel.y -= baseSpeed
       })
-      padels.current.filter((padel) => {
-        // 移除不可见的踏板符号
-        return padel.y + padelAreaHeight > 0
-      })
+      // 移除不可见的踏板符号
+      padels.current = padels.current.filter((padel) => padel.y > -padelAreaHeight)
     }
 
     function draw(ctx: CanvasRenderingContext2D): void {
