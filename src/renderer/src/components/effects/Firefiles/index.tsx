@@ -181,10 +181,10 @@ export default function Firefiles({
       if (unmounted) {
         return
       }
+      timer('Fireflies')
       update()
       draw()
       requestAnimationFrame(loop)
-      timer('Fireflies')
     }
 
     const addParticle = (): void => {

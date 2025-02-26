@@ -80,4 +80,20 @@ export class Score {
   toString(): string {
     return this.letter + this.octave + (this.sharp == null ? '' : this.sharp)
   }
+
+  /**
+   * @param whiteWidth 白键宽度
+   * @param blackWidth 黑键宽度
+   * @returns [开始位置, 结束位置]
+   */
+  getPerct(whiteWidth: number, blackWidth: number): [number, number] {
+    let res = 0
+    const whiteIndex = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].indexOf(this.letter)
+    res += whiteIndex * whiteWidth
+    res += 7 * whiteWidth * (this.octave - (whiteIndex >= 2 ? 2 : 1))
+    if (this.sharp != null) {
+      res += whiteWidth - blackWidth / 2
+    }
+    return [res, res + (this.sharp == null ? whiteWidth : blackWidth)]
+  }
 }

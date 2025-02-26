@@ -44,7 +44,7 @@ void LEDController::setLedColor(int ledIndex, CRGB color)
     leds[0] = color;
     leds[(KEY_NUM << 1) + 1] = color;
   }
-  else
+  else if (ledIndex >= 1 && ledIndex < numLeds - 1)
   {
     this->needRefresh = leds[ledIndex] != color;
     leds[ledIndex] = color;
@@ -79,9 +79,8 @@ CRGB mixColor(CRGB color1, CRGB color2, int ratio)
       (uint8_t)(color1.b * ratioF + color2.b * (1.0 - ratioF)));
 }
 
-void LEDController::stepAndShow()
+void LedController::stepDiffusion()
 {
-  // TODO: 扩散效果无效、端点灯效果无效
   // 扩散效果支持（扩散后残留，越靠近扩散边缘，前景色越淡，残留时间越短）
   if (diffusionWidth > 0)
   {
@@ -89,45 +88,61 @@ void LEDController::stepAndShow()
     {
       if (activeFlag[i])
       {
-        auto currentIndex = (i + 1) << 1;
-        this->setLedColor(currentIndex, foregroundColor);
         for (int j = 1; j <= diffusionWidth; ++j)
         {
-          if (currentIndex - 1 - j >= 0)
+          if (i - j >= 0 && !activeFlag[i - j])
           {
-            this->setLedColor(currentIndex - 1 - j, mixColor(foregroundColor, backgroundColor, (int)(255.0 * j / diffusionWidth)));
-            residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
+            this->setLedColor((i - j + 1) << 1, mixColor(foregroundColor, backgroundColor, (int)(255.0 * (diffusionWidth - j) / diffusionWidth)));
+            this->setLedColor(((i - j + 1) << 1) - 1, mixColor(foregroundColor, backgroundColor, (int)(255.0 * (diffusionWidth - j) / diffusionWidth)));
+            residualCounter[i - j] = (int)(residualTime - 1.0 * (diffusionWidth - j) * residualTime / diffusionWidth);
           }
-          if (currentIndex + j < numLeds)
+          if (i + j < KEY_NUM && !activeFlag[i + j])
           {
-            this->setLedColor(currentIndex + j, mixColor(foregroundColor, backgroundColor, (int)(255.0 * j / diffusionWidth)));
-            residualCounter[i] = residualTime - j * residualTime / diffusionWidth;
+            this->setLedColor((i + j + 1) << 1, mixColor(foregroundColor, backgroundColor, (int)(255.0 * (diffusionWidth - j) / diffusionWidth)));
+            this->setLedColor(((i + j + 1) << 1) - 1, mixColor(foregroundColor, backgroundColor, (int)(255.0 * (diffusionWidth - j) / diffusionWidth)));
+            residualCounter[i + j] = (int)(residualTime - 1.0 * (diffusionWidth - j) * residualTime / diffusionWidth);
           }
         }
       }
     }
   }
+}
+
+void LedController::stepResidual()
+{
   // 残留效果支持
-  if (residualTime > 0)
+  this->counter = (this->counter + 1) % LED_COUNTER_MAX;
+  if (counter == 0)
   {
-    this->counter = (this->counter + 1) % LED_COUNTER_MAX;
     for (int i = 0; i < KEY_NUM; ++i)
     {
       if (activeFlag[i])
       {
         residualCounter[i] = residualTime;
       }
-      else if (residualCounter[i] > 0 && counter == 0)
+      else if (residualCounter[i] > 0)
       {
         // 计算残留效果（混合前景色和背景色）
         residualCounter[i]--;
         auto currentIndex = (i + 1) << 1;
-        auto mixedColor = mixColor(foregroundColor, backgroundColor, (int) (255.0 * residualCounter[i] / residualTime));
+        auto mixedColor = mixColor(foregroundColor, backgroundColor, (int)(255.0 * residualCounter[i] / residualTime));
         this->setLedColor(currentIndex, mixedColor);
         this->setLedColor(currentIndex - 1, mixedColor);
       }
+      else
+      {
+        // 没有残留效果时，设置背景色
+        this->setLedColor((i + 1) << 1, backgroundColor);
+        this->setLedColor(((i + 1) << 1) - 1, backgroundColor);
+      }
     }
   }
+}
+
+void LEDController::stepAndShow()
+{
+  this->stepDiffusion();
+  this->stepResidual();
   // 展示灯带，需要控制刷新频率
   auto now = millis();
   if (needRefresh && now - lastRefreshTime > REFRESH_INTERVAL)

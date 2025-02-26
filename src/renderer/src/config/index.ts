@@ -183,6 +183,24 @@ export const midiSlice = createSlice({
   }
 })
 
+export const statisticsSlice = createSlice({
+  name: 'statistics',
+  initialState: {
+    statistics: {
+      score: 0,
+      paddle: 0,
+    }
+  },
+  reducers: {
+    setStatistics: (state, action) => {
+      return {
+        ...state,
+        statistics: action.payload
+      }
+    }
+  }
+})
+
 export const langSelector = (state: RootState): Lang => state.lang?.lang || Lang.zh_cn
 export const bgImgSelector = (
   state: RootState
@@ -224,3 +242,11 @@ export const ledSelector = (
 }
 export const menuSelector = (state: RootState): string => state.menu?.menu || 'appearance'
 export const midiSelector = (state: RootState): string => state.midi?.midi || ''
+export const statisticsSelector = (state: RootState): { score: number; paddle: number } => {
+  return (
+    state.statistics || {
+      score: 0,
+      paddle: 0
+    }
+  )
+}

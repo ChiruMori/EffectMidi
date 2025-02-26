@@ -4,11 +4,16 @@ let midiInput: WebMidi.MIDIInput | null = null
 let activeDeviceId: string | null = null
 const KEY_INDEX_OFFSET = 21
 
-const eventHandlers = {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  keyDown: (_ignore: number): void => {},
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  keyUp: (_ignore: number): void => {}
+interface EventHandlers {
+  keyDown?: (index: number) => void
+  keyUp?: (index: number) => void
+  paddleToggle?: (isDown: boolean) => void
+}
+
+const eventHandlers: EventHandlers = {
+  keyDown: undefined,
+  keyUp: undefined,
+  paddleToggle: undefined
 }
 
 export default {
@@ -58,15 +63,33 @@ export default {
   },
 
   handleMidiMessage: (event: WebMidi.MIDIMessageEvent): void => {
-    const { keyDown, keyUp } = eventHandlers
+    const { keyDown, keyUp, paddleToggle } = eventHandlers
+    // 按键按下、释放
+    // @see: https://midi.org/summary-of-midi-1-0-messages
+    // 1001nnnn Note On event.
+    // This message is sent when a note is depressed (start).
+    // (kkkkkkk) is the key (note) number. (vvvvvvv) is the velocity.
     if ((event.data[0] & 0xf0) === 0x90) {
-      keyDown(event.data[1] - KEY_INDEX_OFFSET)
-    } else if ((event.data[0] & 0xf0) === 0x80) {
-      keyUp(event.data[1] - KEY_INDEX_OFFSET)
+      keyDown && keyDown(event.data[1] - KEY_INDEX_OFFSET)
+    }
+    // 1000nnnn Note Off event.
+    // This message is sent when a note is released (ended).
+    // (kkkkkkk) is the key (note) number. (vvvvvvv) is the velocity.
+    else if ((event.data[0] & 0xf0) === 0x80) {
+      keyUp && (event.data[1] - KEY_INDEX_OFFSET)
+    }
+    // 踏板踩下、释放（CC#64 messages）
+    // 1011nnnn Control Change.
+    // This message is sent when a controller value changes.
+    // Controllers include devices such as pedals and levers.
+    // Controller numbers 120-127 are reserved as “Channel Mode Messages” (below).
+    // (ccccccc) is the controller number (0-119). (vvvvvvv) is the controller value (0-127).
+    else if ((event.data[0] & 0xf0) === 0xb0 && event.data[1] === 64) {
+      paddleToggle && paddleToggle(event.data[2] > 63)
     }
   },
 
-  setMidiEventHandlers(handlers: typeof eventHandlers): void {
+  setMidiEventHandlers: function (handlers: EventHandlers): void {
     Object.assign(eventHandlers, handlers)
   },
 

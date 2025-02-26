@@ -100,10 +100,10 @@ export default function ClickGranule({
       if (unmounted) {
         return
       }
+      timer('ClickGranule')
       updateParticles()
       drawParticles(ctx!)
       requestAnimationFrame(animate)
-      timer('ClickGranule')
     }
 
     if (ctx) {

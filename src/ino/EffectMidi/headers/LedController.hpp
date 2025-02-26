@@ -140,6 +140,14 @@ private:
    * @param color 颜色
    */
   void setLedColor(int ledIndex, CRGB color);
+  /**
+   * 扩散模式 Step
+   */
+  void stepDiffusion();
+  /**
+   * 残留模式 Step
+   */
+  void stepResidual();
 };
 
 #endif
