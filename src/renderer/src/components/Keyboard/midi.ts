@@ -76,7 +76,7 @@ export default {
     // This message is sent when a note is released (ended).
     // (kkkkkkk) is the key (note) number. (vvvvvvv) is the velocity.
     else if ((event.data[0] & 0xf0) === 0x80) {
-      keyUp && (event.data[1] - KEY_INDEX_OFFSET)
+      keyUp && keyUp(event.data[1] - KEY_INDEX_OFFSET)
     }
     // 踏板踩下、释放（CC#64 messages）
     // 1011nnnn Control Change.

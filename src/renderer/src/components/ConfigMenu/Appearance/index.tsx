@@ -93,6 +93,14 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
             dispatch(particleSlice.actions.setClickGranule(val))
           }}
         />
+        <EmSwitch
+          label={txt('appearance.particle.waterfall-label')}
+          description={txt('appearance.particle.waterfall-desc')}
+          initValue={nowParticle.enableWaterfall}
+          onChange={(val) => {
+            dispatch(particleSlice.actions.setWaterfall(val))
+          }}
+        />
       </div>
     </div>
   )

@@ -22,6 +22,8 @@ appearance:
     fireflies-desc: Enable background firefly animation, disabling can improve performance
     granule-label: Click Animation
     granule-desc: Enable click particle animation, disabling can improve performance
+    waterfall-label: Key Animation
+    waterfall-desc: Enable key waterfall animation (including pedal), disabling can improve performance
 devices:
   serial-port-label: Serial Port
   serial-port-desc: Select the serial port

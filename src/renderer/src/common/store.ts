@@ -86,7 +86,10 @@ export const store = configureStore({
     // Midi 配置
     midi: persistReducer(storePersistConfigOf('midi'), configManger.midiSlice.reducer),
     // 统计数据
-    statistics: persistReducer(storePersistConfigOf('statistics'), configManger.statisticsSlice.reducer),
+    statistics: persistReducer(
+      storePersistConfigOf('statistics'),
+      configManger.statisticsSlice.reducer
+    )
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
