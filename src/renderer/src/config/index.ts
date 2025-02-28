@@ -204,6 +204,24 @@ export const statisticsSlice = createSlice({
         ...state,
         statistics: action.payload
       }
+    },
+    incrScore: (state) => {
+      return {
+        ...state,
+        statistics: {
+          ...state.statistics,
+          score: state.statistics.score + 1
+        }
+      }
+    },
+    incrPaddle: (state) => {
+      return {
+        ...state,
+        statistics: {
+          ...state.statistics,
+          paddle: state.statistics.paddle + 1
+        }
+      }
     }
   }
 })

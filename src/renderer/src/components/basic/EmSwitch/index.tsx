@@ -1,12 +1,12 @@
 import { Description, Field, Label, Switch } from '@headlessui/react'
-import C from '@renderer/common/colors'
+import C, { ThemeTypeEnum } from '@renderer/common/colors'
 import { themeSelector } from '@renderer/config'
 import { useEffect, useState } from 'react'
 import { EmFormProps } from '../types'
 import { useAppSelector } from '@renderer/common/store'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
 
-interface EmSwitchProps extends EmFormProps<boolean> {}
+interface EmSwitchProps extends EmFormProps<boolean> { }
 
 export default function EmSwitch({
   label,
@@ -15,7 +15,7 @@ export default function EmSwitch({
   onChange
 }: EmSwitchProps): JSX.Element {
   const [enabled, setEnabled] = useState(initValue)
-  const theme = C(useAppSelector(themeSelector))
+  const theme = useAppSelector(themeSelector)
 
   useEffect(() => {
     setEnabled(initValue)
@@ -35,12 +35,10 @@ export default function EmSwitch({
             }
             setEnabled(!enabled)
           }}
-          className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition"
-          style={enabled ? { backgroundColor: theme.main } : {}}
+          className={`group inline-flex h-6 w-11 items-center rounded-full transition bg-${enabled ? theme + '-main' : 'gray-200'}`}
         >
           <span
-            className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6"
-            style={{ color: theme.sub }}
+            className={`size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6 text-${theme}-sub`}
           >
             {/* ICON */}
             {enabled ? <CheckCircleIcon /> : <XCircleIcon />}

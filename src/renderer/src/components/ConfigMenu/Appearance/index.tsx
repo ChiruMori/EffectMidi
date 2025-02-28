@@ -52,8 +52,8 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
         <EmRangeSlider
           min={0}
           max={100}
-          fromColor={C(nowColorType).main}
-          toColor={C(nowColorType).sub}
+          fromColor={C(nowColorType)?.main}
+          toColor={C(nowColorType)?.sub}
           label={txt('appearance.bg-mask-opacity')}
           description={txt('appearance.bg-mask-opacity-desc')}
           initValue={nowBgImg.bgMaskOpacity}
@@ -65,12 +65,12 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
           label={txt('appearance.theme-label')}
           description={txt('appearance.theme-desc')}
           options={[
-            { color: C(ThemeTypeEnum.SKY).ingridient(45), val: ThemeTypeEnum.SKY },
-            { color: C(ThemeTypeEnum.PURPLE).ingridient(45), val: ThemeTypeEnum.PURPLE },
-            { color: C(ThemeTypeEnum.PINK).ingridient(45), val: ThemeTypeEnum.PINK },
-            { color: C(ThemeTypeEnum.GREEN).ingridient(45), val: ThemeTypeEnum.GREEN },
-            { color: C(ThemeTypeEnum.ORANGE).ingridient(45), val: ThemeTypeEnum.ORANGE },
-            { color: C(ThemeTypeEnum.GRAY).ingridient(45), val: ThemeTypeEnum.GRAY }
+            { color: C(ThemeTypeEnum.SKY).ingredient(45), val: ThemeTypeEnum.SKY },
+            { color: C(ThemeTypeEnum.PURPLE).ingredient(45), val: ThemeTypeEnum.PURPLE },
+            { color: C(ThemeTypeEnum.PINK).ingredient(45), val: ThemeTypeEnum.PINK },
+            { color: C(ThemeTypeEnum.GREEN).ingredient(45), val: ThemeTypeEnum.GREEN },
+            { color: C(ThemeTypeEnum.ORANGE).ingredient(45), val: ThemeTypeEnum.ORANGE },
+            { color: C(ThemeTypeEnum.GRAY).ingredient(45), val: ThemeTypeEnum.GRAY }
           ]}
           initValue={nowColorType}
           onChange={(val) => {

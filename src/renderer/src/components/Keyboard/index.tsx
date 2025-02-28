@@ -1,13 +1,12 @@
 import { Score } from '@renderer/common/score'
-import { useAppSelector } from '@renderer/common/store'
+import { useAppDispatch, useAppSelector } from '@renderer/common/store'
 import C from '@renderer/common/colors'
-import { particleSelector, themeSelector } from '@renderer/config'
+import { particleSelector, statisticsSlice, themeSelector } from '@renderer/config'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import ipcClient from '@renderer/common/ipcClient'
 import midi from './midi'
 import Waterfall, { WaterfallRef } from './Waterfall'
 import './index.styl'
-import { useSelector } from 'react-redux'
 
 const whiteKeyCnt = 52
 const startScore = 'A1'
@@ -17,7 +16,8 @@ export default function Keyboard(): JSX.Element {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   const colorType = useAppSelector(themeSelector)
   const waterfallRef = useRef<WaterfallRef>(null)
-  const particle = useSelector(particleSelector)
+  const particle = useAppSelector(particleSelector)
+  const dispatch = useAppDispatch()
 
   // 初始化键盘
   let nextScore = Score.fromString(startScore)
@@ -43,6 +43,7 @@ export default function Keyboard(): JSX.Element {
     })
     const [beginPerct, endPerct] = targetScore.getPerct(1 / whiteKeyCnt, (1 / whiteKeyCnt) * 0.6)
     waterfallRef.current?.rectBegin(key, beginPerct, endPerct)
+    dispatch(statisticsSlice.actions.incrScore())
   }, [])
 
   const handleKeyUp = useCallback((index: number): void => {
@@ -65,6 +66,9 @@ export default function Keyboard(): JSX.Element {
       keyDown: handleKeyDown,
       keyUp: handleKeyUp,
       paddleToggle: (down) => {
+        if (down) {
+          dispatch(statisticsSlice.actions.incrPaddle())
+        }
         waterfallRef.current?.setPadel(down)
       }
     })
@@ -85,7 +89,7 @@ export default function Keyboard(): JSX.Element {
               className={`kb kb-w ${activeKeys.has(scoreTuple[0].toString()) ? '' : 'bg-white'}`}
               style={
                 activeKeys.has(scoreTuple[0].toString())
-                  ? { backgroundImage: C(colorType).ingridient(0) }
+                  ? { backgroundImage: C(colorType).ingredient(0) }
                   : {}
               }
               key={idx}
@@ -96,7 +100,7 @@ export default function Keyboard(): JSX.Element {
                   className={`kb kb-b ${activeKeys.has(scoreTuple[1].toString()) ? '' : 'bg-black'}`}
                   style={
                     activeKeys.has(scoreTuple[1].toString())
-                      ? { backgroundImage: C(colorType).ingridient(0) }
+                      ? { backgroundImage: C(colorType).ingredient(0) }
                       : {}
                   }
                   id={scoreTuple[1].toString()}

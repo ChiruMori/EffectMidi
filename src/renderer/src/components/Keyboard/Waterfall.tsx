@@ -80,7 +80,7 @@ const Waterfall = React.forwardRef(
         ctx.stroke()
       })
       // 绘制踏板符号（SVG 文件）
-      ctx.strokeStyle = C(theme).main
+      ctx.strokeStyle = C(theme)?.main ?? '#fff'
       padels.current.forEach((padel) => {
         const img = new Image()
         ctx.beginPath()

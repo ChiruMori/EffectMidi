@@ -58,5 +58,9 @@ export default {
     remove: async (key: string): Promise<void> => {
       return await server.invoke('storage.remove', key)
     }
+  },
+  // Open Browser
+  openBrowser: (url: string): void => {
+    server.send('openBrowser', url)
   }
 }

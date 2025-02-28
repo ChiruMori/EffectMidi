@@ -43,7 +43,7 @@ const NotificationList: React.FC<NotificationListProps> = ({ notifications, onHo
                     <span
                       className="badge ml-2 text-xs/5 px-1.5 rounded-full absolute right-5 animate__animated animate__faster animate__bounceIn"
                       style={{
-                        backgroundImage: C(colorType).ingridient(45)
+                        backgroundImage: C(colorType).ingredient(45)
                       }}
                     >
                       {message.badge}
@@ -57,7 +57,7 @@ const NotificationList: React.FC<NotificationListProps> = ({ notifications, onHo
                   <div
                     className="h-1"
                     style={{
-                      backgroundImage: C(colorType).ingridient(45),
+                      backgroundImage: C(colorType).ingredient(45),
                       width: `${(!message.life || message.life === -1 ? 1 : (message.life - EXIT_ANIMATION_DURATION) / message.duration!) * 100}%`
                     }}
                   ></div>

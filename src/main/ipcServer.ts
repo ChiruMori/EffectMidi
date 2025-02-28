@@ -4,6 +4,7 @@ import { closeSerial, sendCmd } from './serial/serial'
 import storage from './storage'
 // import midi from './midi'
 import cmds from './serial/cmds'
+import { shell } from 'electron'
 
 // IPC 通信，渲染进程通知主进程执行操作
 export default function ipc(mainWindow: BrowserWindow): void {
@@ -79,5 +80,10 @@ export default function ipc(mainWindow: BrowserWindow): void {
   })
   ipcMain.handle('storage.remove', async (_, key) => {
     return await storage.remove(key as string)
+  })
+  // 浏览器打开
+  ipcMain.on('openBrowser', async (_, url) => {
+    console.log('openBrowser:', url)
+    shell.openExternal(url)
   })
 }

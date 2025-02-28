@@ -59,7 +59,7 @@ export default function MenuItem({
         <div
           hidden={!isActive}
           className={`ani-bg animate__animated animate__fast absolute ${isActive ? 'animate__lightSpeedInLeft' : ''}`}
-          style={{ backgroundImage: C(colorType).ingridient(45) }}
+          style={{ backgroundImage: C(colorType).ingredient(45) }}
         ></div>
       </div>
     </>

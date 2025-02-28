@@ -1,0 +1,26 @@
+{
+  "SKY": {
+    "main": "#3B5CF0",
+    "sub": "#00BCD4"
+  },
+  "GREEN": {
+    "main": "#006400",
+    "sub": "#7FFF00"
+  },
+  "PINK": {
+    "main": "#E60000",
+    "sub": "#FF9F7D"
+  },
+  "ORANGE": {
+    "main": "#FF4500",
+    "sub": "#FFDEAD"
+  },
+  "PURPLE": {
+    "main": "#4B0082",
+    "sub": "#7B68EE"
+  },
+  "GRAY": {
+    "main": "#303030",
+    "sub": "#C0C0C0"
+  }
+}

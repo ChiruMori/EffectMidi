@@ -43,6 +43,13 @@ led:
   diffusion-width-desc: 按键按下时，灯光扩散到的最大键盘数量
   residual-time-label: 延迟时间
   residual-time-desc: 按键按下后，灯光残留的持续时间（帧数，每秒约60帧）
+about:
+  desc1: 本项目完全开源免费，您可以在
+  desc2: 上支持作者、提出建议和问题、检查更新。
+  desc3: 如果您喜欢这个项目，不要忘记给它一个Star⭐️。
+  stat-title: 统计信息
+  stat-score: 弹奏的音符数
+  stat-paddle: 踏板踩下次数
 notify:
   serial-disable-title: 串口未激活
   serial-disable-content: 你需要先激活串口才能使用灯光效果设置

@@ -1,3 +1,5 @@
+import themeConfig from '@root/theme.json'
+
 export enum ThemeTypeEnum {
   SKY = 'SKY',
   GREEN = 'GREEN',
@@ -7,32 +9,16 @@ export enum ThemeTypeEnum {
   GRAY = 'GRAY'
 }
 
-const COLOR_DICT = {
-  [ThemeTypeEnum.SKY]: {
-    main: '#3B5CF0',
-    sub: '#00BCD4'
-  },
-  [ThemeTypeEnum.GREEN]: {
-    main: '#006400',
-    sub: '#7FFF00'
-  },
-  [ThemeTypeEnum.PINK]: {
-    main: '#E60000',
-    sub: '#ff9f7d'
-  },
-  [ThemeTypeEnum.ORANGE]: {
-    main: '#FF4500',
-    sub: '#FFDEAD'
-  },
-  [ThemeTypeEnum.PURPLE]: {
-    main: '#4B0082',
-    sub: '#7B68EE'
-  },
-  [ThemeTypeEnum.GRAY]: {
-    main: '#303030',
-    sub: '#C0C0C0'
-  }
+interface ThemeConfig {
+  main: string
+  sub: string
 }
+
+const COLOR_DICT = Object.values(ThemeTypeEnum).reduce((acc, theme) => {
+  acc[theme] = themeConfig[theme]
+  return acc
+}, {} as Record<ThemeTypeEnum, ThemeConfig>)
+
 
 export const getMidColor = (progress: number, fromColor: string, toColor: string): string => {
   const r =
@@ -50,7 +36,7 @@ export const getMidColor = (progress: number, fromColor: string, toColor: string
 export type ColorFuncType = {
   main: string
   sub: string
-  ingridient: (deg: number) => string
+  ingredient: (deg: number) => string
 }
 
 export function hexStringToHue(hex: string): number {
@@ -76,7 +62,7 @@ export default function colorOf(type: ThemeTypeEnum): ColorFuncType {
   return {
     main: COLOR_DICT[type].main,
     sub: COLOR_DICT[type].sub,
-    ingridient(deg: number): string {
+    ingredient(deg: number): string {
       return `linear-gradient(${deg}deg, ${COLOR_DICT[type].main}, ${COLOR_DICT[type].sub})`
     }
   }
