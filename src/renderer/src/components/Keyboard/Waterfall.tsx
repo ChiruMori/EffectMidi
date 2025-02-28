@@ -4,6 +4,7 @@ import C, { ThemeTypeEnum } from '@renderer/common/colors'
 import timer from '@renderer/components/effects/timer'
 import paddelUp from '@renderer/assets/pedalup.svg'
 import paddelDown from '@renderer/assets/pedaldown.svg'
+import Particles, { ParticlesRef } from './Hanabi'
 
 export interface WaterfallProps {
   theme: ThemeTypeEnum
@@ -33,6 +34,7 @@ const Waterfall = React.forwardRef(
   (props: WaterfallProps, ref: React.Ref<WaterfallRef>): JSX.Element => {
     const { theme } = props
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const particlesRef = useRef<ParticlesRef>(null)
     const rects = useRef(new Map<string, Rect>())
     const padels = useRef<{ y: number; type: 'down' | 'up' }[]>([])
 
@@ -41,6 +43,10 @@ const Waterfall = React.forwardRef(
         // 更新矩形位置、高度
         if (rect.grow) {
           rect.height = (rect.height ?? minHeight) + baseSpeed
+          // 触发粒子效果
+          const fromX = canvasRef.current!.width * rect.from
+          const toX = canvasRef.current!.width * rect.to
+          particlesRef.current?.emitParticles(fromX, canvasRef.current!.height, toX - fromX)
         }
         rect.y = (rect.y ?? canvasRef.current!.height) - baseSpeed
       })
@@ -176,6 +182,7 @@ const Waterfall = React.forwardRef(
 
     return (
       <div className="absolute w-full h-5/6 top-0 left-0 pointer-events-none z-0">
+        <Particles ref={particlesRef} theme={theme} />
         <canvas className="size-full" ref={canvasRef} />
       </div>
     )

@@ -1,5 +1,4 @@
 import { Description, Field, Label, Switch } from '@headlessui/react'
-import C, { ThemeTypeEnum } from '@renderer/common/colors'
 import { themeSelector } from '@renderer/config'
 import { useEffect, useState } from 'react'
 import { EmFormProps } from '../types'
