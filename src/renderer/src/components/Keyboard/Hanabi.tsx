@@ -5,8 +5,8 @@ export interface ParticlesProps {
   theme: ThemeTypeEnum
 }
 
-export interface ParticlesRef {
-  emitParticles: (x: number, y: number, width: number) => void
+export interface HanabiRef {
+  emitParticles: (x: number, width: number) => void
 }
 
 interface Particle {
@@ -16,101 +16,151 @@ interface Particle {
   vy: number
   life: number
   maxLife: number
-  size: number
 }
 
-const Particles = React.forwardRef(
-  (props: ParticlesProps, ref: React.Ref<ParticlesRef>): JSX.Element => {
-    const { theme } = props
-    const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    const particles = useRef<Particle[]>([])
+// 粒子初始速度范围（横向）
+const speedShakeX = 3
+// 粒子基础速度（纵向）
+const baseSpeedY = -3
+// 粒子数量因子
+const particleCountFactor = 0.15
+// 神说要有重力
+const gravityY = 0.01
+// 神说要有风
+const gravityXBase = 0.05
+// 风向的变化阈值
+const xGravityChangeThreshold = 100
+// 风向的变化计数器
+let xGravityChangeCounter = 0
+// 当前风速向量
+let gravityX = gravityXBase
+// 粒子生命值衰减速度
+const lifeDecay = 0.01
+// 粒子生命值基础
+const lifeBase = 1.4
+// 生命值随机范围
+const lifeRange = 0.6
+// 粒子长度
+const particleLength = 4
+// 粒子渐变色位置
+const gradientPosition = 0.85
 
-    function createParticle(x: number, y: number): Particle {
-      return {
-        x,
-        y,
-        vx: (Math.random() - 0.5) * 2, // 水平速度
-        vy: -Math.random() * 2 - 1, // 向上的垂直速度
-        life: 1,
-        maxLife: 0.7 + Math.random() * 0.3, // 0.7-1.0秒的生命周期
-        size: 1 + Math.random() * 2 // 1-3像素的大小
-      }
+const Hanabi = React.forwardRef((props: ParticlesProps, ref: React.Ref<HanabiRef>): JSX.Element => {
+  const { theme } = props
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const particles = useRef<Particle[]>([])
+
+  function createParticle(x: number): Particle {
+    return {
+      x,
+      y: canvasRef.current!.height,
+      vx: (Math.random() - 0.5) * speedShakeX,
+      vy: (-Math.random() * baseSpeedY) / 2 + baseSpeedY,
+      life: 1,
+      maxLife: lifeBase + Math.random() * lifeRange
+    }
+  }
+
+  function step(): void {
+    xGravityChangeCounter++
+    if (xGravityChangeCounter > xGravityChangeThreshold) {
+      gravityX = (Math.random() - 0.5) * gravityXBase
+      xGravityChangeCounter = 0
+    }
+    particles.current = particles.current.filter((particle) => {
+      // 更新粒子位置
+      particle.x += particle.vx
+      particle.y += particle.vy
+      particle.vy += gravityY
+      particle.vx += gravityX
+      particle.life -= lifeDecay
+      return particle.life > 0
+    })
+  }
+
+  function draw(ctx: CanvasRenderingContext2D): void {
+    ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height)
+
+    // 创建渐变色
+    const gradient = ctx.createLinearGradient(
+      0,
+      canvasRef.current!.height * gradientPosition,
+      0,
+      canvasRef.current!.height
+    )
+    gradient.addColorStop(0, C(theme).main)
+    gradient.addColorStop(1, C(theme).sub)
+
+    particles.current.forEach((particle) => {
+      ctx.beginPath()
+      ctx.strokeStyle = gradient
+      ctx.globalAlpha = particle.life
+      ctx.moveTo(particle.x, particle.y)
+      ctx.lineTo(
+        particle.x - particle.vx * particleLength,
+        particle.y - particle.vy * particleLength
+      )
+      ctx.stroke()
+      ctx.closePath()
+    })
+  }
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+    let unmounted = false
+
+    const animate = (): void => {
+      if (unmounted) return
+      step()
+      draw(ctx!)
+      requestAnimationFrame(animate)
     }
 
-    function step(): void {
-      particles.current = particles.current.filter((particle) => {
-        // 更新粒子位置
-        particle.x += particle.vx
-        particle.y += particle.vy
-        particle.vy += 0.05 // 添加重力效果
-        particle.life -= 0.016 // 每帧减少生命值（假设60fps）
-        return particle.life > 0
-      })
-    }
-
-    function draw(ctx: CanvasRenderingContext2D): void {
-      ctx.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height)
-
-      // 创建渐变色
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvasRef.current!.height)
-      gradient.addColorStop(0, C(theme).main)
-      gradient.addColorStop(1, C(theme).sub)
-
-      particles.current.forEach((particle) => {
-        ctx.beginPath()
-        ctx.fillStyle = gradient
-        ctx.globalAlpha = particle.life // 透明度随生命值变化
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-        ctx.fill()
-      })
-    }
-
-    useEffect(() => {
+    const resize = (): void => {
       const canvas = canvasRef.current
-      const ctx = canvas?.getContext('2d')
-      let unmounted = false
-
-      const animate = (): void => {
-        if (unmounted) return
-        step()
-        draw(ctx!)
-        requestAnimationFrame(animate)
-      }
-
-      if (ctx) {
+      if (canvas) {
+        // 重置为父容器（DIV）大小
         canvas!.height = canvas!.clientHeight
         canvas!.width = canvas!.clientWidth
-        animate()
       }
+    }
 
-      return (): void => {
-        unmounted = true
-      }
-    }, [theme])
+    if (ctx) {
+      canvas!.width = window.innerWidth
+      canvas!.height = window.innerHeight
+      window.addEventListener('resize', resize)
+      animate()
+    }
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        emitParticles: (x: number, y: number, width: number): void => {
-          // 在矩形底部随机位置生成粒子
-          const particleCount = Math.floor(width / 5) // 每5像素生成一个粒子
-          for (let i = 0; i < particleCount; i++) {
-            const particleX = x + Math.random() * width
-            particles.current.push(createParticle(particleX, y))
-          }
+    return (): void => {
+      unmounted = true
+      window.removeEventListener('resize', resize)
+    }
+  }, [theme])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      emitParticles: (x: number, width: number): void => {
+        // 在底部随机位置生成粒子
+        const particleCount = Math.floor(width * particleCountFactor)
+        for (let i = 0; i < particleCount; i++) {
+          const particleX = x + Math.random() * width
+          particles.current.push(createParticle(particleX))
         }
-      }),
-      []
-    )
+      }
+    }),
+    []
+  )
 
-    return (
-      <div className="absolute size-full top-0 left-0 pointer-events-none z-10">
-        <canvas className="size-full" ref={canvasRef} />
-      </div>
-    )
-  }
-)
+  return (
+    <div className="absolute size-full top-0 left-0 pointer-events-none z-10">
+      <canvas className="size-full" ref={canvasRef} />
+    </div>
+  )
+})
 
-Particles.displayName = 'Particles'
+Hanabi.displayName = 'Hanabi'
 
-export default Particles
+export default Hanabi
