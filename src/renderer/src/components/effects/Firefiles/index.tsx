@@ -1,6 +1,6 @@
 // 动画：绘制向右上角随机移动的，具有拖尾效果的粒子
 
-import { ColorFuncType, getMidColor, hexStringToHue, ThemeTypeEnum } from '@renderer/common/colors'
+import { getMidColor, hexStringToHue, ThemeTypeEnum } from '@renderer/common/colors'
 import { useEffect, useRef } from 'react'
 import C from '@renderer/common/colors'
 import timer from '../timer'
@@ -114,7 +114,7 @@ class Particle {
 
   static createRandom(
     canvas: HTMLCanvasElement,
-    theme: ColorFuncType,
+    theme: ThemeTypeEnum,
     radiusBase: number
   ): Particle {
     const x = Math.random() * canvas.width
@@ -127,7 +127,7 @@ class Particle {
       radiusBase
 
     const nowColor =
-      (hexStringToHue(getMidColor(0.5, theme.main, theme.sub)) +
+      (hexStringToHue(getMidColor(0.5, C(theme).main, C(theme).sub)) +
         Math.random() * COLOR_OFFSET) %
       360
     const color =
@@ -142,8 +142,6 @@ export default function Firefiles({
   theme: ThemeTypeEnum
 }): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-
-  const color = C(theme)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -191,7 +189,7 @@ export default function Firefiles({
 
     const addParticle = (): void => {
       const radiusBase = Math.sqrt(canvas!.width * canvas!.width + canvas!.height * canvas!.height)
-      particles.unshift(Particle.createRandom(canvas!, color, radiusBase))
+      particles.unshift(Particle.createRandom(canvas!, theme, radiusBase))
     }
 
     window.addEventListener('resize', resize)
