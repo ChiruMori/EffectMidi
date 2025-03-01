@@ -43,6 +43,9 @@ SerialCommand *SerialCommandHolder::getCommand(const int cmdNameByte)
   {
     return commands[CMD_BYTE_KEY_UP];
   }
+  if (cmdNameByte < 0) {
+    return nullptr;
+  }
   if (commands[cmdNameByte])
   {
     return commands[cmdNameByte];

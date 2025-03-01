@@ -23,14 +23,20 @@ void setup()
 }
 
 void loop() {
+  bool noData = true;
   while(Serial.available() > 0) {
     int currentByte = Serial.read();
     ledController.endWaiting();
     cmdHolder.processByte(currentByte, false, oled);
+    noData = false;
   }
 
   if(ledController.isWaiting()) {
     WaitingCmd::getInstance(ledController).execute(nullptr);
+  }
+
+  if (noData) {
+    cmdHolder.processByte(-1, true, oled);
   }
 
   ledController.stepAndShow();

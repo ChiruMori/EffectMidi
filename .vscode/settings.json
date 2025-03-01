@@ -30,7 +30,11 @@
     "cstddef": "cpp",
     "mutex": "cpp",
     "cmath": "cpp",
-    "istream": "cpp"
+    "istream": "cpp",
+    "algorithm": "cpp",
+    "limits": "cpp",
+    "random": "cpp",
+    "utility": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled",
   "files.eol": "\n"

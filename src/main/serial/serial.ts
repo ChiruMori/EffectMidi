@@ -184,8 +184,6 @@ const handleCmdQueue = async (): Promise<void> => {
     try {
       await connectSerial()
       await sendAndFlush(parser, arg)
-      // 根据波特率控制指令间隔，每个指令平均为 4 个字节，
-      // await new Promise((resolve) => setTimeout(resolve, SERIAL_DELAY))
     } catch (error) {
       console.error('Error in handleCmdQueue:', error)
     }

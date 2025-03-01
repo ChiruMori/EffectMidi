@@ -44,10 +44,6 @@ public:
    */
   void setEndLightsColor(CRGB color);
   /**
-   * 设置LED灯带的亮度
-   */
-  void setBrightness(int brightness);
-  /**
    * 设置是否启用背景灯
    */
   void setUseBackground(bool use);
