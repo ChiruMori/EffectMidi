@@ -60,23 +60,37 @@ export default {
     if (midiAccess) {
       midiAccess.onstatechange = null
     }
+    eventHandlers.keyDown = undefined
+    eventHandlers.keyUp = undefined
+    eventHandlers.paddleToggle = undefined
   },
 
   handleMidiMessage: (event: WebMidi.MIDIMessageEvent): void => {
     const { keyDown, keyUp, paddleToggle } = eventHandlers
+    const eventType = event.data[0] & 0xf0
+    const key = event.data[1] - KEY_INDEX_OFFSET
+    const velocity = event.data[2]
     // 按键按下、释放
     // @see: https://midi.org/summary-of-midi-1-0-messages
     // 1001nnnn Note On event.
     // This message is sent when a note is depressed (start).
     // (kkkkkkk) is the key (note) number. (vvvvvvv) is the velocity.
-    if ((event.data[0] & 0xf0) === 0x90) {
-      keyDown && keyDown(event.data[1] - KEY_INDEX_OFFSET)
+    // Note On 事件（包含 Velocity=0 的伪 Note Off）
+    if (eventType === 0x90) {
+      if (velocity > 0) {
+        // 正常按下
+        keyDown?.(key)
+      } else {
+        // 零速度 Note On 视为松开
+        keyUp?.(key)
+      }
     }
     // 1000nnnn Note Off event.
     // This message is sent when a note is released (ended).
     // (kkkkkkk) is the key (note) number. (vvvvvvv) is the velocity.
-    else if ((event.data[0] & 0xf0) === 0x80) {
-      keyUp && keyUp(event.data[1] - KEY_INDEX_OFFSET)
+    // Note Off 事件
+    else if (eventType === 0x80) {
+      keyUp?.(key) // 正常松开
     }
     // 踏板踩下、释放（CC#64 messages）
     // 1011nnnn Control Change.
@@ -84,8 +98,8 @@ export default {
     // Controllers include devices such as pedals and levers.
     // Controller numbers 120-127 are reserved as “Channel Mode Messages” (below).
     // (ccccccc) is the controller number (0-119). (vvvvvvv) is the controller value (0-127).
-    else if ((event.data[0] & 0xf0) === 0xb0 && event.data[1] === 64) {
-      paddleToggle && paddleToggle(event.data[2] > 63)
+    else if (eventType === 0xb0 && event.data[1] === 64) {
+      paddleToggle?.(velocity > 63)
     }
   },
 

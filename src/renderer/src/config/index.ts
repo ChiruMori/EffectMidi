@@ -270,7 +270,7 @@ export const menuSelector = (state: RootState): string => state.menu?.menu || 'a
 export const midiSelector = (state: RootState): string => state.midi?.midi || ''
 export const statisticsSelector = (state: RootState): { score: number; paddle: number } => {
   return (
-    state.statistics || {
+    state.statistics?.statistics || {
       score: 0,
       paddle: 0
     }
