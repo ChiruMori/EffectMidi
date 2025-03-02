@@ -9,7 +9,7 @@ module.exports = {
     }
   },
   plugins: [],
-  safelist:[
+  safelist: [
     'bg-gray-200',
     {
       pattern: /text-\w+-(sub|main)/
@@ -19,4 +19,3 @@ module.exports = {
     }
   ]
 }
-

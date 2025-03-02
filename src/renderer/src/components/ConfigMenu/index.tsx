@@ -22,8 +22,8 @@ function ConfigMenu(): JSX.Element {
           nowBgImg.bgImg === ''
             ? {}
             : {
-              backgroundImage: 'url(' + (nowBgImg.bgDataUrl || nowBgImg.bgImg) + ')'
-            }
+                backgroundImage: 'url(' + (nowBgImg.bgDataUrl || nowBgImg.bgImg) + ')'
+              }
         }
       >
         {nowBgImg.bgImg === '' ? (
@@ -40,10 +40,14 @@ function ConfigMenu(): JSX.Element {
           className="p-2 bg-neutral-800/50 text-gray-400 rounded-r-xl"
           onClick={() => setFold(!fold)}
         >
-          <ChevronDoubleRightIcon className={`w-6 h-6 transition-transform duration-300 ${fold ? '' : 'rotate-180'}`} />
+          <ChevronDoubleRightIcon
+            className={`w-6 h-6 transition-transform duration-300 ${fold ? '' : 'rotate-180'}`}
+          />
         </button>
       </div>
-      <div className={`overflow-hidden py-24 absolute top-0 left-0 transition-all duration-500 ${fold ? 'w-0 h-0' : 'size-full'}`}>
+      <div
+        className={`overflow-hidden py-24 absolute top-0 left-0 transition-all duration-500 ${fold ? 'w-0 h-0' : 'size-full'}`}
+      >
         <div className="h-full main-panel mx-auto px-4 grid grid-rows-1 grid-cols-12 gap-4">
           <div className="col-span-1"></div>
           <div className="col-span-2">

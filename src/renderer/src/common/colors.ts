@@ -14,11 +14,13 @@ interface ThemeConfig {
   sub: string
 }
 
-const COLOR_DICT = Object.values(ThemeTypeEnum).reduce((acc, theme) => {
-  acc[theme] = themeConfig[theme]
-  return acc
-}, {} as Record<ThemeTypeEnum, ThemeConfig>)
-
+const COLOR_DICT = Object.values(ThemeTypeEnum).reduce(
+  (acc, theme) => {
+    acc[theme] = themeConfig[theme]
+    return acc
+  },
+  {} as Record<ThemeTypeEnum, ThemeConfig>
+)
 
 export const getMidColor = (progress: number, fromColor: string, toColor: string): string => {
   const r =

@@ -5,7 +5,7 @@ import { EmFormProps } from '../types'
 import { useAppSelector } from '@renderer/common/store'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/20/solid'
 
-interface EmSwitchProps extends EmFormProps<boolean> { }
+interface EmSwitchProps extends EmFormProps<boolean> {}
 
 export default function EmSwitch({
   label,
