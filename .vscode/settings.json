@@ -1,4 +1,41 @@
 {
-  "C_Cpp.default.compilerPath": "path_to_mingw64\\bin\\g++.exe",
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "map": "cpp",
+    "xiosbase": "cpp",
+    "array": "cpp",
+    "chrono": "cpp",
+    "deque": "cpp",
+    "format": "cpp",
+    "forward_list": "cpp",
+    "initializer_list": "cpp",
+    "list": "cpp",
+    "vector": "cpp",
+    "xhash": "cpp",
+    "xstring": "cpp",
+    "xtree": "cpp",
+    "xutility": "cpp",
+    "xlocale": "cpp",
+    "ostream": "cpp",
+    "iosfwd": "cpp",
+    "xlocbuf": "cpp",
+    "cstddef": "cpp",
+    "mutex": "cpp",
+    "cmath": "cpp",
+    "istream": "cpp",
+    "algorithm": "cpp",
+    "limits": "cpp",
+    "random": "cpp",
+    "utility": "cpp"
+  },
+  "C_Cpp.errorSquiggles": "enabled",
+  "files.eol": "\n"
 }

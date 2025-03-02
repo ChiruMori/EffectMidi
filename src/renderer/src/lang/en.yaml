@@ -1,0 +1,63 @@
+# English translations
+components:
+  select:
+    no-selected: No selected
+menu:
+  appearance: Display
+  led: Lights
+  devices: Device
+  about: About
+appearance:
+  language-label: Language
+  language-desc: Change the language of the application
+  bg-img-label: Background Image
+  bg-img-desc: Choose a background image
+  bg-img-placeholder: Local image file or URL
+  bg-mask-opacity: Mask Opacity
+  bg-mask-opacity-desc: Adjust the opacity of the background mask
+  theme-label: Theme
+  theme-desc: Choose a theme
+  particle:
+    fireflies-label: Background Animation
+    fireflies-desc: Enable background firefly animation, disabling can improve performance
+    granule-label: Click Animation
+    granule-desc: Enable click particle animation, disabling can improve performance
+    waterfall-label: Key Animation
+    waterfall-desc: Enable key waterfall animation (including pedal), disabling can improve performance
+devices:
+  serial-port-label: Serial Port
+  serial-port-desc: Select the serial port
+  serial-enable-label: Enable Serial Port
+  serial-enable-desc: Must be activated after selecting the serial port, otherwise the light effect settings cannot be used
+  midi-device-label: MIDI Device
+  midi-device-desc: Select the MIDI input device
+  unknown-midi-device: Unknown MIDI Device
+led:
+  bg-color-label: Background Color
+  bg-color-desc: The background color of the light strip, the color of the light when the key is not pressed, can be set to black to turn off the light
+  fg-color-label: Foreground Color
+  fg-color-desc: The color of the light when the key is pressed
+  end-color-label: Endpoint Light Color
+  end-color-desc: The color of the indicator light at both ends of the light strip, can be set to black to turn off the indicator light
+  diffusion-width-label: Diffusion Width
+  diffusion-width-desc: The maximum number of keys that the light can diffuse to when the key is pressed
+  residual-time-label: Delay Time
+  residual-time-desc: The duration of the light remaining after the key is pressed (frames, about 60 frames per second)
+about:
+  desc1: The project is completely open source and free, you can support the author, provide suggestions and issues, and check for updates on
+  desc2: .
+  desc3: If you like this project, don't forget to give it a Star⭐️.
+  stat-title: Statistics
+  stat-score: Number of notes played
+  stat-paddle: Number of times the pedal is pressed
+notify:
+  serial-disable-title: Serial Port Not Activated
+  serial-disable-content: You need to activate the serial port before you can use the light effect settings
+  serial-unselected-title: Unselected Serial Port
+  serial-unselected-content: Cannot activate the serial port, you must first select the serial port to activate
+  serial-abort-title: Serial Port Disconnected
+  serial-abort-content: The serial port connection has been disconnected, please reselect and activate the serial port
+  midi-connect-error-title: MIDI Connection Error
+  midi-connect-error-content: MIDI device connection error, please check the device and restart the application
+  midi-disconnect-title: MIDI Disconnected
+  midi-disconnect-content: The MIDI device connection has been disconnected, please reselect the MIDI input device

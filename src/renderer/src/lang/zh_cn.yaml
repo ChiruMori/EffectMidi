@@ -1,0 +1,63 @@
+# 中文语言配置（默认）
+components:
+  select:
+    no-selected: 未选择
+menu:
+  appearance: 外观
+  led: 灯光
+  devices: 外设
+  about: 关于
+appearance:
+  language-label: 语言
+  language-desc: 更换应用的语言
+  bg-img-label: 背景图片
+  bg-img-desc: 选择一个背景图片
+  bg-img-placeholder: 本地图片文件或网络地址
+  bg-mask-opacity: 遮罩透明度
+  bg-mask-opacity-desc: 调整背景遮罩的透明度
+  theme-label: 主题
+  theme-desc: 选择一个主题
+  particle:
+    fireflies-label: 背景动画
+    fireflies-desc: 是否启用背景光斑动画，关闭后可节约🔋
+    granule-label: 点击动画
+    granule-desc: 是否启用点击粒子动画，关闭后可可节约🔋
+    waterfall-label: 按键动画
+    waterfall-desc: 是否启用按键瀑布动画（含踏板），关闭后可以关爱电脑
+devices:
+  serial-port-label: 串口
+  serial-port-desc: 选择串口
+  serial-enable-label: 激活串口
+  serial-enable-desc: 选择串口后必须激活才能使用，否则无法进行灯光效果设置
+  midi-device-label: MIDI设备
+  midi-device-desc: 选择MIDI输入设备
+  unknown-midi-device: 未知MIDI设备
+led:
+  bg-color-label: 背景颜色
+  bg-color-desc: 灯带背景颜色，按键没有按下时灯光的颜色，可以设置为黑色以关闭灯光
+  fg-color-label: 前景颜色
+  fg-color-desc: 按键按下时灯光的颜色
+  end-color-label: 端点灯颜色
+  end-color-desc: 灯带两端指示灯的颜色，可以设置为黑色以关闭指示灯
+  diffusion-width-label: 扩散宽度
+  diffusion-width-desc: 按键按下时，灯光扩散到的最大键盘数量
+  residual-time-label: 延迟时间
+  residual-time-desc: 按键按下后，灯光残留的持续时间（帧数，每秒约60帧）
+about:
+  desc1: 本项目完全开源免费，您可以在
+  desc2: 上支持作者、提出建议和问题、检查更新。
+  desc3: 如果您喜欢这个项目，不要忘记给它一个Star⭐️。
+  stat-title: 统计信息
+  stat-score: 弹奏的音符数
+  stat-paddle: 踏板踩下次数
+notify:
+  serial-disable-title: 串口未激活
+  serial-disable-content: 你需要先激活串口才能使用灯光效果设置
+  serial-unselected-title: 未选择串口
+  serial-unselected-content: 无法激活串口，必须先选择要激活的串口
+  serial-abort-title: 串口断开
+  serial-abort-content: 串口连接已断开，请重新选择并激活串口
+  midi-connect-error-title: MIDI连接错误
+  midi-connect-error-content: MIDI设备连接错误，请检查设备后重启应用
+  midi-disconnect-title: MIDI断开
+  midi-disconnect-content: MIDI设备连接已断开，请重新选择MIDI输入设备
