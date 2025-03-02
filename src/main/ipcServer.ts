@@ -37,10 +37,10 @@ export default function ipc(mainWindow: BrowserWindow): void {
         ...cmds.setEndLightsColor(endColor.length === 9 ? endColor.substring(1, 8) : endColor)
       )
       // 延迟时间设置
-      const residualTime = await storage.main.getLedConfig('residualTime')
+      const residualTime = await storage.main.getLedConfig('residue')
       bytes.push(...cmds.setResidualTime(residualTime))
       // 扩散宽度设置
-      const diffusionWidth = await storage.main.getLedConfig('diffusionWidth')
+      const diffusionWidth = await storage.main.getLedConfig('diffusion')
       bytes.push(...cmds.setDiffusionWidth(diffusionWidth))
       // 发送指令
       sendCmd(cmds.combined, bytes)

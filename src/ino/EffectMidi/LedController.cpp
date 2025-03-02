@@ -15,7 +15,6 @@ LEDController::LEDController(int numLeds)
   }
   this->diffusionWidth = 0;
   this->residualTime = 0;
-  this->endLightsColor = CRGB::Black;
   this->foregroundColor = CRGB::White;
   this->backgroundColor = CRGB::Black;
   this->brightness = 100;
@@ -40,15 +39,14 @@ void LEDController::setLedColor(int ledIndex, CRGB color)
 {
   if (ledIndex == -1)
   {
-    this->needRefresh = leds[0] != color || leds[(KEY_NUM << 1) + 1] != color;
     leds[0] = color;
     leds[(KEY_NUM << 1) + 1] = color;
   }
   else if (ledIndex >= 1 && ledIndex < numLeds - 1)
   {
-    this->needRefresh = true;
     leds[ledIndex] = color;
   }
+  this->needRefresh = true;
 }
 
 bool LEDController::isWaiting()
@@ -84,7 +82,8 @@ void LEDController::stepDiffusion()
             CRGB blended = blend(foregroundColor, backgroundColor, 255 * j / diffusionWidth);
             setLedColor(ledIndex1, blended);
             setLedColor(ledIndex2, blended);
-            residualCounter[targetKey] = max(1, residualTime - j * residualTime / diffusionWidth);
+            residualCounter[targetKey] = max(residualCounter[targetKey], residualTime - j * residualTime / diffusionWidth);
+            residualCounter[targetKey] = max(1, residualCounter[targetKey]);
           }
           // 右扩散区域
           if (i + j < KEY_NUM && !activeFlag[i + j])
@@ -95,7 +94,8 @@ void LEDController::stepDiffusion()
             CRGB blended = blend(foregroundColor, backgroundColor, 255 * j / diffusionWidth);
             setLedColor(ledIndex1, blended);
             setLedColor(ledIndex2, blended);
-            residualCounter[targetKey] = max(1, residualTime - j * residualTime / diffusionWidth);
+            residualCounter[targetKey] = max(residualCounter[targetKey], residualTime - j * residualTime / diffusionWidth);
+            residualCounter[targetKey] = max(1, residualCounter[targetKey]);
           }
         }
       }
@@ -181,7 +181,6 @@ void LEDController::setBackgroundColor(CRGB color)
 void LEDController::setEndLightsColor(CRGB color)
 {
   this->setLedColor(-1, color);
-  this->endLightsColor = color;
 }
 
 void LEDController::pressKey(uint8_t keyIndex)

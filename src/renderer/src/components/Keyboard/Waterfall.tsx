@@ -94,7 +94,7 @@ const Waterfall = React.forwardRef(
         if (padel.type === 'down') {
           // 踩下踏板符号，先绘制符号，再绘制踏板分割线
           img.src = paddelDown
-          ctx.drawImage(img, padelPadding, padel.y - 26 - padelPadding, 40, 26)
+          ctx.drawImage(img, padelPadding, padel.y - 13 - padelPadding, 20, 13)
           ctx.moveTo(0, padel.y)
           ctx.lineTo(canvasRef.current!.width, padel.y)
         } else {
@@ -102,7 +102,7 @@ const Waterfall = React.forwardRef(
           img.src = paddelUp
           ctx.moveTo(0, padel.y)
           ctx.lineTo(canvasRef.current!.width, padel.y)
-          ctx.drawImage(img, padelPadding, padel.y + padelPadding, 24, 26)
+          ctx.drawImage(img, padelPadding, padel.y + padelPadding, 12, 13)
         }
         ctx.closePath()
         ctx.stroke()

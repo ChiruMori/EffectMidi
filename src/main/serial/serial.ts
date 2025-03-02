@@ -67,10 +67,10 @@ const connectSerial = async (): Promise<void> => {
             serial = null
             win?.webContents.send('serial-abort')
           })
-          // 新连接，需要等待一定时间，清空板子上发飙的指令
-          setTimeout(resolve, 1000)
         }
       )
+      // 新连接，需要等待一定时间，清空板子上发飙的指令
+      setTimeout(resolve, 1000)
     })
   }
 }
@@ -78,16 +78,17 @@ const connectSerial = async (): Promise<void> => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
   try {
-    if (!serial) {
-      await connectSerial()
-    }
+    if (!serial) await connectSerial()
+
+    // 创建原子化数据包
+    const data = Buffer.from(parser(arg))
 
     let retry = 0
 
     const sendAndWait = async (): Promise<void> => {
       // 发送指令
       await new Promise<void>((resolve, reject) => {
-        serial!.write(Buffer.from(parser(arg)), 'hex', (err) => {
+        serial!.write(data, (err) => {
           if (err) {
             console.error('Error writing to serial port:', err)
             reject(err)
@@ -118,7 +119,10 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
 
       // console.log(`Command sent: ${parser.name}(${arg})`)
       // 等待开发板发送的信号
-      const response = await waitForEndSignal(`${parser.name}(${arg})`)
+      const response = await waitForEndSignal(`${parser.name}(${arg})`).catch((err) => {
+        console.info(err.message)
+        return Promise.resolve(TIMEOUT_RESP_BYTE)
+      })
       if (response === FAIL_RESP_BYTE) {
         console.error('Unexpected response from device, expected 0x00')
         await sendAndWait()
@@ -140,23 +144,28 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
         resolve()
       }
     }
-    sendAndWait()
+    await sendAndWait()
   } catch (error) {
     console.error('Error in sendAndFlush:', error)
-    closeSerial() // 关闭串口
-    await connectSerial() // 尝试重新连接
   }
 }
 
 const waitForEndSignal = async (key: string): Promise<number> => {
-  return new Promise((resolve) => {
-    lastCmd = key
-    // lastResolve = (data: number): void => {
-    //   resolve(data)
-    //   console.log(`Response of ${key}: ${data}`)
-    // }
-    lastResolve = resolve
-  })
+  return Promise.race([
+    new Promise<number>((resolve) => {
+      lastCmd = key
+      // lastResolve = (data: number): void => {
+      //   resolve(data)
+      //   console.log(`Response of ${key}: ${data}`)
+      // }
+      lastResolve = resolve
+    }),
+    new Promise<number>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Timeout waiting for end signal of ${key}`))
+      }, 100)
+    })
+  ])
 }
 
 let lock = false
@@ -183,6 +192,8 @@ const handleCmdQueue = async (): Promise<void> => {
 
     try {
       await connectSerial()
+      // 进行一定时间的延迟，使不同平台的开发板均能正常工作
+      await new Promise((resolve) => setTimeout(resolve, 5))
       await sendAndFlush(parser, arg)
     } catch (error) {
       console.error('Error in handleCmdQueue:', error)

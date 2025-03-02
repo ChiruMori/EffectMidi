@@ -1,6 +1,6 @@
 import { useAppSelector } from '@renderer/common/store'
 import { get } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { langSelector } from '@renderer/config'
 
 export enum Lang {
@@ -32,22 +32,21 @@ const loadLangFile = async (lang: Lang): Promise<void> => {
 export default function useGetText(): (key: string) => string {
   const lang = useAppSelector(langSelector)
   const [text, setText] = useState<LangData>({})
+  // 引用容器，使回调函数中的 text 保持最新
+  const textRef = useRef(text)
 
   useEffect(() => {
     loadLangFile(lang).then(() => {
-      setText(parsedLangMap[lang])
+      const newText = parsedLangMap[lang]
+      setText(newText)
+      textRef.current = newText // 同步到引用
     })
   }, [lang])
 
-  /**
-   * 多语言文本获取
-   *
-   * @param key 文本键，对应yaml文件中的键，多层级用.分隔
-   * @returns 返回对应的文本，如果没有找到则返回key本身
-   */
-  const getText = (key: string): string => {
-    return get(text, key, key) || key
-  }
+  const getText = useCallback((key: string): string => {
+    // 始终读取最新值
+    return get(textRef.current, key, key)
+  }, [])
 
   return getText
 }

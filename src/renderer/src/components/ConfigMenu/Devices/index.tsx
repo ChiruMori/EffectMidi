@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import EmSelect from '@renderer/components/basic/EmSelect'
 import {
@@ -24,14 +24,19 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const nowCom = useAppSelector(comSelector)
   const enableCom = useAppSelector(enableComSelector)
   const { notify } = useNotification()
-  const txt = lang()
   const dispatch = useAppDispatch()
   const selectedDeviceId = useAppSelector(midiSelector)
+  const txt = lang()
+  // 引用容器，使回调函数中的 txt 保持最新
+  const txtRef = useRef(txt)
+  useEffect(() => {
+    txtRef.current = txt
+  }, [txt])
 
   const comAbortedNotify = (): void => {
+    console.log(txt('notify.serial-abort-title'))
     notify({
       type: 'info',
-      // TODO: i18n 无效
       title: txt('notify.serial-abort-title'),
       content: txt('notify.serial-abort-content'),
       key: 'serial-abort'

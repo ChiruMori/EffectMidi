@@ -94,10 +94,6 @@ private:
    */
   CRGB backgroundColor;
   /**
-   * 端点灯的颜色
-   */
-  CRGB endLightsColor;
-  /**
    * 亮度
    */
   int brightness;
