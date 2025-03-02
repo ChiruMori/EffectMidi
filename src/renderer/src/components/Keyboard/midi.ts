@@ -1,3 +1,5 @@
+import 'webmidi'
+
 // web midi api
 let midiAccess: WebMidi.MIDIAccess | null = null
 let midiInput: WebMidi.MIDIInput | null = null

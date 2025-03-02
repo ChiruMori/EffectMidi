@@ -14,7 +14,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
-        '@root': resolve('')
+        '@root': resolve('./')
       }
     },
     plugins: [react(), yaml()]

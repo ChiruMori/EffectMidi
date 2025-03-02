@@ -4,7 +4,8 @@ import SQLite from 'sqlite3'
 import path from 'path'
 
 // DB 文件存储在当前目录下，名为 effect-midi.db
-const db = new SQLite.Database(path.join(app.getAppPath(), 'effect-midi.db'))
+const dbPath = process.env.NODE_ENV === 'development' ? app.getAppPath() : process.cwd()
+const db = new SQLite.Database(path.resolve(dbPath, 'effect-midi.db'))
 
 const getparsedJson = async (key: string): Promise<any> => {
   const raw = await innerGet(getInnerKey(key))

@@ -13,6 +13,8 @@ asarUnpack:
   - resources/**
 win:
   executableName: effect-midi
+  icon: resources/EffectMidi_1024.png
+  
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
