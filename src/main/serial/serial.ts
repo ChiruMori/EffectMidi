@@ -120,7 +120,7 @@ const sendAndFlush = async (parser: CmdParser, arg?: any): Promise<void> => {
       // console.log(`Command sent: ${parser.name}(${arg})`)
       // 等待开发板发送的信号
       const response = await waitForEndSignal(`${parser.name}(${arg})`).catch((err) => {
-        console.info(err.message)
+        console.log(err.message)
         return Promise.resolve(TIMEOUT_RESP_BYTE)
       })
       if (response === FAIL_RESP_BYTE) {
@@ -163,7 +163,7 @@ const waitForEndSignal = async (key: string): Promise<number> => {
     new Promise<number>((_, reject) => {
       setTimeout(() => {
         reject(new Error(`Timeout waiting for end signal of ${key}`))
-      }, 100)
+      }, 500)
     })
   ])
 }
