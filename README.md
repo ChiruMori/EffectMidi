@@ -24,6 +24,8 @@
 
 控制端除底部键盘组件外，其他组件均可折叠（左上角折叠按钮），折叠后可以更好的展示键盘音符瀑布。
 
+[更多功能介绍、项目概览](https://mori.plus/archives/effect-midi-01)
+
 ## 使用方法
 
 ### 硬件清单
@@ -85,13 +87,13 @@
 
 ### Arduino 开发板端
 
-推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)。暂未发现 VSCode 上 Arduino 的合适插件，仍需依赖 Arduino IDE 完成开发（验证、上传、依赖）。
+推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)。暂未发现 VSCode 上 Arduino 的合适插件，仍需依赖 Arduino IDE 完成开发（解决依赖、验证编译、上传）。
 
 依赖下列库：
 
 - [FastLED](https://fastled.io/) - 必须，用于控制灯带
 
-下列依赖库仅用于开发，启用 `#define USE_OLED`、连接 OLED 后可以展示部分调试信息，连接方式：
+开发环境下，可以通过启用 `#define USE_OLED` 激活调试信息展示，也可以从源码里彻底删除有关代码来释放一部分性能，连接方式：
 
 + `SDA` -> `SDA`
 + `SCL` -> `SCL`
@@ -99,6 +101,8 @@
 + `VCC` -> `5V`
 
 > 注意，如果使用的开发板内存较小，OLED 可能不工作。
+
+依赖的库：
 
 - [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library)
 - [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306)
