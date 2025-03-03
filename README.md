@@ -48,10 +48,10 @@
 
 ### 程序烧录
 
-1. 下载本项目的代码
-2. 使用 Arduino IDE 打开 `arduino/EffectMidi/EffectMidi.ino`，注意，项目代码非单文件，如果拷贝到其他目录，需要保持目录结构（`EffectMidi` 目录下文件完整）
-3. 更新驱动：打开设备管理器，找到 `端口（COM 和 LPT）` 下的 `USB-SERIAL CH340`，右键更新驱动，选择手动更新，选择 `arduino/drivers` 目录下的驱动
-4. 选择开发板：`工具` -> `开发板` -> `Arduino Uno`
+1. 下载本项目的代码，[Releases](https://github.com/ChiruMori/EffectMidi/releases) 中提供 Arduino 项目代码，解压后可以使用
+2. 使用 Arduino IDE 打开解压后的 `EffectMidi/EffectMidi.ino`，注意，项目代码非单文件，如果拷贝到其他目录，需要保持目录结构（`EffectMidi` 目录下文件完整）
+3. 更新驱动：打开设备管理器，找到 `端口（COM 和 LPT）` 下的 `USB-SERIAL CH340`，右键更新驱动，选择手动更新，选择 `arduino/drivers` 目录下的驱动（在 Arduino 安装路径下）
+4. 选择开发板：`工具` -> `开发板` -> 搜索选择 `Arduino Uno`
 5. 选择端口：`工具` -> `端口` -> 选择 `COM` 开头的端口
 6. 安装依赖库：`工具` -> `管理库` -> 搜索 `FastLED` -> 安装，如果需要 OLED 显示（需修改代码，仅测试使用，无实际功能），搜索 `Adafruit SSD1306` 和 `Adafruit GFX Library` 进行安装
 7. 编译并上传：点击左上角的 `上传`

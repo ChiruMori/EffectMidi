@@ -1,7 +1,7 @@
 // 点击粒子效果：点击鼠标时，会在点击位置生成自动消失的光斑
 
 import { useEffect, useRef } from 'react'
-import C, { ThemeTypeEnum, getMidColor, hexStringToHue } from '@renderer/common/colors'
+import C, { ThemeTypeEnum } from '@renderer/common/colors'
 import timer from '../timer'
 
 const colorOffset = 50
@@ -24,14 +24,7 @@ const createParticle = (x: number, y: number, colorType: ThemeTypeEnum): Particl
   const radius = Math.random() * radiusBase + 2
   const speedX = (Math.random() - 0.5) * speedBase
   const speedY = (Math.random() - 0.5) * speedBase
-  const nowColor =
-    (hexStringToHue(getMidColor(0.5, C(colorType).main, C(colorType).sub)) +
-      Math.random() * colorOffset) %
-    360
-  const color =
-    colorType !== ThemeTypeEnum.GRAY
-      ? `hsl(${nowColor}, 90%, 50%)`
-      : `hsl(0, 0%, ${nowColor % 100}%)`
+  const color = C(colorType).random(colorOffset)
 
   return { x, y, radius, color, speedX, speedY }
 }

@@ -7,6 +7,7 @@ import ipcClient from '@renderer/common/ipcClient'
 import midi from './midi'
 import Waterfall, { WaterfallRef } from './Waterfall'
 import './index.styl'
+import GlowEffect from '../effects/Glow'
 
 const whiteKeyCnt = 52
 const startScore = 'A1'
@@ -81,7 +82,12 @@ export default function Keyboard(): JSX.Element {
 
   return (
     <>
-      {particle.enableWaterfall && <Waterfall ref={waterfallRef} theme={colorType} />}
+      {particle.enableWaterfall && (
+        <>
+          <Waterfall ref={waterfallRef} theme={colorType} />
+          <GlowEffect theme={colorType} height={30} />
+        </>
+      )}
       <div className="absolute w-full h-1/6 bg-white bottom-0 z-40">
         <div className="flex flex-nowrap size-full kb-container">
           {keyboards.map((scoreTuple, idx) => (

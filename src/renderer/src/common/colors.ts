@@ -39,6 +39,7 @@ export type ColorFuncType = {
   main: string
   sub: string
   ingredient: (deg: number) => string
+  random: (offset: number) => string
 }
 
 export function hexStringToHue(hex: string): number {
@@ -66,6 +67,15 @@ export default function colorOf(type: ThemeTypeEnum): ColorFuncType {
     sub: COLOR_DICT[type].sub,
     ingredient(deg: number): string {
       return `linear-gradient(${deg}deg, ${COLOR_DICT[type].main}, ${COLOR_DICT[type].sub})`
+    },
+    random: (offset: number): string => {
+      const nowColor =
+        (hexStringToHue(getMidColor(0.5, COLOR_DICT[type].main, COLOR_DICT[type].sub)) +
+          Math.random() * offset) %
+        360
+      return type !== ThemeTypeEnum.GRAY
+        ? `hsl(${nowColor}, 80%, 40%)`
+        : `hsl(0, 0%, ${nowColor % 100}%)`
     }
   }
 }

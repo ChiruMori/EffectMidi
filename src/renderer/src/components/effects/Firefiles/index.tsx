@@ -1,6 +1,6 @@
 // 动画：绘制向右上角随机移动的，具有拖尾效果的粒子
 
-import { getMidColor, hexStringToHue, ThemeTypeEnum } from '@renderer/common/colors'
+import { ThemeTypeEnum } from '@renderer/common/colors'
 import { useEffect, useRef } from 'react'
 import C from '@renderer/common/colors'
 import timer from '../timer'
@@ -126,12 +126,7 @@ class Particle {
         MIN_END_POINT_RADIUS_RATE) *
       radiusBase
 
-    const nowColor =
-      (hexStringToHue(getMidColor(0.5, C(theme).main, C(theme).sub)) +
-        Math.random() * COLOR_OFFSET) %
-      360
-    const color =
-      theme !== ThemeTypeEnum.GRAY ? `hsl(${nowColor}, 80%, 40%)` : `hsl(0, 0%, ${nowColor % 100}%)`
+    const color = C(theme).random(COLOR_OFFSET)
     return new Particle(x, y, vx, vy, color, endPointRadius)
   }
 }
