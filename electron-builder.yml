@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: plus.mori.effect-midi
 productName: effect-midi
 directories:
   buildResources: build
@@ -14,7 +14,7 @@ asarUnpack:
 win:
   executableName: effect-midi
   icon: resources/EffectMidi_1024.png
-  
+
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

@@ -29,6 +29,7 @@ const minHeight = 5
 const padelAreaHeight = 20
 const padelPadding = 10
 const globalAlpha = 0.8
+const maxActiveObjects = 30
 
 const Waterfall = React.forwardRef(
   (props: WaterfallProps, ref: React.Ref<WaterfallRef>): JSX.Element => {
@@ -56,6 +57,11 @@ const Waterfall = React.forwardRef(
           rects.current.delete(key)
         }
       }
+      // 限制活动对象数量
+      if (rects.current.size > maxActiveObjects) {
+        const keys = Array.from(rects.current.keys())
+        rects.current.delete(keys[0])
+      }
 
       padels.current.forEach((padel) => {
         // 更新踏板符号位置
@@ -63,6 +69,10 @@ const Waterfall = React.forwardRef(
       })
       // 移除不可见的踏板符号
       padels.current = padels.current.filter((padel) => padel.y > -padelAreaHeight)
+      // 限制活动对象数量
+      if (padels.current.length > maxActiveObjects) {
+        padels.current.shift()
+      }
     }
 
     function draw(ctx: CanvasRenderingContext2D): void {
