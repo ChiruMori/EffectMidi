@@ -18,7 +18,9 @@ void setup()
   cmdHolder.createAllCommands(ledController);
   ledController.setup();
   oled.setup();
-
+  // 为指拨开关，控制是否响应按键指令，低电平时响应
+  // 可在该串口添加指示灯，灯亮时表示以MIDI模式工作，灯灭时表示以串口指令模式工作
+  pinMode(KEY_SWITCH_PIN, INPUT_PULLUP);
   ledController.stepAndShow();
 }
 

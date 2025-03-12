@@ -4,6 +4,7 @@
 #define SUCCESS_RESP_BYTE 0x00
 #define FAIL_RESP_BYTE 0x01
 #define TIMEOUT_RESP_BYTE -1
+#define KEY_SWITCH_PIN 8
 
 // state 大于 0 时表示正在读取参数
 // 等待指令字节

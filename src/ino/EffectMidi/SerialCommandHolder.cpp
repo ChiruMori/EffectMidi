@@ -78,14 +78,16 @@ void SerialCommandHolder::processByte(const int byte, const bool noData, OledCon
       return;
     }
     // 无需参数的指令，直接执行
+    // key 指令执行前，需要检查 switch 状态
+    auto keyEnabled = digitalRead(KEY_SWITCH_PIN) == LOW;
     // key down
     uint8_t *args = nullptr;
-    if (byte >= CMD_OFFSET_KEY_DOWN && byte < CMD_OFFSET_KEY_UP)
+    if (keyEnabled && byte >= CMD_OFFSET_KEY_DOWN && byte < CMD_OFFSET_KEY_UP)
     {
       args = new uint8_t[1];
       args[0] = byte - CMD_OFFSET_KEY_DOWN;
     }
-    else if (byte >= CMD_OFFSET_KEY_UP)
+    else if (keyEnabled && byte >= CMD_OFFSET_KEY_UP)
     {
       args = new uint8_t[1];
       args[0] = byte - CMD_OFFSET_KEY_UP;
