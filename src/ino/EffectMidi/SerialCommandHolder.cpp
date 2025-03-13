@@ -116,7 +116,7 @@ void SerialCommandHolder::processByte(const int byte, const bool noData, OledCon
   if (state == currentCommand->getArgCount())
   {
     currentCommand->execute(argsBuffer);
-    oled.displayData(currentCommand->getNameByte(), argsBuffer, state);
+    // oled.displayData(currentCommand->getNameByte(), argsBuffer, state);
     state = STATE_INIT;
     Serial.write(SUCCESS_RESP_BYTE);
   }

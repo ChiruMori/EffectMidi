@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-// #define USE_OLED
+#define USE_OLED
 
 #ifdef USE_OLED
 
