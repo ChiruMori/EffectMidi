@@ -26,6 +26,8 @@
 
 [更多功能介绍、项目概览](https://mori.plus/archives/effect-midi-01)
 
+[使用本项目制作的视频效果](https://www.bilibili.com/video/BV1D4ZFYqEaF/?share_source=copy_web&vd_source=a5261a3226919a8b0f0b47bb707e4e71)
+
 ## 使用方法
 
 ### 硬件清单
