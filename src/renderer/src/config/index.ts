@@ -93,7 +93,8 @@ export const particleSlice = createSlice({
   initialState: {
     enableFirefiles: true,
     enableClickGranule: true,
-    enableWaterfall: true
+    enableWaterfall: true,
+    waterfallSpeed: 20,
   },
   reducers: {
     setFirefiles: (state, action) => {
@@ -112,6 +113,12 @@ export const particleSlice = createSlice({
       return {
         ...state,
         enableWaterfall: action.payload
+      }
+    },
+    setWaterfallSpeed: (state, action) => {
+      return {
+       ...state,
+        waterfallSpeed: action.payload
       }
     }
   }
@@ -244,12 +251,13 @@ export const themeSelector = (state: RootState): ThemeTypeEnum =>
   state.theme?.theme || ThemeTypeEnum.SKY
 export const particleSelector = (
   state: RootState
-): { enableFirefiles: boolean; enableClickGranule: boolean; enableWaterfall: boolean } => {
+): { enableFirefiles: boolean; enableClickGranule: boolean; enableWaterfall: boolean, waterfallSpeed: number } => {
   return (
     state.particle || {
       enableFirefiles: true,
       enableClickGranule: true,
-      enableWaterfall: true
+      enableWaterfall: true,
+      waterfallSpeed: 20
     }
   )
 }
