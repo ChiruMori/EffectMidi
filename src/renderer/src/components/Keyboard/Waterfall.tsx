@@ -26,7 +26,6 @@ interface Rect {
   grow?: boolean
 }
 
-// TODO: 可配置的速度
 const minHeight = 5
 const padelAreaHeight = 20
 const padelPadding = 10
@@ -123,7 +122,7 @@ const Waterfall = React.forwardRef(
     }
 
     useEffect(() => {
-      const handleVisibilityChange = () => {
+      const handleVisibilityChange = (): void => {
         const visible = document.visibilityState === 'visible'
         setActive(visible)
         if (!visible) {
@@ -132,7 +131,7 @@ const Waterfall = React.forwardRef(
         }
       }
       document.addEventListener('visibilitychange', handleVisibilityChange)
-      return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+      return (): void => document.removeEventListener('visibilitychange', handleVisibilityChange)
     }, [])
 
     useEffect(() => {
@@ -161,7 +160,7 @@ const Waterfall = React.forwardRef(
         window.removeEventListener('resize', handleResize)
         unmounted = true
       }
-    }, [theme])
+    }, [theme, baseSpeed, active])
 
     // 对外暴露的方法
     useImperativeHandle(
@@ -203,7 +202,7 @@ const Waterfall = React.forwardRef(
           }
         }
       }),
-      [rects, padels]
+      [rects, padels, active]
     )
 
     return (
