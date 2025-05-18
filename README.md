@@ -4,6 +4,8 @@
 
 <em><h5 align="center">使用 <a href="https://electron-vite.org/">electron-vite</a> 构建，采用<a href="https://www.typescriptlang.org/">Typescript</a> + <a href="https://react.dev/">React</a> 开发，并依赖<a href="https://www.arduino.cc/">Arduino</a>平台运行</h5></em>
 
+<p align="center"><a href="https://hellogithub.com/repository/3c563d54a4aa4512bb64a1b0b28c362b" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=3c563d54a4aa4512bb64a1b0b28c362b&claim_uid=NyZTYxnBd92biCK" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a></p>
+
 ## 说明
 
 本项目受[Effect_Piano_light_controller](https://github.com/esun-z/Effect_Piano_light_controller)启发，通过桌面端控制 MIDI 键盘的外置灯光效果，通过读取 MIDI 键盘输入，控制灯带的效果。
@@ -25,6 +27,8 @@
 控制端除底部键盘组件外，其他组件均可折叠（左上角折叠按钮），折叠后可以更好的展示键盘音符瀑布。
 
 [更多功能介绍、项目概览](https://mori.plus/archives/effect-midi-01)
+
+[使用本项目制作的视频效果](https://www.bilibili.com/video/BV1D4ZFYqEaF/?share_source=copy_web&vd_source=a5261a3226919a8b0f0b47bb707e4e71)
 
 ## 使用方法
 

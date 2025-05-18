@@ -101,6 +101,18 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
             dispatch(particleSlice.actions.setWaterfall(val))
           }}
         />
+        <EmRangeSlider
+          min={5}
+          max={40}
+          fromColor={C(nowColorType)?.main}
+          toColor={C(nowColorType)?.sub}
+          label={txt('appearance.particle.waterfall-speed-label')}
+          description={txt('appearance.particle.waterfall-speed-desc')}
+          initValue={nowParticle.waterfallSpeed}
+          onChange={(val) => {
+            dispatch(particleSlice.actions.setWaterfallSpeed(val))
+          }}
+        />
       </div>
     </div>
   )

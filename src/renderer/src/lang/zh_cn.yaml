@@ -24,6 +24,8 @@ appearance:
     granule-desc: 是否启用点击粒子动画，关闭后可可节约🔋
     waterfall-label: 按键动画
     waterfall-desc: 是否启用按键瀑布动画（含踏板），关闭后可以关爱电脑
+    waterfall-speed-label: 音符瀑布速度
+    waterfall-speed-desc: 音符瀑布速度的参考值，实际速度还与帧率有关
 devices:
   serial-port-label: 串口
   serial-port-desc: 选择串口
