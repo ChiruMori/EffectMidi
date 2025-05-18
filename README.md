@@ -4,7 +4,15 @@
 
 <em><h5 align="center">使用 <a href="https://electron-vite.org/">electron-vite</a> 构建，采用<a href="https://www.typescriptlang.org/">Typescript</a> + <a href="https://react.dev/">React</a> 开发，并依赖<a href="https://www.arduino.cc/">Arduino</a>平台运行</h5></em>
 
-<p align="center"><a href="https://hellogithub.com/repository/3c563d54a4aa4512bb64a1b0b28c362b" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=3c563d54a4aa4512bb64a1b0b28c362b&claim_uid=NyZTYxnBd92biCK" alt="Featured｜HelloGitHub" style="width: 250px; height: 54px;" width="250" height="54" /></a></p>
+<p align="center"></p>
+
+
+<div align="center">
+  <a href="https://github.com/ChiruMori/EffectMidi/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ChiruMori/EffectMidi?style=flat-square&logo=github" alt="License"></a>
+  <a href="https://github.com/ChiruMori/EffectMidi/tags"><img src="https://img.shields.io/github/downloads/ChiruMori/EffectMidi/total
+"/></a>
+<a href="https://hellogithub.com/repository/3c563d54a4aa4512bb64a1b0b28c362b" target="_blank"><img src="https://abroad.hellogithub.com/v1/widgets/recommend.svg?rid=3c563d54a4aa4512bb64a1b0b28c362b&claim_uid=NyZTYxnBd92biCK&theme=small" alt="Featured｜HelloGitHub"/></a>
+</div>
 
 ## 说明
 
@@ -57,7 +65,7 @@
 3. 更新驱动：打开设备管理器，找到 `端口（COM 和 LPT）` 下的 `USB-SERIAL CH340`，右键更新驱动，选择手动更新，选择 `arduino/drivers` 目录下的驱动（在 Arduino 安装路径下）
 4. 选择开发板：`工具` -> `开发板` -> 搜索选择 `Arduino Uno`
 5. 选择端口：`工具` -> `端口` -> 选择 `COM` 开头的端口
-6. 安装依赖库：`工具` -> `管理库` -> 搜索 `FastLED` -> 安装，如果需要 OLED 显示（需修改代码，仅测试使用，无实际功能），搜索 `Adafruit SSD1306` 和 `Adafruit GFX Library` 进行安装
+6. 安装依赖库：`工具` -> `管理库` -> 搜索 `FastLED` 和 `Adafruit TinyUSB Library` -> 安装，如果需要 OLED 显示（需修改代码，仅测试使用，无实际功能），搜索 `Adafruit SSD1306` 和 `Adafruit GFX Library` 进行安装
 7. 编译并上传：点击左上角的 `上传`
 8. 端点灯缓慢闪烁，表示程序正常运行，等待控制端连接
 
@@ -89,18 +97,26 @@
 - `pnpm build:mac` 打包 macOS 版本
 - `pnpm build:linux` 打包 Linux 版本
 
-### Arduino 开发板端
+### 开发板端
 
-推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)。暂未发现 VSCode 上 Arduino 的合适插件，仍需依赖 Arduino IDE 完成开发（解决依赖、验证编译、上传）。
+开发板：本项目在以下开发板上测试通过：
+- RP2040：推荐使用，全部可用，更稳定的 USB 支持，性价比高，需要从 [arduino-pico](https://arduino-pico.readthedocs.io/en/latest/install.html#installing-via-arduino-boards-manager) 安装支持
+- Arduino Uno R3：基础功能可用（OLED调试不可用）
+- Arduino Mega 2560：开发可用（OLED调试可用）
+
+烧录：推荐使用 [Arduino IDE](https://www.arduino.cc/en/software)，或者您习惯使用的具备开发板烧录功能的 IDE。
 
 依赖下列库：
 
 - [FastLED](https://fastled.io/) - 必须，用于控制灯带
+- [Adafruit_TinyUSB](https://github.com/adafruit/Adafruit_TinyUSB_Arduino) - 必须，用于USB通信，如果不需要此部分功能，可能需要手动删除相关代码，安装后，需要手动在 `Arduino IDE` -> `工具` -> `USB Stack` 中选择 `Adafruit TinyUSB`
+
+- - -
 
 开发环境下，可以通过启用 `#define USE_OLED` 激活调试信息展示，也可以从源码里彻底删除有关代码来释放一部分性能，连接方式：
 
-+ `SDA` -> `SDA`
-+ `SCL` -> `SCL`
++ `SDA` -> `SDA`（GP4）
++ `SCL` -> `SCL`（GP5）
 + `GND` -> `GND`
 + `VCC` -> `5V`
 
@@ -111,3 +127,15 @@
 - [Adafruit_GFX](https://github.com/adafruit/Adafruit-GFX-Library)
 - [Adafruit_SSD1306](https://github.com/adafruit/Adafruit_SSD1306)
 
+## 开源声明
+
+本项目采用 **[GNU GPL v3](LICENSE) 协议**，沿用原项目的开源协议，保留更换权利
+
+本项目继承自 [Effect_Piano_light_controller](https://github.com/esun-z/Effect_Piano_light_controller) 的代码仅存在于 `effect_piano_refactor` 分支，主分支代码为全新实现。
+
+- - -
+
+本项目使用以下 USB 标识符：
+
+- **VID**: `0x1209` ([PID.org](https://pid.codes/1209/)分配的开源标识)
+- **PID**: `0x0666` (项目自定义标识)

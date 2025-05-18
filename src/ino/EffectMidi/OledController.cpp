@@ -42,10 +42,11 @@ void OledController::log(String message)
 void OledController::setup()
 {
 #ifdef USE_OLED
-  // I2C引脚配置（按需使用）
-  TwoWire i2c = TwoWire(4, 5);
-  i2c.begin();
-  oled = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &i2c, OLED_RESET);
+  // I2C引脚配置（按需使用），以下为 RP2040 专用I2C初始化方式
+  Wire.setSDA(OLED_SDA_PIN);
+  Wire.setSCL(OLED_SCL_PIN);
+  Wire.begin();
+  oled = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
   if (!oled)
   {
     Serial.println("Failed to allocate memory for OLED.");

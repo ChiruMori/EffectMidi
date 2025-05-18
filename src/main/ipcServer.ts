@@ -43,6 +43,7 @@ export default function ipc(mainWindow: BrowserWindow): void {
       const diffusionWidth = await storage.main.getLedConfig('diffusion')
       bytes.push(...cmds.setDiffusionWidth(diffusionWidth))
       // 发送指令
+      // TODO: 这里需要根据设备类型选用发送的协议
       sendCmd(cmds.combined, bytes)
     } catch (err) {
       mainWindow.webContents.send('serial-abort')

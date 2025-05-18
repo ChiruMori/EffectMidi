@@ -2,12 +2,12 @@
 #define OLED_CONTROLLER_H
 
 #include <Arduino.h>
+#include "PinDefine.hpp"
 
 #define USE_OLED
 
 #ifdef USE_OLED
 
-#include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
