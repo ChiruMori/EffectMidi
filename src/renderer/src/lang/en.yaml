@@ -28,9 +28,10 @@ appearance:
     waterfall-speed-desc: The reference value for the waterfall speed of the notes, the actual speed is also affected by the frame rate
 devices:
   serial-port-label: Serial Port
-  serial-port-desc: Select the serial port
+  serial-port-desc: Select the serial port, if your device supports, it is recommended to use USB HID
   serial-enable-label: Enable Serial Port
   serial-enable-desc: Must be activated after selecting the serial port, otherwise the light effect settings cannot be used
+  serial-usb-hid: USB HID Device
   midi-device-label: MIDI Device
   midi-device-desc: Select the MIDI input device
   unknown-midi-device: Unknown MIDI Device
@@ -63,3 +64,7 @@ notify:
   midi-connect-error-content: MIDI device connection error, please check the device and restart the application
   midi-disconnect-title: MIDI Disconnected
   midi-disconnect-content: The MIDI device connection has been disconnected, please reselect the MIDI input device
+  multiple-usb-title: Multiple USB Devices
+  multiple-usb-content: Multiple USB devices detected. The first device will be used by default. If it's not your device, please disconnect other devices and try again.
+  no-usb-title: No USB Device
+  no-usb-content: No USB device detected. Please connect your device and try again.

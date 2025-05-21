@@ -2,9 +2,20 @@ import { BrowserWindow, ipcMain } from 'electron'
 import { SerialPort } from 'serialport'
 import { closeSerial, sendCmd } from './serial/serial'
 import storage from './storage'
-// import midi from './midi'
-import cmds from './serial/cmds'
+import cmds, { CmdParser } from './serial/cmds'
 import { shell } from 'electron'
+import { sendUsbHidCmd, isChooseUsb, closeUsb } from './serial/usb'
+
+// 尝试 USB 连接时，需要调用 usb 的方法进行同步发送
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const handleCmd = async (parser: CmdParser, arg?: any): Promise<void> => {
+  // USB 连接时，调用 USB 的方法进行同步发送
+  if (await isChooseUsb()) {
+    await sendUsbHidCmd(parser, arg)
+    return
+  }
+  sendCmd(parser, arg)
+}
 
 // IPC 通信，渲染进程通知主进程执行操作
 export default function ipc(mainWindow: BrowserWindow): void {
@@ -37,48 +48,53 @@ export default function ipc(mainWindow: BrowserWindow): void {
         ...cmds.setEndLightsColor(endColor.length === 9 ? endColor.substring(1, 8) : endColor)
       )
       // 延迟时间设置
-      const residualTime = await storage.main.getLedConfig('residue')
+      const residualTime = Number(await storage.main.getLedConfig('residue'))
       bytes.push(...cmds.setResidualTime(residualTime))
       // 扩散宽度设置
-      const diffusionWidth = await storage.main.getLedConfig('diffusion')
+      const diffusionWidth = Number(await storage.main.getLedConfig('diffusion'))
       bytes.push(...cmds.setDiffusionWidth(diffusionWidth))
       // 发送指令
-      // TODO: 这里需要根据设备类型选用发送的协议
-      sendCmd(cmds.combined, bytes)
+      await handleCmd(cmds.combined, bytes)
     } catch (err) {
       mainWindow.webContents.send('serial-abort')
       console.error('Init LED failed:', err)
     }
   })
   // 关闭 LED
-  ipcMain.on('closeLed', closeSerial)
+  ipcMain.on('closeLed', async (): Promise<void> => {
+    if (await isChooseUsb()) {
+      closeUsb()
+      return
+    }
+    closeSerial()
+  })
   // 按键按下
   ipcMain.on('midi-keydown', (_, key) => {
-    sendCmd(cmds.keyDown, key)
+    handleCmd(cmds.keyDown, key)
   })
   // 按键松开
   ipcMain.on('midi-keyup', (_, key) => {
-    sendCmd(cmds.keyUp, key)
+    handleCmd(cmds.keyUp, key)
   })
   // 背景色设置
   ipcMain.on('setBgColor', (_, color) => {
-    sendCmd(cmds.setBackgroundColor, color)
+    handleCmd(cmds.setBackgroundColor, color)
   })
   // 前景色设置
   ipcMain.on('setFgColor', (_, color) => {
-    sendCmd(cmds.setForegroundColor, color)
+    handleCmd(cmds.setForegroundColor, color)
   })
   // 端点灯颜色设置
   ipcMain.on('setEndColor', (_, color) => {
-    sendCmd(cmds.setEndLightsColor, color)
+    handleCmd(cmds.setEndLightsColor, color)
   })
   // 延迟时间设置
   ipcMain.on('setResidualTime', (_, time) => {
-    sendCmd(cmds.setResidualTime, time)
+    handleCmd(cmds.setResidualTime, time)
   })
   // 扩散宽度设置
   ipcMain.on('setDiffusionWidth', (_, width) => {
-    sendCmd(cmds.setDiffusionWidth, width)
+    handleCmd(cmds.setDiffusionWidth, width)
   })
   // SQLite
   ipcMain.handle('storage.get', async (_, key) => {

@@ -28,9 +28,10 @@ appearance:
     waterfall-speed-desc: 音符瀑布速度的参考值，实际速度还与帧率有关
 devices:
   serial-port-label: 串口
-  serial-port-desc: 选择串口
+  serial-port-desc: 选择串口，如果您的设备支持，推荐使用USB直连
   serial-enable-label: 激活串口
   serial-enable-desc: 选择串口后必须激活才能使用，否则无法进行灯光效果设置
+  serial-usb-hid: USB直连
   midi-device-label: MIDI设备
   midi-device-desc: 选择MIDI输入设备
   unknown-midi-device: 未知MIDI设备
@@ -63,3 +64,7 @@ notify:
   midi-connect-error-content: MIDI设备连接错误，请检查设备后重启应用
   midi-disconnect-title: MIDI断开
   midi-disconnect-content: MIDI设备连接已断开，请重新选择MIDI输入设备
+  multiple-usb-title: 多个设备
+  multiple-usb-content: 检测到多个USB设备，默认使用第一个设备，如果不是您的设备，请断开其他设备后重试
+  no-usb-title: 无设备
+  no-usb-content: 未检测到匹配的USB设备，请检查设备后重试

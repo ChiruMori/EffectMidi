@@ -19,6 +19,8 @@ import { useNotification } from '@renderer/components/basic/EmNotifacation'
 import midi from '@renderer/components/Keyboard/midi'
 import './index.styl'
 
+const usbHidId = 'usb-hid'
+
 export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const [ports, setPorts] = useState<PortInfo[]>([])
   const nowCom = useAppSelector(comSelector)
@@ -107,10 +109,17 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
       <EmSelect
         label={txt('devices.serial-port-label')}
         description={txt('devices.serial-port-desc')}
-        options={ports.map((port) => ({
-          val: port.path,
-          label: port.friendlyName || port.path
-        }))}
+        options={ports
+          .map((port) => ({
+            val: port.path,
+            label: port.friendlyName || port.path
+          }))
+          .concat([
+            {
+              val: usbHidId,
+              label: txt('devices.serial-usb-hid')
+            }
+          ])}
         onChange={(value) => {
           dispatch(comSlice.actions.setCom(value))
         }}
@@ -133,23 +142,26 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
         description={txt('devices.serial-enable-desc')}
         initValue={enableCom}
         onChange={async (value) => {
-          // 强制获取最新端口列表
-          const latestPorts = await ipc.listSerialPorts()
-          setPorts(latestPorts)
+          // 非 USB HID 设备，则尝试串口连接，前置校验
+          if (usbHidId !== nowCom) {
+            // 强制获取最新端口列表
+            const latestPorts = await ipc.listSerialPorts()
+            setPorts(latestPorts)
 
-          // 检查串口是否有效
-          const isValidPort = latestPorts.some((p) => p.path === nowCom)
+            // 检查串口是否有效
+            const isValidPort = latestPorts.some((p) => p.path === nowCom)
 
-          if (!isValidPort) {
-            notify({
-              type: 'error',
-              title: txt('notify.serial-unselected-title'),
-              content: txt('notify.serial-unselected-content'),
-              key: 'serial-unselected'
-            })
-            // 尝试启用的串口无效，阻止状态变化
-            dispatch(comSlice.actions.setCom(''))
-            return true
+            if (!isValidPort) {
+              notify({
+                type: 'error',
+                title: txt('notify.serial-unselected-title'),
+                content: txt('notify.serial-unselected-content'),
+                key: 'serial-unselected'
+              })
+              // 尝试启用的串口无效，阻止状态变化
+              dispatch(comSlice.actions.setCom(''))
+              return true
+            }
           }
           console.log('enableCom', value, nowCom)
           // 通知主进程操作串口

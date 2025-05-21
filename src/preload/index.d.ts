@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ElectronAPI } from '@electron-toolkit/preload'
 
-export type RegisteredEvent = 'ping' | 'midi-keydown' | 'midi-keyup' | 'serial-abort'
+export type RegisteredEvent =
+  | 'ping'
+  | 'midi-keydown'
+  | 'midi-keyup'
+  | 'serial-abort'
+  | 'server-notify'
+export type ServerNotifyType = 'no-usb' | 'multiple-usb'
 
 export interface EffectMidiAPI {
   // IPC Test
@@ -14,6 +20,8 @@ export interface EffectMidiAPI {
   offEvent: (eventName: RegisteredEvent) => void
   // 监听串口异常中断
   onSerialAbort: (callback: () => void) => void
+  // 监听服务器通知
+  onServerNotify: (callback: (type: ServerNotifyType) => void) => void
 }
 
 declare global {

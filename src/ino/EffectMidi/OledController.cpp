@@ -32,9 +32,20 @@ void OledController::displayData(uint8_t leadByte, uint8_t *data, int length)
 void OledController::log(String message)
 {
 #ifdef USE_OLED
+  static const int MAX_LINES = 4;
+  static String logLines[MAX_LINES];
+  static int lineIndex = 0;
+  logLines[lineIndex] = message;
+  lineIndex = (lineIndex + 1) % MAX_LINES;
   oled->clearDisplay();
   oled->setCursor(0, 0);
-  oled->print(message);
+  for(int i = 0; i < MAX_LINES; i++) {
+    int currentLine = (lineIndex + i) % MAX_LINES;
+    if(!logLines[currentLine].isEmpty()) {
+      oled->setCursor(0, i * 9);
+      oled->println(logLines[currentLine]);
+    }
+  }
   oled->display();
 #endif
 }
