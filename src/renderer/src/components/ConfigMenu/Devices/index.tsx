@@ -28,6 +28,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
   const { notify } = useNotification()
   const dispatch = useAppDispatch()
   const selectedDeviceId = useAppSelector(midiSelector)
+  const [usbAvaliable, setUsbAvaliable] = useState(false)
   const txt = lang()
   // 引用容器，使回调函数中的 txt 保持最新
   const txtRef = useRef(txt)
@@ -72,8 +73,9 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
       // 跳转到当前页面
       dispatch(menuSlice.actions.setMenu('devices'))
     })
-    ipc.listSerialPorts().then((ports) => {
-      setPorts(ports)
+    ipc.listSerialPorts().then((avaliableDevices) => {
+      setPorts(avaliableDevices.serial)
+      setUsbAvaliable(avaliableDevices.usb)
     })
     // 连接 MIDI 设备
     connectDeviceById(selectedDeviceId)
@@ -109,27 +111,32 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
       <EmSelect
         label={txt('devices.serial-port-label')}
         description={txt('devices.serial-port-desc')}
-        options={ports
-          .map((port) => ({
-            val: port.path,
-            label: port.friendlyName || port.path
-          }))
-          .concat([
-            {
-              val: usbHidId,
-              label: txt('devices.serial-usb-hid')
-            }
-          ])}
+        options={
+          // USB 可用时，添加 USB HID 选项，并将其放在列表顶部
+          (usbAvaliable ? [{ val: usbHidId, label: txt('devices.serial-usb-hid') }] : []).concat(
+            // 补充可用的串口选项
+            ports.map((port) => ({
+              val: port.path,
+              label: port.friendlyName || port.path
+            }))
+          )
+        }
         onChange={(value) => {
-          dispatch(comSlice.actions.setCom(value))
+          // 切换设备，需要关闭当前设备
+          if (value !== nowCom) {
+            ipc.closeLed()
+            dispatch(enableComSlice.actions.setEnableCom(false))
+            dispatch(comSlice.actions.setCom(value))
+          }
         }}
         initValue={nowCom}
         suffixBtn={
           <button
             className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-9 ref-btn"
             onClick={() => {
-              ipc.listSerialPorts().then((ports) => {
-                setPorts(ports)
+              ipc.listSerialPorts().then((avaliableDevices) => {
+                setPorts(avaliableDevices.serial)
+                setUsbAvaliable(avaliableDevices.usb)
               })
             }}
           >
@@ -145,7 +152,7 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
           // 非 USB HID 设备，则尝试串口连接，前置校验
           if (usbHidId !== nowCom) {
             // 强制获取最新端口列表
-            const latestPorts = await ipc.listSerialPorts()
+            const latestPorts = (await ipc.listSerialPorts()).serial
             setPorts(latestPorts)
 
             // 检查串口是否有效

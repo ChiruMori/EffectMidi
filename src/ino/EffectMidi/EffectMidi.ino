@@ -22,12 +22,20 @@ uint8_t const descHidReport[] = {
     0x06, 0x00, 0xFF, // Usage Page (Vendor Defined 0xFF00)
     0x09, 0x01,       // Usage (0x01)
     0xA1, 0x01,       // Collection (Application)
+    // 控制指令，最多 16 字节一起发送
+    0x85, 0x01,       //   Report ID (1)
     0x15, 0x00,       //   Logical Minimum (0)
     0x26, 0xFF, 0x00, //   Logical Maximum (255)
     0x75, 0x08,       //   Report Size (8 bits)
-    0x95, 0x11,       //   Report Count (17 bytes)
+    0x95, 0x16,       //   Report Count (16 bytes)
     0x09, 0x00,       //   Usage (Undefined)
-    0x81, 0x02,       //   Input (Data,Var,Abs)
+    0x91, 0x02,       //   Output (Data,Var,Abs)
+    // 键盘指令，每个指令都是 1 字节
+    0x85, 0x02,       //   Report ID (2)
+    0x15, 0x00,       //   Logical Minimum (0)
+    0x26, 0xFF, 0x00, //   Logical Maximum (255)
+    0x75, 0x08,       //   Report Size (8 bits)
+    0x95, 0x01,       //   Report Count (1 byte)
     0x09, 0x00,       //   Usage (Undefined)
     0x91, 0x02,       //   Output (Data,Var,Abs)
     0xC0              // End Collection
@@ -48,32 +56,6 @@ void reportReceivedCallback(uint8_t instance, hid_report_type_t report_type, uin
   }
   return;
 }
-
-// TODO: 如果不向上位机推送数据，删除此代码
-// uint16_t reportPusheCallback(uint8_t report_id, hid_report_type_t report_type, uint8_t *buffer, uint16_t reqlen)
-// {
-//   // 直接丢弃推送的 HID 报告数据
-//   oled.log("RPC" + String(reqlen));
-//   return reqlen;
-// }
-//
-// void usbHidKeepAlive()
-// {
-//   if (usbHid.ready())
-//   {
-//     // 保持连接心跳
-//     static uint32_t lastHeartbeat = 0;
-//     if (millis() - lastHeartbeat > 1000)
-//     {
-
-//       if (usbHid.sendReport(0, nullptr, 0) <= 0)
-//       {
-//         oled.log("HID FEEDBACK FAILED");
-//       }
-//       lastHeartbeat = millis();
-//     }
-//   }
-// }
 
 void setup()
 {
@@ -133,6 +115,11 @@ void loop()
     {
       int currentByte = Serial.read();
       oled.log("DISCARD: " + String(currentByte));
+    }
+    // 等待初始化时，启用端点灯呼吸效果
+    if (ledController.isWaiting())
+    {
+      WaitingCmd::getInstance(ledController).execute(nullptr);
     }
   }
   else

@@ -15,17 +15,12 @@ OledController::~OledController()
 void OledController::displayData(uint8_t leadByte, uint8_t *data, int length)
 {
 #ifdef USE_OLED
-  oled->clearDisplay();
-  oled->setCursor(0, 0);
-  oled->print("Received: ");
-  oled->print(leadByte);
-  oled->print(": ");
+  auto strToLog = String("D.") + String(leadByte) + ":";
   for (int i = 0; i < length; ++i)
   {
-    oled->print(data[i]);
-    oled->print(" ");
+    strToLog += String(data[i], HEX) + " ";
   }
-  oled->display();
+  this->log(strToLog);
 #endif
 }
 
@@ -36,16 +31,16 @@ void OledController::log(String message)
   static String logLines[MAX_LINES];
   static int lineIndex = 0;
   logLines[lineIndex] = message;
-  lineIndex = (lineIndex + 1) % MAX_LINES;
   oled->clearDisplay();
   oled->setCursor(0, 0);
   for(int i = 0; i < MAX_LINES; i++) {
     int currentLine = (lineIndex + i) % MAX_LINES;
     if(!logLines[currentLine].isEmpty()) {
-      oled->setCursor(0, i * 9);
+      oled->setCursor(0, i * 8);
       oled->println(logLines[currentLine]);
     }
   }
+  lineIndex = (lineIndex + 1) % MAX_LINES;
   oled->display();
 #endif
 }

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "PinDefine.hpp"
 
-#define USE_OLED
+// #define USE_OLED
 
 #ifdef USE_OLED
 

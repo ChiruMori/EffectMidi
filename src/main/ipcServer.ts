@@ -4,7 +4,7 @@ import { closeSerial, sendCmd } from './serial/serial'
 import storage from './storage'
 import cmds, { CmdParser } from './serial/cmds'
 import { shell } from 'electron'
-import { sendUsbHidCmd, isChooseUsb, closeUsb } from './serial/usb'
+import { sendUsbHidCmd, isChooseUsb, closeUsb, hasUsb } from './serial/usb'
 
 // 尝试 USB 连接时，需要调用 usb 的方法进行同步发送
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +26,22 @@ export default function ipc(mainWindow: BrowserWindow): void {
     mainWindow.webContents.send('ping')
   })
   // 列出全部串口
-  ipcMain.handle('listSerialPorts', SerialPort.list)
+  ipcMain.handle('listSerialPorts', async () => {
+    const ports = (await SerialPort.list()).map((port) => {
+      return {
+        path: port.path,
+        manufacturer: port.manufacturer,
+        serialNumber: port.serialNumber,
+        pnpId: port.pnpId,
+        vendorId: port.vendorId,
+        productId: port.productId,
+        locationId: port.locationId,
+        // @ts-ignore - friendlyName 属性存在，且展示端有兼容处理
+        friendlyName: port.friendlyName
+      }
+    })
+    return { serial: ports, usb: hasUsb() }
+  })
   // 初始化 LED
   ipcMain.on('initLed', async (): Promise<void> => {
     // 通过发送一系列指令完成配置的初始化
