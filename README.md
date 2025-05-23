@@ -1,5 +1,12 @@
 # EffectMidi
 
+```diff
+- 本分支已弃用，仅归档以保留 Serial 通信的实现，以及对 Arduino Uno 系列开发板的兼容
+- 注意，后续更新已弃用 Serial 通信并不再提供对 Uno 的兼容
+```
+<p align="center"></p>
+<p align="center"></p>
+
 <p align="center"><img src="./resources/EffectMidi_1024.png" width="150px"/></p
 
 <em><h5 align="center">使用 <a href="https://electron-vite.org/">electron-vite</a> 构建，采用<a href="https://www.typescriptlang.org/">Typescript</a> + <a href="https://react.dev/">React</a> 开发，并依赖<a href="https://www.arduino.cc/">Arduino</a>平台运行</h5></em>
