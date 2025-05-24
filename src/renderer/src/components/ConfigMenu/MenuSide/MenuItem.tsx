@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
-import { enableComSelector, menuSelector, menuSlice, themeSelector } from '@renderer/config'
+import { enableEmbeddedSelector, menuSelector, menuSlice, themeSelector } from '@renderer/config'
 import { useNotification } from '@renderer/components/basic/EmNotifacation'
 import { useState } from 'react'
 import C from '@renderer/common/colors'
@@ -20,7 +20,7 @@ export default function MenuItem({
   const dispatch = useAppDispatch()
   const isActive = activeMenu === menuKey
   const colorType = useAppSelector(themeSelector)
-  const enableCom = useAppSelector(enableComSelector)
+  const enableCom = useAppSelector(enableEmbeddedSelector)
   const { notify } = useNotification()
   const txt = lang()
 
@@ -44,8 +44,8 @@ export default function MenuItem({
           setTimeout(() => setAnimating(false), 1000)
           // 提示
           notify({
-            title: txt('notify.serial-disable-title'),
-            content: txt('notify.serial-disable-content'),
+            title: txt('notify.embedded-disable-title'),
+            content: txt('notify.embedded-disable-content'),
             key: 'led-tip',
             type: 'error'
           })

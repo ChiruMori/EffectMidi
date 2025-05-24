@@ -61,14 +61,6 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   useEffect(() => {
     window.api.onServerNotify((type: ServerNotifyType) => {
       switch (type) {
-        case 'multiple-usb':
-          notify({
-            type: 'warning',
-            title: txt('notify.multiple-usb-title'),
-            content: txt('notify.multiple-usb-content'),
-            key: 'multiple-usb'
-          })
-          break
         case 'no-usb':
           notify({
             type: 'error',

@@ -43,31 +43,31 @@ export const bgImgSlice = createSlice({
   }
 })
 
-export const comSlice = createSlice({
-  name: 'com',
+export const embeddedSlice = createSlice({
+  name: 'embedded',
   initialState: {
-    com: ''
+    embedded: ''
   },
   reducers: {
-    setCom: (state, action) => {
+    setEmbedded: (state, action) => {
       return {
         ...state,
-        com: action.payload
+        embedded: action.payload
       }
     }
   }
 })
 
-export const enableComSlice = createSlice({
-  name: 'enableCom',
+export const enableEmbeddedSlice = createSlice({
+  name: 'enableEmbedded',
   initialState: {
-    enableCom: false
+    enableEmbedded: false
   },
   reducers: {
-    setEnableCom: (state, action) => {
+    setEnableEmbedded: (state, action) => {
       return {
         ...state,
-        enableCom: action.payload
+        enableEmbedded: action.payload
       }
     }
   }
@@ -245,8 +245,9 @@ export const bgImgSelector = (
     }
   )
 }
-export const comSelector = (state: RootState): string => state.com?.com || ''
-export const enableComSelector = (state: RootState): boolean => state.enableCom?.enableCom || false
+export const embeddedSelector = (state: RootState): string => state.embedded?.embedded || ''
+export const enableEmbeddedSelector = (state: RootState): boolean =>
+  state.enableEmbedded?.enableEmbedded || false
 export const themeSelector = (state: RootState): ThemeTypeEnum =>
   state.theme?.theme || ThemeTypeEnum.SKY
 export const particleSelector = (

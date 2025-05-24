@@ -69,11 +69,11 @@ export const store = configureStore({
     // 主背景图设置
     bg: persistReducer(storePersistConfigOf('bg'), configManger.bgImgSlice.reducer),
     // 启用的串口
-    com: persistReducer(storePersistConfigOf('com'), configManger.comSlice.reducer),
+    embedded: persistReducer(storePersistConfigOf('embedded'), configManger.embeddedSlice.reducer),
     // 是否已激活串口设备（该配置不能持久化存储，每次启动程序都默认设置为否）
-    enableCom: persistReducer(
-      storeSessionConfigOf('enableCom'),
-      configManger.enableComSlice.reducer
+    enableEmbedded: persistReducer(
+      storeSessionConfigOf('enableEmbedded'),
+      configManger.enableEmbeddedSlice.reducer
     ),
     // 主题颜色
     theme: persistReducer(storePersistConfigOf('theme'), configManger.themeSlice.reducer),

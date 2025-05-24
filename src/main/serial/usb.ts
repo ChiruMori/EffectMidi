@@ -4,102 +4,19 @@ import storage from '../storage'
 
 const VENDOR_ID = 0x1209
 const PRODUCT_ID = 0x0666
-const USB_HID_KEYWORD = 'usb-hid'
 
 const REPORT_ID = 0x01
 const KEY_REPORT_ID = 0x02
 // 控制指令的发送缓冲区大小
-const BUFFER_SIZE = 16
+const BUFFER_SIZE = 4
 const KEY_BUFFER_SIZE = 1
-// 控制指令延迟时间（键盘指令是实时的）
-const FLUSH_TIMEOUT = 100
-const MAX_RETRY = 3
-let sendQueue: number[] = []
-let flushTimer: NodeJS.Timeout | null = null
-let isSending = false
 let pollingTimer: NodeJS.Timeout | null = null
-
-// 异步发送锁控制
-const sendLock = {
-  acquire: async (): Promise<void> => {
-    while (isSending) {
-      await new Promise((resolve) => setTimeout(resolve, 1))
-    }
-    isSending = true
-  },
-  release: (): void => {
-    isSending = false
-  }
-}
 
 // 释放设备标记、定时器，通知用户设备断了
 const releaseAndNotify = (): void => {
   if (device) {
-    device.close()
-    device = null
+    closeUsb()
     win?.webContents.send('serial-abort')
-    if (pollingTimer) {
-      clearInterval(pollingTimer)
-      pollingTimer = null
-    }
-  }
-}
-
-async function flushBuffer(): Promise<void> {
-  await sendLock.acquire()
-
-  if (sendQueue.length === 0) return
-  const buffer = Buffer.alloc(BUFFER_SIZE, 0x00)
-  try {
-    // 创建符合HID规范的字节数据包
-    buffer[0] = REPORT_ID
-    // 填充数据
-    for (let i = 0; i < BUFFER_SIZE; i++) {
-      buffer[i + 1] = sendQueue[i] || 0
-    }
-
-    // 发送数据
-    if (device) {
-      await device.write(buffer)
-      // console.log('Sent buffer:', buffer.toString('hex'))
-    }
-
-    // 清空已发送数据
-    sendQueue = []
-
-    // 重置定时器
-    if (flushTimer) clearTimeout(flushTimer)
-    flushTimer = null
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    // 设备连接中断，没必要重试，直接返回
-    if (error.message && error.message.includes('closed')) {
-      console.log('Device closed, Ignore data:', buffer.toString('hex'))
-      releaseAndNotify()
-      return
-    }
-    console.error('Error flushing buffer:', error)
-    // 尝试重发，重试多次仍失败则断开设备并通知用户
-    let retryCount = MAX_RETRY
-    while (retryCount-- > 0) {
-      try {
-        if (device) {
-          await device.write(buffer)
-          console.log('Resent buffer:', buffer.toString('hex'))
-          break
-        }
-      } catch (retryError) {
-        const retryTime = MAX_RETRY - retryCount
-        console.error(`Retry ${retryTime} failed:`, retryError)
-        // 延迟重试
-        await new Promise((resolve) => setTimeout(resolve, FLUSH_TIMEOUT * retryTime))
-      }
-    }
-    if (device) {
-      releaseAndNotify()
-    }
-  } finally {
-    sendLock.release()
   }
 }
 
@@ -116,11 +33,12 @@ const connectUsb = async (): Promise<void> => {
     win?.webContents.send('no-usb')
     return
   }
-  if (devices.length > 1) {
-    win?.webContents.send('multiple-usb')
+  const usingPath = await storage.main.getEmbedded()
+  if (!usingPath || devices.findIndex((d) => d.path === usingPath) < 0) {
+    win?.webContents.send('no-usb')
+    return
   }
-
-  device = await hid.HIDAsync.open(devices[0].path!).catch(() => {
+  device = await hid.HIDAsync.open(usingPath).catch(() => {
     console.log('HID device closed')
     win?.webContents.send('serial-abort')
     return null
@@ -160,7 +78,7 @@ export const sendUsbHidCmd = async (parser: CmdParser, arg?: any): Promise<void>
     return
   }
   if (keyboardCmd) {
-    // 键盘指令直接发送
+    // 键盘指令
     const payload = parser(arg)
     // 每个按键指令数据包2字节
     const buffer = Buffer.alloc(KEY_BUFFER_SIZE + 1, 0x00)
@@ -170,25 +88,28 @@ export const sendUsbHidCmd = async (parser: CmdParser, arg?: any): Promise<void>
     // console.log(parser.name, arg || '')
     return
   }
+  // 其他控制指令
   const payload = parser(arg)
-  // 缓冲区满，同步推送
-  if (sendQueue.length + payload.length > BUFFER_SIZE) {
-    await flushBuffer()
-  } else if (!flushTimer) {
-    flushTimer = setTimeout(() => flushBuffer(), FLUSH_TIMEOUT)
+  const buffer = Buffer.alloc(BUFFER_SIZE + 1, 0x00)
+  buffer[0] = REPORT_ID
+  for (let i = 0; i < payload.length; i++) {
+    buffer[i + 1] = payload[i]
   }
-  sendQueue.push(...payload)
+  await device.write(buffer)
+  // console.log(parser.name, arg || '')
 }
 
 export const closeUsb = (): void => {
   if (device) {
     device.close()
+    device = null
+    if (pollingTimer) {
+      clearInterval(pollingTimer)
+      pollingTimer = null
+    }
+  } else {
+    console.log('Device not connected')
   }
-}
-
-export const isChooseUsb = async (): Promise<boolean> => {
-  const chooseDevice = await storage.main.getCom()
-  return chooseDevice.includes(USB_HID_KEYWORD)
 }
 
 export const initUsb = (mainWindow: Electron.BrowserWindow): void => {
@@ -198,4 +119,8 @@ export const initUsb = (mainWindow: Electron.BrowserWindow): void => {
 export const hasUsb = (): boolean => {
   const devices = hid.devices(VENDOR_ID, PRODUCT_ID)
   return devices.length > 0
+}
+
+export const listUsb = (): hid.Device[] => {
+  return hid.devices(VENDOR_ID, PRODUCT_ID)
 }
