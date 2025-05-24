@@ -2,16 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import EmSelect from '@renderer/components/basic/EmSelect'
 import {
-  comSelector,
-  comSlice,
-  enableComSelector,
-  enableComSlice,
+  embeddedSelector,
+  embeddedSlice,
+  enableEmbeddedSelector,
+  enableEmbeddedSlice,
   menuSlice,
   midiSelector,
   midiSlice
 } from '@renderer/config'
 import { useAppDispatch, useAppSelector } from '@renderer/common/store'
-import { PortInfo } from '@renderer/common/common'
 import ipc from '@renderer/common/ipcClient'
 import lang from '@renderer/lang'
 import EmSwitch from '@renderer/components/basic/EmSwitch'
@@ -19,10 +18,19 @@ import { useNotification } from '@renderer/components/basic/EmNotifacation'
 import midi from '@renderer/components/Keyboard/midi'
 import './index.styl'
 
+const simpleHash = (str: string, len: number): string => {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i)
+    hash |= 0
+  }
+  return Math.abs(hash).toString(16).slice(0, len)
+}
+
 export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
-  const [ports, setPorts] = useState<PortInfo[]>([])
-  const nowCom = useAppSelector(comSelector)
-  const enableCom = useAppSelector(enableComSelector)
+  const [embeddeds, setEmbeddeds] = useState<string[]>([])
+  const nowEmbedded = useAppSelector(embeddedSelector)
+  const enableEmbedded = useAppSelector(enableEmbeddedSelector)
   const { notify } = useNotification()
   const dispatch = useAppDispatch()
   const selectedDeviceId = useAppSelector(midiSelector)
@@ -33,13 +41,13 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
     txtRef.current = txt
   }, [txt])
 
-  const comAbortedNotify = (): void => {
-    console.log(txt('notify.serial-abort-title'))
+  const embeddedAbortedNotify = (): void => {
+    console.log(txt('notify.embedded-abort-title'))
     notify({
       type: 'info',
-      title: txt('notify.serial-abort-title'),
-      content: txt('notify.serial-abort-content'),
-      key: 'serial-abort'
+      title: txt('notify.embedded-abort-title'),
+      content: txt('notify.embedded-abort-content'),
+      key: 'embedded-abort'
     })
   }
 
@@ -63,16 +71,14 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
 
   useEffect(() => {
     window.api.onSerialAbort(() => {
-      // 选项置为未开启，串口置为空
-      dispatch(enableComSlice.actions.setEnableCom(false))
-      dispatch(comSlice.actions.setCom(''))
-      comAbortedNotify()
+      // 选项置为未开启，置为空
+      dispatch(enableEmbeddedSlice.actions.setEnableEmbedded(false))
+      dispatch(embeddedSlice.actions.setEmbedded(''))
+      embeddedAbortedNotify()
       // 跳转到当前页面
       dispatch(menuSlice.actions.setMenu('devices'))
     })
-    ipc.listSerialPorts().then((ports) => {
-      setPorts(ports)
-    })
+    ipc.listEmbeddeds().then(setEmbeddeds)
     // 连接 MIDI 设备
     connectDeviceById(selectedDeviceId)
     return (): void => {
@@ -105,23 +111,27 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
         }
       />
       <EmSelect
-        label={txt('devices.serial-port-label')}
-        description={txt('devices.serial-port-desc')}
-        options={ports.map((port) => ({
-          val: port.path,
-          label: port.friendlyName || port.path
+        label={txt('devices.embedded-label')}
+        description={txt('devices.embedded-desc')}
+        options={embeddeds.map((device) => ({
+          val: device,
+          // path 过长，hash 处理为 8 位长度用于展示
+          label: txt('devices.embedded-option-prefix') + simpleHash(device, 8)
         }))}
         onChange={(value) => {
-          dispatch(comSlice.actions.setCom(value))
+          // 切换设备，需要关闭当前设备
+          if (value !== nowEmbedded) {
+            ipc.closeLed()
+            dispatch(enableEmbeddedSlice.actions.setEnableEmbedded(false))
+            dispatch(embeddedSlice.actions.setEmbedded(value))
+          }
         }}
-        initValue={nowCom}
+        initValue={nowEmbedded}
         suffixBtn={
           <button
             className="bg-white/5 text-white/50 text-lg rounded-lg px-3 py-1.5 flex items-center justify-center h-9 ref-btn"
             onClick={() => {
-              ipc.listSerialPorts().then((ports) => {
-                setPorts(ports)
-              })
+              ipc.listEmbeddeds().then(setEmbeddeds)
             }}
           >
             <ArrowPathIcon className="group pointer-events-none size-4 fill-white/60 animate__animated" />
@@ -129,36 +139,18 @@ export const Devices = ({ hidden }: { hidden: boolean }): JSX.Element => {
         }
       />
       <EmSwitch
-        label={txt('devices.serial-enable-label')}
-        description={txt('devices.serial-enable-desc')}
-        initValue={enableCom}
+        label={txt('devices.embedded-enable-label')}
+        description={txt('devices.embedded-enable-desc')}
+        initValue={enableEmbedded}
         onChange={async (value) => {
-          // 强制获取最新端口列表
-          const latestPorts = await ipc.listSerialPorts()
-          setPorts(latestPorts)
-
-          // 检查串口是否有效
-          const isValidPort = latestPorts.some((p) => p.path === nowCom)
-
-          if (!isValidPort) {
-            notify({
-              type: 'error',
-              title: txt('notify.serial-unselected-title'),
-              content: txt('notify.serial-unselected-content'),
-              key: 'serial-unselected'
-            })
-            // 尝试启用的串口无效，阻止状态变化
-            dispatch(comSlice.actions.setCom(''))
-            return true
-          }
-          console.log('enableCom', value, nowCom)
+          console.log('USB: ', nowEmbedded, value)
           // 通知主进程操作串口
-          if (value) {
+          if (value && nowEmbedded) {
             ipc.initLed()
           } else {
             ipc.closeLed()
           }
-          dispatch(enableComSlice.actions.setEnableCom(value))
+          dispatch(enableEmbeddedSlice.actions.setEnableEmbedded(value))
           return false
         }}
       />

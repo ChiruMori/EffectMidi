@@ -1,14 +1,15 @@
 #ifndef LED_CONTROLLER_H
 #define LED_CONTROLLER_H
 #define KEY_NUM 88
-#define DIGITAL_PIN 7
 #define DEBUG_MODE 1
 #define PREVIEW_TIME 5000
 //（60fps，16ms）
 #define REFRESH_INTERVAL 16
 #define LED_COUNTER_MAX 60
 
+#include <SPI.h>
 #include <FastLED.h>
+#include "PinDefine.hpp"
 
 class LEDController
 {

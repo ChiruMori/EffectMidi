@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import type { RegisteredEvent } from './index.d'
+import type { RegisteredEvent, ServerNotifyType } from './index.d'
 
 // 暴露给渲染进程的自定义 API，由渲染进程执行
 // IPC 通信，主进程通知渲染进程执行操作
@@ -25,6 +25,10 @@ const api = {
   onSerialAbort: (callback: () => void): void => {
     ipcRenderer.removeAllListeners('serial-abort')
     ipcRenderer.on('serial-abort', callback)
+  },
+  onServerNotify: (callback: (type: ServerNotifyType) => void): void => {
+    ipcRenderer.removeAllListeners('inform')
+    ipcRenderer.on('server-notify', (_, type) => callback(type))
   }
 }
 

@@ -92,7 +92,7 @@ void SerialCommandHolder::processByte(const int byte, const bool noData, OledCon
     }
     command->execute(args);
     state = STATE_INIT;
-    Serial.write(SUCCESS_RESP_BYTE);
+    Serial.write(static_cast<uint8_t> (SUCCESS_RESP_BYTE));
     delete[] args;
     return;
   }
@@ -116,6 +116,6 @@ void SerialCommandHolder::processByte(const int byte, const bool noData, OledCon
     currentCommand->execute(argsBuffer);
     oled.displayData(currentCommand->getNameByte(), argsBuffer, state);
     state = STATE_INIT;
-    Serial.write(SUCCESS_RESP_BYTE);
+    Serial.write(static_cast<uint8_t> (SUCCESS_RESP_BYTE));
   }
 }

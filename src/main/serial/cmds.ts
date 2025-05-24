@@ -43,6 +43,5 @@ export default {
   setEndLightsColor: (colorHex: string): number[] => [
     CMD_BYTE_SET_END_LIGHTS_COLOR,
     ...parseColor(colorHex)
-  ],
-  combined: (bytes: number[]) => bytes
+  ]
 } as Record<string, CmdParser>

@@ -5,6 +5,7 @@ import icon from '../../resources/EffectMidi_1024.png?asset'
 import storage from './storage'
 import ipc from './ipcServer'
 import { closeSerial, initSerial } from './serial/serial'
+import { initUsb } from './serial/usb'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -60,6 +61,7 @@ app.whenReady().then(() => {
     ipc(mainWindow!)
     // 初始化串口工具
     initSerial(mainWindow!)
+    initUsb(mainWindow!)
   })
 
   app.on('activate', function () {

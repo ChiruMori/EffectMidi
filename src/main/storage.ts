@@ -85,16 +85,31 @@ export default {
   },
   // 主进程读取数据
   main: {
-    getCom: async (): Promise<string> => {
-      const com = (await getparsedJson('com')).com
-      if (com.startsWith('"') && com.endsWith('"')) {
-        return com.substring(1, com.length - 1)
+    getEmbedded: async (): Promise<string> => {
+      const embPath = (await getparsedJson('embedded')).embedded
+      try {
+        // 解析转义后的字符串
+        return JSON.parse(embPath)
+      } catch (error) {
+        // 解析失败则直接返回原始值
+        console.log('Parse embedded failed:', error)
+        return embPath
       }
-      return com
     },
     getLedConfig: async (key: string): Promise<string> => {
       const ledConfig = await getparsedJson('led')
-      return ledConfig[key]
+      const val = ledConfig[key]
+      if (!val) {
+        return ''
+      }
+      try {
+        // 解析转义后的字符串
+        return JSON.parse(val)
+      } catch (error) {
+        // 解析失败则直接返回原始值
+        console.log('Parse led config failed:', error)
+        return val
+      }
     }
   }
 }

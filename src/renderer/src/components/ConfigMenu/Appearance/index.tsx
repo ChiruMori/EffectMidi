@@ -103,7 +103,7 @@ export default function Appearance({ hidden }: { hidden: boolean }): JSX.Element
         />
         <EmRangeSlider
           min={5}
-          max={40}
+          max={65}
           fromColor={C(nowColorType)?.main}
           toColor={C(nowColorType)?.sub}
           label={txt('appearance.particle.waterfall-speed-label')}

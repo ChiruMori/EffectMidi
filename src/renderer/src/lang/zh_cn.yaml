@@ -27,10 +27,11 @@ appearance:
     waterfall-speed-label: 音符瀑布速度
     waterfall-speed-desc: 音符瀑布速度的参考值，实际速度还与帧率有关
 devices:
-  serial-port-label: 串口
-  serial-port-desc: 选择串口
-  serial-enable-label: 激活串口
-  serial-enable-desc: 选择串口后必须激活才能使用，否则无法进行灯光效果设置
+  embedded-label: 嵌入式设备
+  embedded-desc: 选择要激活的嵌入式设备，如果您的设备受支持，它将出现在列表中
+  embedded-enable-label: 激活设备
+  embedded-enable-desc: 选择设备后必须激活才能使用，否则无法进行灯光效果设置
+  embedded-option-prefix: EffectMidi 设备 @
   midi-device-label: MIDI设备
   midi-device-desc: 选择MIDI输入设备
   unknown-midi-device: 未知MIDI设备
@@ -53,13 +54,17 @@ about:
   stat-score: 弹奏的音符数
   stat-paddle: 踏板踩下次数
 notify:
-  serial-disable-title: 串口未激活
-  serial-disable-content: 你需要先激活串口才能使用灯光效果设置
-  serial-unselected-title: 未选择串口
-  serial-unselected-content: 无法激活串口，必须先选择要激活的串口
-  serial-abort-title: 串口断开
-  serial-abort-content: 串口连接已断开，请重新选择并激活串口
+  embedded-disable-title: 设备未激活
+  embedded-disable-content: 你需要先激活嵌入式设备，才能使用灯光效果设置
+  embedded-unselected-title: 未选择设备
+  embedded-unselected-content: 无法激活嵌入式设备，必须先选择要激活的设备
+  embedded-abort-title: 设备断开
+  embedded-abort-content: 嵌入式设备连接已断开，请重新选择并激活
   midi-connect-error-title: MIDI连接错误
   midi-connect-error-content: MIDI设备连接错误，请检查设备后重启应用
   midi-disconnect-title: MIDI断开
   midi-disconnect-content: MIDI设备连接已断开，请重新选择MIDI输入设备
+  multiple-usb-title: 多个设备
+  multiple-usb-content: 检测到多个USB设备，默认使用第一个设备，如果不是您的设备，请断开其他设备后重试
+  no-usb-title: 无设备
+  no-usb-content: 未检测到匹配的USB设备，请检查设备后重试

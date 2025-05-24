@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PortInfo } from './common.d'
 
 const server = window.electron.ipcRenderer
 
@@ -7,9 +6,9 @@ const server = window.electron.ipcRenderer
 export default {
   // IPC Test
   ping: (): void => server.send('ping'),
-  // List all serial ports
-  listSerialPorts: async (): Promise<PortInfo[]> => {
-    return await server.invoke('listSerialPorts')
+  // List all listEmbedded devices
+  listEmbeddeds: async (): Promise<string[]> => {
+    return await server.invoke('listEmbeddeds')
   },
   // Enable serial port
   initLed: (): void => {

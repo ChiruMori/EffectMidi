@@ -43,31 +43,31 @@ export const bgImgSlice = createSlice({
   }
 })
 
-export const comSlice = createSlice({
-  name: 'com',
+export const embeddedSlice = createSlice({
+  name: 'embedded',
   initialState: {
-    com: ''
+    embedded: ''
   },
   reducers: {
-    setCom: (state, action) => {
+    setEmbedded: (state, action) => {
       return {
         ...state,
-        com: action.payload
+        embedded: action.payload
       }
     }
   }
 })
 
-export const enableComSlice = createSlice({
-  name: 'enableCom',
+export const enableEmbeddedSlice = createSlice({
+  name: 'enableEmbedded',
   initialState: {
-    enableCom: false
+    enableEmbedded: false
   },
   reducers: {
-    setEnableCom: (state, action) => {
+    setEnableEmbedded: (state, action) => {
       return {
         ...state,
-        enableCom: action.payload
+        enableEmbedded: action.payload
       }
     }
   }
@@ -94,7 +94,7 @@ export const particleSlice = createSlice({
     enableFirefiles: true,
     enableClickGranule: true,
     enableWaterfall: true,
-    waterfallSpeed: 20,
+    waterfallSpeed: 20
   },
   reducers: {
     setFirefiles: (state, action) => {
@@ -117,7 +117,7 @@ export const particleSlice = createSlice({
     },
     setWaterfallSpeed: (state, action) => {
       return {
-       ...state,
+        ...state,
         waterfallSpeed: action.payload
       }
     }
@@ -212,21 +212,21 @@ export const statisticsSlice = createSlice({
         statistics: action.payload
       }
     },
-    incrScore: (state) => {
+    incrScore: (state, action) => {
       return {
         ...state,
         statistics: {
           ...state.statistics,
-          score: state.statistics.score + 1
+          score: state.statistics.score + (action.payload ?? 1)
         }
       }
     },
-    incrPaddle: (state) => {
+    incrPaddle: (state, action) => {
       return {
         ...state,
         statistics: {
           ...state.statistics,
-          paddle: state.statistics.paddle + 1
+          paddle: state.statistics.paddle + (action.payload ?? 1)
         }
       }
     }
@@ -245,13 +245,19 @@ export const bgImgSelector = (
     }
   )
 }
-export const comSelector = (state: RootState): string => state.com?.com || ''
-export const enableComSelector = (state: RootState): boolean => state.enableCom?.enableCom || false
+export const embeddedSelector = (state: RootState): string => state.embedded?.embedded || ''
+export const enableEmbeddedSelector = (state: RootState): boolean =>
+  state.enableEmbedded?.enableEmbedded || false
 export const themeSelector = (state: RootState): ThemeTypeEnum =>
   state.theme?.theme || ThemeTypeEnum.SKY
 export const particleSelector = (
   state: RootState
-): { enableFirefiles: boolean; enableClickGranule: boolean; enableWaterfall: boolean, waterfallSpeed: number } => {
+): {
+  enableFirefiles: boolean
+  enableClickGranule: boolean
+  enableWaterfall: boolean
+  waterfallSpeed: number
+} => {
   return (
     state.particle || {
       enableFirefiles: true,

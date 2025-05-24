@@ -2,7 +2,9 @@
 #define OLED_CONTROLLER_H
 
 #include <Arduino.h>
+#include "PinDefine.hpp"
 
+// 使用以下宏定义启用 OLED 显示功能（仅用于调试）
 // #define USE_OLED
 
 #ifdef USE_OLED

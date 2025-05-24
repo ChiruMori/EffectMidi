@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react'
 import NotificationList from './container'
+import { ServerNotifyType } from '@root/src/preload/index.d'
+import lang from '@renderer/lang'
 
 const COUNTER_DELAY = 20
 export const EXIT_ANIMATION_DURATION = 500
@@ -8,6 +10,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<NotificationParams[]>([])
+  const txt = lang()
   // 鼠标悬停时，所在的通知暂停计时
   const handleHover = (key: string, isHover: boolean): void => {
     setNotifications((prev) =>
@@ -53,6 +56,24 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       })
     )
   }
+
+  // 监听服务端发送的通知
+  useEffect(() => {
+    window.api.onServerNotify((type: ServerNotifyType) => {
+      switch (type) {
+        case 'no-usb':
+          notify({
+            type: 'error',
+            title: txt('notify.no-usb-title'),
+            content: txt('notify.no-usb-content'),
+            key: 'no-usb'
+          })
+          break
+        default:
+          break
+      }
+    })
+  }, [])
 
   // 定时器，自动扫描并关闭通知（20ms一次，30fps）
   useEffect(() => {

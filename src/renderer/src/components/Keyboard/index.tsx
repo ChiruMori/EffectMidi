@@ -31,6 +31,37 @@ export default function Keyboard(): JSX.Element {
     nextScore = nextScore.nextHalfTone()
   }
 
+  // 每秒最多更新一次统计信息
+  let statisticsTimer: NodeJS.Timeout | null = null
+  let padelIncr = 0
+  let keyIncr = 0
+  let updatePadel = false
+
+  const updateStatistics = (padel = false): void => {
+    if (padel) {
+      padelIncr += 1
+    } else {
+      keyIncr += 1
+    }
+    if (statisticsTimer === null) {
+      statisticsTimer = setTimeout(() => {
+        if (updatePadel && padelIncr > 0) {
+          dispatch(statisticsSlice.actions.incrPaddle(padelIncr))
+          padelIncr = 0
+          updatePadel = false
+          statisticsTimer = null
+          return
+        }
+        if (keyIncr > 0) {
+          dispatch(statisticsSlice.actions.incrScore(keyIncr))
+          keyIncr = 0
+          updatePadel = true
+          statisticsTimer = null
+        }
+      }, 1000)
+    }
+  }
+
   // 处理键盘事件，使用useCallback稳定事件处理器
   const handleKeyDown = useCallback((index: number): void => {
     const targetScore = Score.fromMidi(index)
@@ -44,7 +75,7 @@ export default function Keyboard(): JSX.Element {
     })
     const [beginPerct, endPerct] = targetScore.getPerct(1 / whiteKeyCnt, (1 / whiteKeyCnt) * 0.6)
     waterfallRef.current?.rectBegin(key, beginPerct, endPerct)
-    dispatch(statisticsSlice.actions.incrScore())
+    updateStatistics()
   }, [])
 
   const handleKeyUp = useCallback((index: number): void => {
@@ -68,7 +99,7 @@ export default function Keyboard(): JSX.Element {
       keyUp: handleKeyUp,
       paddleToggle: (down) => {
         if (down) {
-          dispatch(statisticsSlice.actions.incrPaddle())
+          updateStatistics(true)
         }
         waterfallRef.current?.setPadel(down)
       }
@@ -77,6 +108,7 @@ export default function Keyboard(): JSX.Element {
       window.api.offEvent('midi-keydown')
       window.api.offEvent('midi-keyup')
       midi.disconnectDevice()
+      statisticsTimer && clearTimeout(statisticsTimer)
     }
   }, [handleKeyDown, handleKeyUp])
 
