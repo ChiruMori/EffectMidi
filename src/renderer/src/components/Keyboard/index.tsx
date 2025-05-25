@@ -108,7 +108,9 @@ export default function Keyboard(): JSX.Element {
       window.api.offEvent('midi-keydown')
       window.api.offEvent('midi-keyup')
       midi.disconnectDevice()
-      statisticsTimer && clearTimeout(statisticsTimer)
+      if (statisticsTimer) {
+        clearTimeout(statisticsTimer)
+      }
     }
   }, [handleKeyDown, handleKeyUp])
 

@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const themeConfig = require('./theme.json')
+import themeConfig from './theme.json'
 
 module.exports = {
   content: ['./src/renderer/**/*.html', './src/renderer/**/*.{ts,tsx}'],

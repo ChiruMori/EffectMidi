@@ -6,14 +6,14 @@ import { debounce } from 'lodash'
 import { EmFormProps } from '../types'
 import './index.styl'
 
-interface EmColorPickerProps extends EmFormProps<string> {}
+// interface EmColorPickerProps extends EmFormProps<string> {}
 
 export default function EmColorPicker({
   label,
   description,
   onChange = (): void => {},
   initValue = '#000000'
-}: EmColorPickerProps): JSX.Element {
+}: EmFormProps<string>): JSX.Element {
   const [color, setColor] = useState(initValue)
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [enableFadeOut, setEnableFadeOut] = useState(false)

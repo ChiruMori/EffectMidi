@@ -60,7 +60,9 @@ const EmInput: React.FC<EmInputProps> = ({
                     className="top-2.5 right-2.5 size-4 fill-white/60 img-picker-icon animate__animated"
                     onClick={(e) => {
                       setFilename('')
-                      onChange && onChange({ path: '' })
+                      if (onChange) {
+                        onChange({ path: '' })
+                      }
                       e.preventDefault()
                     }}
                   />
@@ -87,11 +89,12 @@ const EmInput: React.FC<EmInputProps> = ({
                   setFilename(FILE_PATH_PREFIX + filepath)
                   const reader = new FileReader()
                   reader.onload = (e: ProgressEvent<FileReader>): void => {
-                    onChange &&
+                    if (onChange) {
                       onChange({
                         path: FILE_PATH_PREFIX + filepath,
                         dataUrl: e.target?.result as string
                       })
+                    }
                   }
                   // 读取文件为 Data URL
                   reader.readAsDataURL(e.target.files?.[0] as Blob)
