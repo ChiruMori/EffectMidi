@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { logger } from '../logger'
+
 const CMD_BYTE_WAITING = 0x00
 const CMD_BYTE_SET_FOREGROUND_COLOR = 0x01
 const CMD_BYTE_SET_BACKGROUND_COLOR = 0x02
@@ -14,7 +16,7 @@ function parseColor(colorHex: string): number[] {
   const g = parseInt(colorHex.substring(3, 5), 16)
   const b = parseInt(colorHex.substring(5, 7), 16)
   if (isNaN(r) || isNaN(g) || isNaN(b)) {
-    console.error('Invalid color:', colorHex)
+    logger.error('Invalid color:' + colorHex)
     return [0, 0, 0]
   }
   return [r, g, b]

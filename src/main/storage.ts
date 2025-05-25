@@ -2,10 +2,27 @@
 import { app } from 'electron'
 import SQLite from 'sqlite3'
 import path from 'path'
+import { logger } from './logger'
+import { existsSync, mkdirSync } from 'fs'
 
-// DB 文件存储在当前目录下，名为 effect-midi.db
-const dbPath = process.env.NODE_ENV === 'development' ? app.getAppPath() : process.cwd()
-const db = new SQLite.Database(path.resolve(dbPath, 'effect-midi.db'))
+// 生产环境运行时，从用户目录：~/.effect-midi 中查找
+const dbPath =
+  process.env.NODE_ENV === 'development'
+    ? app.getAppPath()
+    : path.join(app.getPath('home'), '.effect-midi')
+if (!existsSync(dbPath)) {
+  mkdirSync(dbPath, { recursive: true })
+}
+const db = new SQLite.Database(
+  path.resolve(dbPath, 'effect-midi.db'),
+  // 读写模式，不存在则创建
+  SQLite.OPEN_READWRITE | SQLite.OPEN_CREATE,
+  (err) => {
+    if (err) {
+      logger.error('Database connection error:' + err.message)
+    }
+  }
+)
 
 const getparsedJson = async (key: string): Promise<any> => {
   const raw = await innerGet(getInnerKey(key))
@@ -17,7 +34,7 @@ const innerGet = (key: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     db.get('SELECT value FROM state WHERE key = ?', key, (err, row) => {
       if (err) {
-        console.error(err.message)
+        logger.error(err.message)
         reject(err)
       } else {
         resolve(row ? (row as any).value : null)
@@ -31,7 +48,7 @@ const innerSet = (key: string, value: any): Promise<void> => {
   return new Promise((resolve, reject) => {
     db.run('INSERT OR REPLACE INTO state (key, value) VALUES (?, ?)', key, value, (err) => {
       if (err) {
-        console.error(err.message)
+        logger.error(err.message)
         reject(err)
       } else {
         resolve()
@@ -48,10 +65,10 @@ export default {
     return new Promise((resolve, reject) => {
       db.run('CREATE TABLE IF NOT EXISTS state (key TEXT PRIMARY KEY, value TEXT)', (err) => {
         if (err) {
-          console.error(err.message)
+          logger.error(err.message)
           reject(err)
         } else {
-          console.log('Opened the database connection.')
+          logger.info('Opened the database connection.')
           resolve()
         }
       })
@@ -66,7 +83,7 @@ export default {
     return new Promise((resolve, reject) => {
       db.run('DELETE FROM state WHERE key = ?', key, (err) => {
         if (err) {
-          console.error(err.message)
+          logger.error(err.message)
           reject(err)
         } else {
           resolve()
@@ -78,9 +95,9 @@ export default {
   close: (): void => {
     db.close((err) => {
       if (err) {
-        console.error(err.message)
+        logger.error(err.message)
       }
-      console.log('Closed the database connection.')
+      logger.info('Closed the database connection.')
     })
   },
   // 主进程读取数据
@@ -92,7 +109,7 @@ export default {
         return JSON.parse(embPath)
       } catch (error) {
         // 解析失败则直接返回原始值
-        console.log('Parse embedded failed:', error)
+        logger.info('Parse embedded failed:' + error)
         return embPath
       }
     },
@@ -107,7 +124,7 @@ export default {
         return JSON.parse(val)
       } catch (error) {
         // 解析失败则直接返回原始值
-        console.log('Parse led config failed:', error)
+        logger.info('Parse led config failed:' + error)
         return val
       }
     }

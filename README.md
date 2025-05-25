@@ -20,7 +20,9 @@
 
 ![主界面](./doc/main.jpg)
 
-所有配置均会保存在程序目录下的 `effect-midi.db` 数据库文件中，在传递本程序时，可以带上这个文件以保留配置。
+所有配置均会保存到用户 `home` 目录的 `.effect-midi` 目录下，比如一个最常见的路径为 `C:/Users/Administrator/.effect-midi`，或者将其中的 `Administrator` 替换为你的用户名。
+
+而 `effect-midi.db` 数据库文件会保存在其中，便携版、安装版均从中读取配置，它是一个明文的 SQLite 数据库文件，你可以使用任何数据库管理工具打开它，查看其中的配置。
 
 ![配置界面](./doc/effect.jpg)
 

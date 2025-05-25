@@ -3,12 +3,13 @@ import storage from './storage'
 import cmds from './serial/cmds'
 import { shell } from 'electron'
 import { sendUsbHidCmd, closeUsb, listUsb } from './serial/usb'
+import { logger } from './logger'
 
 // IPC 通信，渲染进程通知主进程执行操作
 export default function ipc(mainWindow: BrowserWindow): void {
   // IPC test
   ipcMain.on('ping', () => {
-    console.log('pong')
+    logger.info('pong')
     // 回复渲染进程
     mainWindow.webContents.send('ping')
   })
@@ -37,7 +38,7 @@ export default function ipc(mainWindow: BrowserWindow): void {
       await sendUsbHidCmd(cmds.setDiffusionWidth, diffusionWidth)
     } catch (err) {
       mainWindow.webContents.send('serial-abort')
-      console.error('Init LED failed:', err)
+      logger.error('Init LED failed:' + err)
     }
   })
   // 关闭 LED
@@ -84,7 +85,7 @@ export default function ipc(mainWindow: BrowserWindow): void {
   })
   // 浏览器打开
   ipcMain.on('openBrowser', async (_, url) => {
-    console.log('openBrowser:', url)
+    logger.info('openBrowser:' + url)
     shell.openExternal(url)
   })
 }

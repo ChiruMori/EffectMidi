@@ -1,20 +1,26 @@
 appId: plus.mori.effect-midi
-productName: effect-midi
+productName: EffectMidi
 directories:
   buildResources: build
 files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.eslintignore,eslint.config.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,effect-midi.db,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!**/doc/*'
 asarUnpack:
   - resources/**
 win:
   executableName: effect-midi
   icon: resources/EffectMidi_1024.png
-
+  # 打包为便携模式
+  target:
+    - target: portable
+      arch: x64
+    - target: nsis
+      arch: x64
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

@@ -4,8 +4,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/EffectMidi_1024.png?asset'
 import storage from './storage'
 import ipc from './ipcServer'
-import { closeSerial, initSerial } from './serial/serial'
-import { initUsb } from './serial/usb'
+import { closeUsb, initUsb } from './serial/usb'
+import { version } from '../../package.json'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -24,6 +24,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
+    mainWindow!.setTitle(`EffectMidi ${version}`)
     mainWindow!.show()
   })
 
@@ -38,6 +39,9 @@ function createWindow(): void {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    // 资源路径
+    app.commandLine.appendSwitch('disable-http-cache')
+    app.commandLine.appendSwitch('ignore-certificate-errors')
   }
 }
 
@@ -59,8 +63,7 @@ app.whenReady().then(() => {
 
     // 初始化 IPC
     ipc(mainWindow!)
-    // 初始化串口工具
-    initSerial(mainWindow!)
+    // 初始化USB工具
     initUsb(mainWindow!)
   })
 
@@ -76,7 +79,7 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     storage.close()
-    closeSerial()
+    closeUsb()
     app.quit()
   }
 })

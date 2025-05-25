@@ -1,6 +1,7 @@
 import hid from 'node-hid'
 import { CmdParser } from './cmds'
 import storage from '../storage'
+import { logger } from '../logger'
 
 const VENDOR_ID = 0x1209
 const PRODUCT_ID = 0x0666
@@ -28,7 +29,7 @@ const connectUsb = async (): Promise<void> => {
     return
   }
   const devices = hid.devices(VENDOR_ID, PRODUCT_ID)
-  // console.log('Devices:', devices)
+  // logger.info('Devices:', devices)
   if (devices.length === 0) {
     win?.webContents.send('no-usb')
     return
@@ -39,12 +40,12 @@ const connectUsb = async (): Promise<void> => {
     return
   }
   device = await hid.HIDAsync.open(usingPath).catch(() => {
-    console.log('HID device closed')
+    logger.info('HID device closed')
     win?.webContents.send('serial-abort')
     return null
   })
   device?.on('error', (err) => {
-    console.error('HID device error:', err)
+    logger.error('HID device error:' + err)
     releaseAndNotify()
   })
   pollingTimer = setInterval(() => {
@@ -57,7 +58,7 @@ const connectUsb = async (): Promise<void> => {
     }
     // 设备连接时，需要定时检查设备是否已中断
     if (!hasUsb()) {
-      console.log('Device disconnected')
+      logger.info('Device disconnected')
       releaseAndNotify()
     }
   })
@@ -74,7 +75,7 @@ export const sendUsbHidCmd = async (parser: CmdParser, arg?: any): Promise<void>
     await connectUsb()
   }
   if (!device) {
-    console.log('Device not connected, Ignore data:', parser.name, arg || '')
+    logger.info('Device not connected, Ignore data:' + parser.name + arg || '')
     return
   }
   if (keyboardCmd) {
@@ -85,7 +86,7 @@ export const sendUsbHidCmd = async (parser: CmdParser, arg?: any): Promise<void>
     buffer[0] = KEY_REPORT_ID
     buffer[1] = payload[0]
     await device.write(buffer)
-    // console.log(parser.name, arg || '')
+    // logger.info(parser.name, arg || '')
     return
   }
   // 其他控制指令
@@ -96,7 +97,7 @@ export const sendUsbHidCmd = async (parser: CmdParser, arg?: any): Promise<void>
     buffer[i + 1] = payload[i]
   }
   await device.write(buffer)
-  // console.log(parser.name, arg || '')
+  // logger.info(parser.name, arg || '')
 }
 
 export const closeUsb = (): void => {
@@ -108,7 +109,7 @@ export const closeUsb = (): void => {
       pollingTimer = null
     }
   } else {
-    console.log('Device not connected')
+    logger.info('Device not connected')
   }
 }
 
