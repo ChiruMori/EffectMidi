@@ -8,6 +8,7 @@ import midi from './midi'
 import Waterfall, { WaterfallRef } from './Waterfall'
 import './index.styl'
 import GlowEffect from '../effects/Glow'
+import FluidEffect from '../effects/Fluid'
 
 const whiteKeyCnt = 52
 const startScore = 'A1'
@@ -122,6 +123,7 @@ export default function Keyboard(): JSX.Element {
           <GlowEffect theme={colorType} height={30} />
         </>
       )}
+      <FluidEffect theme={colorType} />
       <div className="absolute w-full h-1/6 bg-white bottom-0 z-40">
         <div className="flex flex-nowrap size-full kb-container">
           {keyboards.map((scoreTuple, idx) => (
