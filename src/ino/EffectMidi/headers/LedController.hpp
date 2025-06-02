@@ -1,13 +1,10 @@
 #ifndef LED_CONTROLLER_H
 #define LED_CONTROLLER_H
 #define KEY_NUM 88
-#define DEBUG_MODE 1
-#define PREVIEW_TIME 5000
 //（60fps，16ms）
-#define REFRESH_INTERVAL 16
+#define LED_REFRESH_INTERVAL 16
 #define LED_COUNTER_MAX 60
 
-#include <SPI.h>
 #include <FastLED.h>
 #include "PinDefine.hpp"
 
@@ -77,7 +74,7 @@ private:
   /**
    * LED灯带的灯珠（颜色）
    */
-  CRGB *leds;
+  CRGB *ledColorArr;
   /**
    * 按键状态
    */

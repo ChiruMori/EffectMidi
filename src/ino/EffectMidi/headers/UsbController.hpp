@@ -2,7 +2,7 @@
 #define USBCONTROLLER_HPP
 
 #include <Adafruit_TinyUSB.h>
-#include "LEDController.hpp"
+#include "LedController.hpp"
 #include "SerialCommandHolder.hpp"
 #include "OledController.hpp"
 // 使用 PID.org 推荐 https://pid.codes/1209/，PID 使用测试区间 0x0000 ~ 0x0FFF

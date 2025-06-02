@@ -1,12 +1,11 @@
 #include "headers/LedController.hpp"
 
-LEDController::LEDController(int numLeds)
+LEDController::LEDController(int numLeds) : numLeds(numLeds)
 {
-  this->numLeds = numLeds;
-  this->leds = new CRGB[numLeds];
+  this->ledColorArr = new CRGB[numLeds];
   for (int i = 0; i < numLeds; ++i)
   {
-    this->leds[i] = CRGB::Black;
+    ledColorArr[i] = CRGB::Black;
   }
   for (int i = 0; i < KEY_NUM; ++i)
   {
@@ -17,21 +16,21 @@ LEDController::LEDController(int numLeds)
   this->residualTime = 0;
   this->foregroundColor = CRGB::White;
   this->backgroundColor = CRGB::Black;
-  this->brightness = 100;
+  this->brightness = 255;
   this->waiting = true;
-  FastLED.addLeds<WS2812, DIGITAL_PIN, GRB>(leds, numLeds);
   this->needRefresh = false;
   this->counter = 0;
 }
 
 LEDController::~LEDController()
 {
-  delete[] leds;
+  delete[] ledColorArr;
 }
 
 void LEDController::setup()
 {
-  FastLED.setBrightness(100);
+  FastLED.addLeds<WS2812, LED_DIGITAL_PIN, GRB>(this->ledColorArr, numLeds);
+  FastLED.setBrightness(this->brightness);
   this->needRefresh = true;
 }
 
@@ -39,12 +38,12 @@ void LEDController::setLedColor(int ledIndex, CRGB color)
 {
   if (ledIndex == -1)
   {
-    leds[0] = color;
-    leds[(KEY_NUM << 1) + 1] = color;
+    ledColorArr[0] = color;
+    ledColorArr[numLeds - 1] = color;
   }
   else if (ledIndex >= 1 && ledIndex < numLeds - 1)
   {
-    leds[ledIndex] = color;
+    ledColorArr[ledIndex] = color;
   }
   this->needRefresh = true;
 }
@@ -144,7 +143,7 @@ void LEDController::stepAndShow()
   this->stepResidual();
   // 展示灯带，需要控制刷新频率
   auto now = millis();
-  if (needRefresh && now - lastRefreshTime > REFRESH_INTERVAL)
+  if (needRefresh && now - lastRefreshTime > LED_REFRESH_INTERVAL)
   {
     FastLED.show();
     needRefresh = false;

@@ -1,6 +1,6 @@
 #include <FastLED.h>
 #include "headers/PinDefine.hpp"
-#include "headers/LEDController.hpp"
+#include "headers/LedController.hpp"
 #include "headers/SerialCommand.hpp"
 #include "headers/SerialCommandHolder.hpp"
 #include "headers/UsbController.hpp"

@@ -6,7 +6,7 @@
 // OLED SCL引脚
 #define OLED_SCL_PIN 5
 // 灯带数据引脚
-#define DIGITAL_PIN 7
+#define LED_DIGITAL_PIN 7
 // 指示正在处理数据的LED引脚（直接使用板载LED）
 #define RUNNING_PIN LED_BUILTIN
 

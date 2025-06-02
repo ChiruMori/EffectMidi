@@ -32,7 +32,7 @@ public:                                                       \
 private:                                                      \
   ClassName(LEDController &ledController) : BaseClass(ledController) {}
 
-#include "LEDController.hpp"
+#include "LedController.hpp"
 
 /**
  * 串口指令基类
