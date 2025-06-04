@@ -38,6 +38,8 @@
 
 [使用本项目制作的视频效果](https://www.bilibili.com/video/BV1D4ZFYqEaF/?share_source=copy_web&vd_source=a5261a3226919a8b0f0b47bb707e4e71)
 
+[也可以使用绿幕图片用于后期剪辑](https://www.bilibili.com/video/BV17ATEzUEAj/?share_source=copy_web&vd_source=a5261a3226919a8b0f0b47bb707e4e71)
+
 ## 使用方法
 
 ### 硬件清单
